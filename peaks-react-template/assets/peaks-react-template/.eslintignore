@@ -1,0 +1,13 @@
+# 构建输出
+dist/
+build/
+
+# 依赖
+node_modules/
+
+# Umi 临时文件
+src/.umi/
+src/.umi-production/
+
+# 其他
+*.min.js

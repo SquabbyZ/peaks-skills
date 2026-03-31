@@ -1,0 +1,25 @@
+{
+  "i18n-ally.localesPaths": ["src/locales"],
+  "i18n-ally.keystyle": "nested",
+  "i18n-ally.sortKeys": true,
+  "i18n-ally.namespace": false,
+  "i18n-ally.sourceLanguage": "zh-CN",
+  "i18n-ally.displayLanguage": "zh-CN",
+  "i18n-ally.enabledParsers": ["json"],
+  "i18n-ally.extract.keygenStrategy": "camelCase",
+  "i18n-ally.extract.outputPath": "src/locales/{{locale}}.json",
+  "i18n-ally.extract.autoDetect": true,
+  "i18n-ally.extract.defaultNamespace": "",
+  "i18n-ally.pathMatcher": "{locale}.json",
+  "i18n-ally.usePathMatcher": true,
+  "i18n-ally.ignoreLocales": [],
+  "i18n-ally.preferredDelimiter": ".",
+  "i18n-ally.enabledFrameworks": ["react"],
+  "i18n-ally.enabledExtensions": ["ts", "tsx"],
+  "i18n-ally.parserOptions": {
+    "json": {
+      "loader": "json"
+    }
+  },
+  "i18n-ally.debug": true
+}

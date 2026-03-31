@@ -1,0 +1,48 @@
+{
+  "name": "peaks-skills",
+  "version": "1.0.0",
+  "description": "AI-driven frontend development skills collection for Trae IDE and AI coding assistants",
+  "type": "module",
+  "bin": {
+    "peaks-skills": "./bin/cli.js"
+  },
+  "files": [
+    "peaks-*/SKILL.md",
+    "peaks-*/skill.yaml",
+    "peaks-*/references/",
+    "peaks-*/scripts/",
+    "peaks-*/assets/",
+    "bin/"
+  ],
+  "scripts": {
+    "test": "echo \"No tests specified\" && exit 0",
+    "prepublishOnly": "echo 'Publishing peaks-skills...' && npm run test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SquabbyZ/peaks-skills.git"
+  },
+  "keywords": [
+    "ai-skills",
+    "trae",
+    "react",
+    "nextjs",
+    "pixso",
+    "frontend",
+    "ai-coding",
+    "mcp",
+    "agent-skills"
+  ],
+  "author": "SquabbyZ",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/SquabbyZ/peaks-skills/issues"
+  },
+  "homepage": "https://github.com/SquabbyZ/peaks-skills#readme",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

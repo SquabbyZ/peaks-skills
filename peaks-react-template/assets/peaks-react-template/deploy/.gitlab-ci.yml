@@ -1,0 +1,53 @@
+stages:
+  - lint
+  - test
+  - build
+  - deploy
+
+# 注意：需要在 GitLab 项目的 Settings > CI/CD > Variables 中设置 API_DOMAIN 变量
+# 例如：API_DOMAIN=http://your-api-server.com
+
+lint:
+  stage: lint
+  image: node:22-alpine
+  script:
+    - npm install -g pnpm
+    - pnpm install
+    - pnpm run lint
+  only:
+    - tags
+
+test:
+  stage: test
+  image: node:22-alpine
+  script:
+    - npm install -g pnpm
+    - pnpm install
+    - pnpm run test
+  only:
+    - tags
+
+build:
+  stage: build
+  image: node:22-alpine
+  script:
+    - npm install -g pnpm
+    - pnpm install
+    - pnpm run build
+  artifacts:
+    paths:
+      - dist
+  only:
+    - tags
+
+deploy:
+  stage: deploy
+  image: docker:20.10.16
+  services:
+    - docker:20.10.16-dind
+  script:
+    - docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG .
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG
+  only:
+    - tags

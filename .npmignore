@@ -1,0 +1,72 @@
+# Dependencies
+node_modules/
+
+# Development files
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Test files
+coverage/
+.nyc_output/
+
+# Build outputs
+dist/
+build/
+
+# Documentation (optional - include if you want docs in npm package)
+# *.md
+# Except README which is included by default
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# CI/CD
+.github/
+.travis.yml
+.circleci/
+.gitlab-ci.yml
+
+# Docker
+Dockerfile
+docker-compose.yml
+
+# Misc
+*.tgz
+*.tar.gz
+.cache/
+temp/
+tmp/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Test and demo projects
+test/
+example/
+examples/
+demo/
+demos/
+
+# Configuration files not needed for runtime
+.eslintrc*
+.prettierrc*
+.editorconfig
+lint-staged.config.*

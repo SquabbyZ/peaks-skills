@@ -1,0 +1,148 @@
+# Peaks Skills Collection
+# This file is for vercel-labs/skills compatibility
+
+name: peaks-skills
+version: 1.0.0
+description: AI-driven frontend development skills for React, Next.js, Pixso design sync, forms, and API generation
+
+author:
+  name: SquabbyZ
+  url: https://github.com/SquabbyZ
+
+repository:
+  type: git
+  url: https://github.com/SquabbyZ/peaks-skills.git
+
+license: MIT
+
+skills:
+  - name: peaks-react-template
+    description: Generate complete React/Next.js project templates with pre-configured tooling
+    category: Project Scaffolding
+    tags:
+      - react
+      - nextjs
+      - template
+      - scaffold
+      - typescript
+      - tailwindcss
+    
+  - name: peaks-pixso-code-sync
+    description: Bidirectional sync between Pixso design files and React code
+    category: Design Tools
+    tags:
+      - pixso
+      - design
+      - sync
+      - code-generation
+      - ui
+    
+  - name: peaks-hook-form
+    description: Generate React Hook Form + Ant Design forms with Zod validation
+    category: Code Generation
+    tags:
+      - forms
+      - react-hook-form
+      - ant-design
+      - zod
+      - validation
+    
+  - name: peaks-api-create
+    description: Auto-generate React Query hooks from Swagger/OpenAPI specifications
+    category: API Tools
+    tags:
+      - api
+      - swagger
+      - openapi
+      - react-query
+      - hooks
+
+installation:
+  # Method 1: Using npx skills (vercel-labs/skills)
+  - method: npx_skills
+    command: npx skills add your-username/peaks-skills
+    description: Install via vercel-labs/skills CLI
+    
+  # Method 2: Using peaks-skills CLI
+  - method: npx_peaks_skills
+    command: npx peaks-skills install peaks-react-template
+    description: Install via peaks-skills native CLI
+    
+  # Method 3: Manual installation
+  - method: manual
+    steps:
+      - Clone or download the repository
+      - Copy desired skill directory to .trae/skills/ in your project
+    description: Manual installation by copying files
+
+requirements:
+  ide:
+    - Trae IDE (recommended)
+    - VS Code (with Trae extension)
+    - JetBrains IDEs (with Trae plugin)
+  
+  runtime:
+    - Node.js >= 16.0.0
+    - npm >= 7.0.0 or pnpm >= 7.0.0
+
+  dependencies:
+    - react: ^18.0.0
+    - typescript: ^5.0.0
+    - tailwindcss: ^3.0.0
+    - antd: ^5.0.0
+
+compatibility:
+  # Supported AI coding platforms
+  platforms:
+    - trae
+    - cursor
+    - claude-code
+    - windsurf
+    - cline
+    
+  # Supported frameworks
+  frameworks:
+    - react
+    - nextjs
+    - umijs
+    
+  # Supported languages
+  languages:
+    - typescript
+    - javascript
+
+examples:
+  - title: Create a new React project
+    skill: peaks-react-template
+    command: npx peaks-skills install peaks-react-template
+    description: Scaffold a complete React project with best practices
+    
+  - title: Generate a form
+    skill: peaks-hook-form
+    prompt: "Generate a form with username, email, and password fields"
+    description: Quickly create forms with validation
+    
+  - title: Sync design to code
+    skill: peaks-pixso-code-sync
+    prompt: "Sync this Pixso design to code"
+    description: Convert Pixso designs to React components
+    
+  - title: Generate API hooks
+    skill: peaks-api-create
+    prompt: "Generate API hooks from https://api.example.com/openapi.json"
+    description: Create type-safe API hooks from Swagger
+
+support:
+  issues: https://github.com/your-username/peaks-skills/issues
+  documentation: https://github.com/your-username/peaks-skills#readme
+  discord: null
+  twitter: null
+
+changelog:
+  - version: 1.0.0
+    date: 2026-03-31
+    changes:
+      - Initial release
+      - 4 core skills included
+      - CLI tool for easy installation
+      - Support for vercel-labs/skills integration

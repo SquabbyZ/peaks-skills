@@ -1,0 +1,566 @@
+:root {
+  /* ===================================
+   * Ant Design 5.x 设计令牌
+   * 参考：https://ant-design.antgroup.com/theme-editor
+   * =================================== */
+
+  /* 主色调 (Brand Color) */
+  --color-primary: #1677ff;
+  --color-primary-hover: #4096ff;
+  --color-primary-active: #0958d9;
+  --color-primary-bg: #e6f4ff;
+  --color-primary-bg-hover: #bae0ff;
+  --color-primary-border: #91caff;
+  --color-primary-border-hover: #69b1ff;
+  --color-primary-text: #0050b3;
+  --color-primary-text-active: #003a8c;
+
+  /* 成功色 (Success Color) */
+  --color-success: #52c41a;
+  --color-success-hover: #73d13d;
+  --color-success-active: #389e0d;
+  --color-success-bg: #f6ffed;
+  --color-success-bg-hover: #f9f0d9;
+  --color-success-border: #b7eb8f;
+  --color-success-border-hover: #95de64;
+  --color-success-text: #389e0d;
+  --color-success-text-active: #237804;
+
+  /* 警告色 (Warning Color) */
+  --color-warning: #faad14;
+  --color-warning-hover: #ffc53d;
+  --color-warning-active: #d48806;
+  --color-warning-bg: #fffbe6;
+  --color-warning-bg-hover: #fff1b8;
+  --color-warning-border: #ffe58f;
+  --color-warning-border-hover: #ffd666;
+  --color-warning-text: #d48806;
+  --color-warning-text-active: #ad6800;
+
+  /* 错误色 (Error Color) */
+  --color-error: #ff4d4f;
+  --color-error-hover: #ff7875;
+  --color-error-active: #d9363e;
+  --color-error-bg: #fff2f0;
+  --color-error-bg-hover: #fff1f0;
+  --color-error-border: #ffccc7;
+  --color-error-border-hover: #ffa39e;
+  --color-error-text: #d9363e;
+  --color-error-text-active: #a8071a;
+
+  /* 信息色 (Info Color) */
+  --color-info: #1677ff;
+  --color-info-hover: #4096ff;
+  --color-info-active: #0958d9;
+  --color-info-bg: #e6f4ff;
+  --color-info-bg-hover: #bae0ff;
+  --color-info-border: #91caff;
+  --color-info-border-hover: #69b1ff;
+  --color-info-text: #0050b3;
+  --color-info-text-active: #003a8c;
+
+  /* ===================================
+   * 中性色 (Neutral Colors)
+   * 基于 colorTextBase (#000) 和 colorBgBase (#fff) 派生
+   * =================================== */
+
+  /* 文本色 (Text Colors) */
+  --color-text-primary: rgba(0, 0, 0, 0.88);
+  --color-text-secondary: rgba(0, 0, 0, 0.65);
+  --color-text-tertiary: rgba(0, 0, 0, 0.45);
+  --color-text-quaternary: rgba(0, 0, 0, 0.25);
+
+  /* 背景色 (Background Colors) */
+  --color-bg-primary: #ffffff;
+  --color-bg-secondary: #f5f5f5;
+  --color-bg-tertiary: #fafafa;
+  --color-bg-quaternary: #f0f0f0;
+  --color-bg-elevated: #ffffff;
+  --color-bg-layout: #f5f5f5;
+  --color-bg-mask: rgba(0, 0, 0, 0.45);
+  --color-bg-spotlight: rgba(0, 0, 0, 0.85);
+
+  /* 填充色 (Fill Colors) */
+  --color-fill: rgba(0, 0, 0, 0.15);
+  --color-fill-secondary: rgba(0, 0, 0, 0.06);
+  --color-fill-tertiary: rgba(0, 0, 0, 0.02);
+  --color-fill-quaternary: rgba(0, 0, 0, 0.01);
+
+  /* 边框色 (Border Colors) */
+  --color-border: #d9d9d9;
+  --color-border-secondary: #f0f0f0;
+  --color-border-bg: #ffffff;
+
+  /* 分割线 (Split Color) */
+  --color-split: rgba(5, 5, 5, 0.06);
+
+  /* ===================================
+   * 字体大小 (Font Sizes)
+   * 基于 fontSize (14px) 派生
+   * =================================== */
+  --font-size-xs: 12px;
+  --font-size-sm: 12px;
+  --font-size-base: 14px;
+  --font-size-lg: 16px;
+  --font-size-xl: 20px;
+  --font-size-2xl: 20px;
+  --font-size-heading-1: 38px;
+  --font-size-heading-2: 30px;
+  --font-size-heading-3: 24px;
+  --font-size-heading-4: 20px;
+  --font-size-heading-5: 16px;
+  --font-size-icon: 12px;
+
+  /* ===================================
+   * 线条 (Line)
+   * =================================== */
+  --line-width: 1px;
+  --line-width-bold: 2px;
+  --line-width-focus: 3px;
+  --line-type: solid;
+  --line-height: 1.5714285714285714;
+  --line-height-sm: 1.6666666666666667;
+  --line-height-lg: 1.5;
+  --line-height-heading-1: 1.2105263157894737;
+  --line-height-heading-2: 1.2666666666666666;
+  --line-height-heading-3: 1.3333333333333333;
+  --line-height-heading-4: 1.4;
+  --line-height-heading-5: 1.5;
+
+  /* ===================================
+   * 尺寸控制 (Control Sizes)
+   * 基于 controlHeight (32px) 派生
+   * =================================== */
+  --control-height-xs: 16px;
+  --control-height-sm: 24px;
+  --control-height: 32px;
+  --control-height-lg: 40px;
+  --control-height-xl: 48px;
+  --control-interactive-size: 16px;
+
+  /* ===================================
+   * 间距 (Spacing)
+   * 基于 sizeUnit (4px) 和 sizeStep (4px) 派生
+   * =================================== */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+  --spacing-control-sm: 8px;
+  --spacing-control: 12px;
+  --spacing-control-lg: 24px;
+  --spacing-content-horizontal: 16px;
+  --spacing-content-horizontal-sm: 16px;
+  --spacing-content-horizontal-lg: 24px;
+  --spacing-content-vertical: 12px;
+  --spacing-content-vertical-sm: 8px;
+  --spacing-content-vertical-lg: 16px;
+
+  /* ===================================
+   * 外边距 (Margin)
+   * =================================== */
+  --margin-xs: 4px;
+  --margin-sm: 8px;
+  --margin: 16px;
+  --margin-md: 20px;
+  --margin-lg: 24px;
+  --margin-xl: 32px;
+  --margin-2xl: 48px;
+
+  /* ===================================
+   * 圆角 (Border Radius)
+   * 基于 borderRadius (6px) 派生
+   * =================================== */
+  --border-radius-xs: 2px;
+  --border-radius-sm: 4px;
+  --border-radius-md: 6px;
+  --border-radius-lg: 8px;
+  --border-radius-xl: 12px;
+  --border-radius-outer: 4px;
+  --border-radius-full: 9999px;
+
+  /* ===================================
+   * 阴影 (Box Shadow)
+   * =================================== */
+  --box-shadow:
+    0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 3px 6px -4px rgba(0, 0, 0, 0.12),
+    0 9px 28px 8px rgba(0, 0, 0, 0.05);
+  --box-shadow-sm:
+    0 1px 2px 0 rgba(0, 0, 0, 0.03), 0 1px 6px -1px rgba(0, 0, 0, 0.02),
+    0 2px 4px 0 rgba(0, 0, 0, 0.02);
+  --box-shadow-md:
+    0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 3px 6px -4px rgba(0, 0, 0, 0.12),
+    0 9px 28px 8px rgba(0, 0, 0, 0.05);
+  --box-shadow-lg:
+    0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 3px 6px -4px rgba(0, 0, 0, 0.12),
+    0 9px 28px 8px rgba(0, 0, 0, 0.05);
+  --box-shadow-secondary:
+    0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 3px 6px -4px rgba(0, 0, 0, 0.12),
+    0 9px 28px 8px rgba(0, 0, 0, 0.05);
+  --box-shadow-tertiary:
+    0 1px 2px 0 rgba(0, 0, 0, 0.03), 0 1px 6px -1px rgba(0, 0, 0, 0.02),
+    0 2px 4px 0 rgba(0, 0, 0, 0.02);
+
+  /* ===================================
+   * 动画 (Motion)
+   * =================================== */
+  --motion: true;
+  --motion-base: 0;
+  --motion-unit: 0.1;
+  --motion-duration-fast: 0.1s;
+  --motion-duration-mid: 0.2s;
+  --motion-duration: 0.3s;
+  --motion-duration-slow: 0.3s;
+  --motion-ease-out: cubic-bezier(0.215, 0.61, 0.355, 1);
+  --motion-ease-in: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+  --motion-ease-in-out: cubic-bezier(0.645, 0.045, 0.355, 1);
+  --motion-ease-in-out-circ: cubic-bezier(0.78, 0.14, 0.15, 0.86);
+  --motion-ease-in-quint: cubic-bezier(0.755, 0.05, 0.855, 0.06);
+  --motion-ease-out-back: cubic-bezier(0.12, 0.4, 0.29, 1.46);
+  --motion-ease-in-back: cubic-bezier(0.71, -0.46, 0.88, 0.6);
+  --motion-ease-out-circ: cubic-bezier(0.08, 0.82, 0.17, 1);
+  --motion-ease-out-quint: cubic-bezier(0.23, 1, 0.32, 1);
+
+  /* ===================================
+   * 尺寸 (Size)
+   * =================================== */
+  --size-unit: 4;
+  --size-step: 4;
+  --size-xs: 4px;
+  --size-sm: 8px;
+  --size: 16px;
+  --size-md: 20px;
+  --size-lg: 24px;
+  --size-xl: 32px;
+  --size-2xl: 48px;
+  --size-popup-arrow: 16px;
+
+  /* ===================================
+   * 字体家族 (Font Family)
+   * =================================== */
+  --font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue',
+    Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    'Segoe UI Symbol', 'Noto Color Emoji';
+  --font-family-code:
+    'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+
+  /* ===================================
+   * 字重 (Font Weight)
+   * =================================== */
+  --font-weight-strong: 600;
+
+  /* ===================================
+   * 不透明度 (Opacity)
+   * =================================== */
+  --opacity-image: 1;
+  --opacity-loading: 0.65;
+
+  /* ===================================
+   * Z 轴层级 (Z-Index)
+   * =================================== */
+  --z-index-base: 0;
+  --z-index-popup-base: 1000;
+
+  /* ===================================
+   * 链接装饰 (Link Decoration)
+   * =================================== */
+  --link-decoration: none;
+  --link-hover-decoration: none;
+  --link-focus-decoration: none;
+
+  /* ===================================
+   * 屏幕尺寸 (Screen Sizes)
+   * =================================== */
+  --screen-xs: 480px;
+  --screen-xs-max: 575px;
+  --screen-xs-min: 480px;
+  --screen-sm: 576px;
+  --screen-sm-max: 767px;
+  --screen-sm-min: 576px;
+  --screen-md: 768px;
+  --screen-md-max: 991px;
+  --screen-md-min: 768px;
+  --screen-lg: 992px;
+  --screen-lg-max: 1199px;
+  --screen-lg-min: 992px;
+  --screen-xl: 1200px;
+  --screen-xl-max: 1599px;
+  --screen-xl-min: 1200px;
+  --screen-xxl: 1600px;
+  --screen-xxl-max: 1919px;
+  --screen-xxl-min: 1600px;
+  --screen-xxxl: 1920px;
+  --screen-xxxl-min: 1920px;
+}
+
+/* ===================================
+ * Ant Design 组件变量映射
+ * 用于与 Ant Design 的 CSS-in-JS 系统对接
+ * =================================== */
+:root {
+  /* 主色调映射 */
+  --ant-color-primary: var(--color-primary);
+  --ant-color-primary-hover: var(--color-primary-hover);
+  --ant-color-primary-active: var(--color-primary-active);
+  --ant-color-primary-bg: var(--color-primary-bg);
+  --ant-color-primary-bg-hover: var(--color-primary-bg-hover);
+  --ant-color-primary-border: var(--color-primary-border);
+  --ant-color-primary-border-hover: var(--color-primary-border-hover);
+  --ant-color-primary-text: var(--color-primary-text);
+  --ant-color-primary-text-active: var(--color-primary-text-active);
+
+  /* 成功色映射 */
+  --ant-color-success: var(--color-success);
+  --ant-color-success-hover: var(--color-success-hover);
+  --ant-color-success-active: var(--color-success-active);
+  --ant-color-success-bg: var(--color-success-bg);
+  --ant-color-success-border: var(--color-success-border);
+  --ant-color-success-border-hover: var(--color-success-border-hover);
+  --ant-color-success-text: var(--color-success-text);
+  --ant-color-success-text-active: var(--color-success-text-active);
+
+  /* 警告色映射 */
+  --ant-color-warning: var(--color-warning);
+  --ant-color-warning-hover: var(--color-warning-hover);
+  --ant-color-warning-active: var(--color-warning-active);
+  --ant-color-warning-bg: var(--color-warning-bg);
+  --ant-color-warning-border: var(--color-warning-border);
+  --ant-color-warning-border-hover: var(--color-warning-border-hover);
+  --ant-color-warning-text: var(--color-warning-text);
+  --ant-color-warning-text-active: var(--color-warning-text-active);
+
+  /* 错误色映射 */
+  --ant-color-error: var(--color-error);
+  --ant-color-error-hover: var(--color-error-hover);
+  --ant-color-error-active: var(--color-error-active);
+  --ant-color-error-bg: var(--color-error-bg);
+  --ant-color-error-border: var(--color-error-border);
+  --ant-color-error-border-hover: var(--color-error-border-hover);
+  --ant-color-error-text: var(--color-error-text);
+  --ant-color-error-text-active: var(--color-error-text-active);
+
+  /* 信息色映射 */
+  --ant-color-info: var(--color-info);
+  --ant-color-info-hover: var(--color-info-hover);
+  --ant-color-info-active: var(--color-info-active);
+  --ant-color-info-bg: var(--color-info-bg);
+  --ant-color-info-border: var(--color-info-border);
+  --ant-color-info-border-hover: var(--color-info-border-hover);
+  --ant-color-info-text: var(--color-info-text);
+  --ant-color-info-text-active: var(--color-info-text-active);
+
+  /* 文本色映射 */
+  --ant-color-text-primary: var(--color-text-primary);
+  --ant-color-text-secondary: var(--color-text-secondary);
+  --ant-color-text-tertiary: var(--color-text-tertiary);
+  --ant-color-text-quaternary: var(--color-text-quaternary);
+
+  /* 背景色映射 */
+  --ant-color-bg-primary: var(--color-bg-primary);
+  --ant-color-bg-secondary: var(--color-bg-secondary);
+  --ant-color-bg-tertiary: var(--color-bg-tertiary);
+  --ant-color-bg-elevated: var(--color-bg-elevated);
+  --ant-color-bg-layout: var(--color-bg-layout);
+  --ant-color-bg-mask: var(--color-bg-mask);
+
+  /* 边框色映射 */
+  --ant-color-border: var(--color-border);
+  --ant-color-border-secondary: var(--color-border-secondary);
+
+  /* 圆角映射 */
+  --ant-border-radius-xs: var(--border-radius-xs);
+  --ant-border-radius-sm: var(--border-radius-sm);
+  --ant-border-radius: var(--border-radius-md);
+  --ant-border-radius-lg: var(--border-radius-lg);
+  --ant-border-radius-xl: var(--border-radius-xl);
+  --ant-border-radius-outer: var(--border-radius-outer);
+
+  /* 阴影映射 */
+  --ant-shadow: var(--box-shadow);
+  --ant-shadow-sm: var(--box-shadow-sm);
+  --ant-shadow-lg: var(--box-shadow-lg);
+  --ant-shadow-secondary: var(--box-shadow-secondary);
+  --ant-shadow-tertiary: var(--box-shadow-tertiary);
+
+  /* 字体映射 */
+  --ant-font-family: var(--font-family);
+  --ant-font-family-code: var(--font-family-code);
+  --ant-font-size-xs: var(--font-size-xs);
+  --ant-font-size-sm: var(--font-size-sm);
+  --ant-font-size: var(--font-size-base);
+  --ant-font-size-lg: var(--font-size-lg);
+  --ant-font-size-xl: var(--font-size-xl);
+  --ant-font-size-heading-1: var(--font-size-heading-1);
+  --ant-font-size-heading-2: var(--font-size-heading-2);
+  --ant-font-size-heading-3: var(--font-size-heading-3);
+  --ant-font-size-heading-4: var(--font-size-heading-4);
+  --ant-font-size-heading-5: var(--font-size-heading-5);
+  --ant-font-size-icon: var(--font-size-icon);
+
+  /* 行高映射 */
+  --ant-line-height: var(--line-height);
+  --ant-line-height-sm: var(--line-height-sm);
+  --ant-line-height-lg: var(--line-height-lg);
+  --ant-line-height-heading-1: var(--line-height-heading-1);
+  --ant-line-height-heading-2: var(--line-height-heading-2);
+  --ant-line-height-heading-3: var(--line-height-heading-3);
+  --ant-line-height-heading-4: var(--line-height-heading-4);
+  --ant-line-height-heading-5: var(--line-height-heading-5);
+
+  /* 线条映射 */
+  --ant-line-width: var(--line-width);
+  --ant-line-width-bold: var(--line-width-bold);
+  --ant-line-width-focus: var(--line-width-focus);
+  --ant-line-type: var(--line-type);
+
+  /* 尺寸映射 */
+  --ant-size-unit: var(--size-unit);
+  --ant-size-step: var(--size-step);
+  --ant-size-xs: var(--size-xs);
+  --ant-size-sm: var(--size-sm);
+  --ant-size: var(--size);
+  --ant-size-md: var(--size-md);
+  --ant-size-lg: var(--size-lg);
+  --ant-size-xl: var(--size-xl);
+  --ant-size-2xl: var(--size-2xl);
+  --ant-size-popup-arrow: var(--size-popup-arrow);
+
+  /* 控制高度映射 */
+  --ant-control-height-xs: var(--control-height-xs);
+  --ant-control-height-sm: var(--control-height-sm);
+  --ant-control-height: var(--control-height);
+  --ant-control-height-lg: var(--control-height-lg);
+  --ant-control-interactive-size: var(--control-interactive-size);
+
+  /* 间距映射 */
+  --ant-spacing-xs: var(--spacing-xs);
+  --ant-spacing-sm: var(--spacing-sm);
+  --ant-spacing-md: var(--spacing-md);
+  --ant-spacing: var(--spacing);
+  --ant-spacing-lg: var(--spacing-lg);
+  --ant-spacing-xl: var(--spacing-xl);
+  --ant-spacing-2xl: var(--spacing-2xl);
+  --ant-spacing-content-horizontal: var(--spacing-content-horizontal);
+  --ant-spacing-content-vertical: var(--spacing-content-vertical);
+
+  /* 外边距映射 */
+  --ant-margin-xs: var(--margin-xs);
+  --ant-margin-sm: var(--margin-sm);
+  --ant-margin: var(--margin);
+  --ant-margin-md: var(--margin-md);
+  --ant-margin-lg: var(--margin-lg);
+  --ant-margin-xl: var(--margin-xl);
+  --ant-margin-2xl: var(--margin-2xl);
+
+  /* 动画映射 */
+  --ant-motion: var(--motion);
+  --ant-motion-base: var(--motion-base);
+  --ant-motion-unit: var(--motion-unit);
+  --ant-motion-duration-fast: var(--motion-duration-fast);
+  --ant-motion-duration-mid: var(--motion-duration-mid);
+  --ant-motion-duration: var(--motion-duration);
+  --ant-motion-duration-slow: var(--motion-duration-slow);
+  --ant-motion-ease-out: var(--motion-ease-out);
+  --ant-motion-ease-in: var(--motion-ease-in);
+  --ant-motion-ease-in-out: var(--motion-ease-in-out);
+  --ant-motion-ease-in-out-circ: var(--motion-ease-in-out-circ);
+  --ant-motion-ease-in-quint: var(--motion-ease-in-quint);
+  --ant-motion-ease-out-back: var(--motion-ease-out-back);
+  --ant-motion-ease-in-back: var(--motion-ease-in-back);
+  --ant-motion-ease-out-circ: var(--motion-ease-out-circ);
+  --ant-motion-ease-out-quint: var(--motion-ease-out-quint);
+
+  /* 字重映射 */
+  --ant-font-weight-strong: var(--font-weight-strong);
+
+  /* 不透明度映射 */
+  --ant-opacity-image: var(--opacity-image);
+  --ant-opacity-loading: var(--opacity-loading);
+
+  /* Z 轴层级映射 */
+  --ant-z-index-base: var(--z-index-base);
+  --ant-z-index-popup-base: var(--z-index-popup-base);
+
+  /* 链接装饰映射 */
+  --ant-link-decoration: var(--link-decoration);
+  --ant-link-hover-decoration: var(--link-hover-decoration);
+  --ant-link-focus-decoration: var(--link-focus-decoration);
+
+  /* 字体颜色映射 */
+  --ant-color-text: var(--color-text-primary);
+  --ant-color-text-disabled: var(--color-text-quaternary);
+  --ant-color-text-heading: var(--color-text-primary);
+  --ant-color-text-label: var(--color-text-secondary);
+  --ant-color-text-description: var(--color-text-tertiary);
+  --ant-color-text-placeholder: var(--color-text-quaternary);
+  --ant-color-text-light-solid: var(--color-bg-primary);
+
+  /* 填充色映射 */
+  --ant-color-fill-content: var(--color-fill-tertiary);
+  --ant-color-fill-content-hover: var(--color-fill);
+  --ant-color-fill-alter: var(--color-fill-quaternary);
+
+  /* 背景色映射 */
+  --ant-color-bg-container: var(--color-bg-primary);
+  --ant-color-bg-container-disabled: var(--color-fill-quaternary);
+  --ant-color-bg-elevated: var(--color-bg-primary);
+  --ant-color-bg-layout: var(--color-bg-secondary);
+  --ant-color-bg-mask: var(--color-bg-mask);
+  --ant-color-bg-spotlight: var(--color-bg-spotlight);
+  --ant-color-bg-text-hover: var(--color-fill-secondary);
+  --ant-color-bg-text-active: var(--color-fill);
+
+  /* 边框色映射 */
+  --ant-color-border: var(--color-border);
+  --ant-color-border-secondary: var(--color-border-secondary);
+  --ant-color-border-bg: var(--color-border-bg);
+  --ant-color-border-disabled: var(--color-border);
+
+  /* 分割线映射 */
+  --ant-color-split: var(--color-split);
+
+  /* 轮廓线映射 */
+  --ant-control-outline: var(--color-primary-bg);
+  --ant-control-outline-width: 2px;
+  --ant-color-error-outline: rgba(255, 38, 5, 0.06);
+  --ant-color-warning-outline: rgba(255, 215, 5, 0.1);
+
+  /* 组件项背景映射 */
+  --ant-control-item-bg-hover: var(--color-fill-quaternary);
+  --ant-control-item-bg-active: var(--color-primary-bg);
+  --ant-control-item-bg-active-hover: var(--color-primary-bg-hover);
+  --ant-control-item-bg-active-disabled: var(--color-fill);
+
+  /* 图标颜色映射 */
+  --ant-color-icon: var(--color-text-tertiary);
+  --ant-color-icon-hover: var(--color-text-primary);
+
+  /* 高亮色映射 */
+  --ant-color-highlight: var(--color-error);
+
+  /* 屏幕尺寸映射 */
+  --ant-screen-xs: var(--screen-xs);
+  --ant-screen-xs-max: var(--screen-xs-max);
+  --ant-screen-xs-min: var(--screen-xs-min);
+  --ant-screen-sm: var(--screen-sm);
+  --ant-screen-sm-max: var(--screen-sm-max);
+  --ant-screen-sm-min: var(--screen-sm-min);
+  --ant-screen-md: var(--screen-md);
+  --ant-screen-md-max: var(--screen-md-max);
+  --ant-screen-md-min: var(--screen-md-min);
+  --ant-screen-lg: var(--screen-lg);
+  --ant-screen-lg-max: var(--screen-lg-max);
+  --ant-screen-lg-min: var(--screen-lg-min);
+  --ant-screen-xl: var(--screen-xl);
+  --ant-screen-xl-max: var(--screen-xl-max);
+  --ant-screen-xl-min: var(--screen-xl-min);
+  --ant-screen-xxl: var(--screen-xxl);
+  --ant-screen-xxl-max: var(--screen-xxl-max);
+  --ant-screen-xxl-min: var(--screen-xxl-min);
+  --ant-screen-xxxl: var(--screen-xxxl);
+  --ant-screen-xxxl-min: var(--screen-xxxl-min);
+}
