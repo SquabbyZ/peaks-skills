@@ -32,51 +32,70 @@ def generate_zod_schema(
     # Generate import statement
     content = "import { z } from 'zod';\n\n"
     
+    # Generate Enum
+    enum_name = f"{schema_name}FormKey"
+    content += f"export enum {enum_name} {{\n"
+    for field in fields:
+        field_name = field['name']
+        label = field.get('label', '')
+        enum_key = field_name.upper()
+        
+        if label:
+            content += f"  {enum_key} = '{field_name}', // {label}\n"
+        else:
+            content += f"  {enum_key} = '{field_name}',\n"
+    content += "}\n\n"
+    
     # Generate schema export
     content += f"export const {schema_var_name} = z.object({{\n"
     
     # Generate field definitions
     for field in fields:
         field_name = field['name']
+        label = field.get('label', field_name)
+        enum_key = f"{enum_name}.{field_name.upper()}"
         field_type = field.get('type', 'string')
         validation = field.get('validation', '')
-        error_message = field.get('message', f'请输入{field_name}')
+        
+        # Use provided message or generate one based on label
+        default_message = f'请输入{label}'
+        error_message = field.get('message', default_message)
         
         # Generate validation based on type
         if field_type == 'string':
             if validation == 'min':
                 min_length = field.get('min_length', '1')
-                content += f"  {field_name}: z.string().min({min_length}, {{\n"
+                content += f"  [{enum_key}]: z.string({{\n"
                 content += f"    message: '{error_message}',\n"
-                content += f"  }}),\n"
+                content += f"  }}).min({min_length}, '{error_message}'),\n"
             elif validation == 'email':
-                content += f"  {field_name}: z.string().email({{\n"
+                content += f"  [{enum_key}]: z.string().email({{\n"
                 content += f"    message: '请输入有效的邮箱地址',\n"
                 content += f"  }}),\n"
             elif validation == 'url':
-                content += f"  {field_name}: z.string().url({{\n"
+                content += f"  [{enum_key}]: z.string().url({{\n"
                 content += f"    message: '请输入有效的 URL',\n"
                 content += f"  }}),\n"
             else:
-                content += f"  {field_name}: z.string({{\n"
+                content += f"  [{enum_key}]: z.string({{\n"
                 content += f"    message: '{error_message}',\n"
                 content += f"  }}),\n"
         
         elif field_type == 'number':
-            content += f"  {field_name}: z.number({{\n"
+            content += f"  [{enum_key}]: z.number({{\n"
             content += f"    message: '请输入有效的数字',\n"
             content += f"  }}),\n"
         
         elif field_type == 'boolean':
-            content += f"  {field_name}: z.boolean(),\n"
+            content += f"  [{enum_key}]: z.boolean(),\n"
         
         elif field_type == 'array':
-            content += f"  {field_name}: z.array(z.string()),\n"
+            content += f"  [{enum_key}]: z.array(z.string()),\n"
         
         elif field_type == 'enum':
             enum_values = field.get('enum_values', [])
             enum_str = ', '.join([f"'{v}'" for v in enum_values])
-            content += f"  {field_name}: z.enum([{enum_str}]),\n"
+            content += f"  [{enum_key}]: z.enum([{enum_str}]),\n"
     
     content += "});\n"
     
@@ -87,21 +106,22 @@ def generate_zod_schema(
     content += f"\nexport const defaultValue: {schema_name} = {{\n"
     for field in fields:
         field_name = field['name']
+        enum_key = f"{enum_name}.{field_name.upper()}"
         field_type = field.get('type', 'string')
         
         # Generate default value based on type
         if field_type == 'string':
-            content += f"  {field_name}: '',\n"
+            content += f"  [{enum_key}]: '',\n"
         elif field_type == 'number':
-            content += f"  {field_name}: 0,\n"
+            content += f"  [{enum_key}]: 0,\n"
         elif field_type == 'boolean':
-            content += f"  {field_name}: false,\n"
+            content += f"  [{enum_key}]: false,\n"
         elif field_type == 'array':
-            content += f"  {field_name}: [],\n"
+            content += f"  [{enum_key}]: [],\n"
         elif field_type == 'enum':
             enum_values = field.get('enum_values', [])
             first_value = enum_values[0] if enum_values else "''"
-            content += f"  {field_name}: '{first_value}',\n"
+            content += f"  [{enum_key}]: '{first_value}',\n"
     content += "};\n"
     
     # Write to file

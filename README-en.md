@@ -63,24 +63,31 @@ A high-efficiency skill collection designed for AI-driven frontend development, 
 
 **Core Features**:
 
-- ⚡ **Fast Generation**: Complete form in 5 minutes
-- 📝 **Zod Validation**: Auto-generated type-safe validation logic
-- 🎯 **Type Safety**: No `any` types, complete TypeScript types
-- 🧩 **Componentization**: Reusable form field components
-- 🚀 **Performance Optimized**: Memo-wrapped to prevent unnecessary re-renders
+- 📝 Auto-generates type-safe fields and Zod validation logic
+- 🧩 Componentized form fields for reuse and extension
+- 🚀 Basic performance optimizations to reduce unnecessary re-renders
 
-**Quick Start**:
+**Prompt Template (Recommended)**:
 
-```bash
-python3 scripts/quick_start.py \
-  DatasetSettingsAntd \
-  RagConfig \
-  --fields '[
-    {"name":"name","type":"string","label":"Name","required":true},
-    {"name":"description","type":"string","label":"Description"},
-    {"name":"apiUrl","type":"string","label":"API URL","validation":"url"},
-    {"name":"enabled","type":"boolean","label":"Enabled"}
-  ]'
+```text
+Use the peaks-hook-form skill to generate a form:
+- Form name: [FormName] (e.g. UserSettingsForm)
+- Form directory: optional, default src/components/
+- Schema name: optional, default [FormName].schema.ts
+- Fields:
+  * [fieldName] [baseComponentType] ([type]): [label] [validation/requirements]
+  * [fieldName] [baseComponentType] ([type]): [label] [validation/requirements]
+```
+
+```text
+Example:
+Use the peaks-hook-form skill to generate a form:
+- Form name: CreateNewPropmt
+- Fields:
+  * name input (string): Prompt name Required, max 64 chars, only Chinese/letters/numbers/underscore
+  * template text (string): Prompt template, display-only and non-interactive
+  * theme select (string): Theme
+  * description textarea (string): Description
 ```
 
 **Use Cases**:
@@ -253,4 +260,3 @@ For questions or suggestions, please contact via:
 
 - Submit an Issue
 - Contact the author team
-

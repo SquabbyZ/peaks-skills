@@ -87,14 +87,17 @@ python3 scripts/create_form_template.py FormName SchemaName --fields field1 fiel
 
 ### 🧩 generate_form_component.py
 
-Generate individual field components:
+Generate generic field components:
 
 ```bash
 # Input component
-python3 scripts/generate_form_component.py input FieldName --output-dir src/components/hook-form/children
+python3 scripts/generate_form_component.py input --output-dir src/components/hook-form/children
 
 # Select component
-python3 scripts/generate_form_component.py select FieldName --output-dir src/components/hook-form/children
+python3 scripts/generate_form_component.py select --output-dir src/components/hook-form/children
+
+# Switch component
+python3 scripts/generate_form_component.py switch --output-dir src/components/hook-form/children
 ```
 
 ## Documentation
@@ -330,11 +333,11 @@ src/components/hook-form/
 Use the generate_form_component.py script to create new form components:
 
 ```bash
-# Generate an Input form component
-python3 scripts/generate_form_component.py input Username --output-dir src/components/hook-form/children
+# Generate a generic Input form component
+python3 scripts/generate_form_component.py input --output-dir src/components/hook-form/children
 
-# Generate a Select form component
-python3 scripts/generate_form_component.py select Role --output-dir src/components/hook-form/children
+# Generate a generic Select form component
+python3 scripts/generate_form_component.py select --output-dir src/components/hook-form/children
 ```
 
 ### Step 3: Generate Zod Schema (Optional)

@@ -13,7 +13,7 @@ from typing import List
 def create_form_template(
     component_name: str,
     schema_name: str,
-    fields: List[str],
+    fields: List[dict],
     output_dir: str
 ) -> str:
     """
@@ -22,7 +22,7 @@ def create_form_template(
     Args:
         component_name: Name of the component (e.g., 'DatasetSettingsAntd')
         schema_name: Name of the schema (e.g., 'RagConfig')
-        fields: List of field names to include in the form
+        fields: List of field definitions to include in the form
         output_dir: Directory to save the template file
     
     Returns:
@@ -31,47 +31,109 @@ def create_form_template(
     # Convert names to proper formats
     schema_var_name = f"{schema_name}Schema"
     schema_file_name = f"{schema_name.lower()}.schema"
+    enum_name = f"{schema_name}FormKey"
+    
+    first_field = fields[0]['name'] if fields else 'name'
+    first_field_enum = f"{enum_name}.{first_field.upper()}"
+    
+    # Track which components need to be imported
+    needed_components = set()
+    
+    # Generate form fields JSX
+    fields_jsx = ""
+    for field in fields:
+        field_name = field['name']
+        enum_key = f"{enum_name}.{field_name.upper()}"
+        label = field.get('label', field_name)
+        component_type = field.get('component_type', 'input').lower()
+        
+        if component_type in ['select', 'enum']:
+            component_tag = "HookSelectFormItem"
+            extra_props = 'options={[]}'
+        elif component_type in ['switch', 'boolean']:
+            component_tag = "HookSwitchFormItem"
+            extra_props = ''
+        elif component_type in ['textarea', 'textarae']:
+            component_tag = "HookTextAreaFormItem"
+            extra_props = f'placeholder="请输入{label}"'
+        elif component_type in ['text', 'display']:
+            component_tag = "HookTextFormItem"
+            extra_props = ''
+        else:
+            component_tag = "HookInputFormItem"
+            extra_props = f'placeholder="请输入{label}"'
+            
+        needed_components.add(component_tag)
+        
+        fields_jsx += f"""            {{/* {label} */}}
+            <{component_tag}
+              prop={{{enum_key}}}
+              label="{label}"
+              {extra_props}
+            />\n"""
+            
+    # Generate imports
+    imports_jsx = "import { cn } from '@/utils';\n"
+    if needed_components:
+        for comp in sorted(needed_components):
+            imports_jsx += f"import {{ {comp} }} from '@/components/hook-form/children/{comp}';\n"
     
     # Generate the template content
     content = f"""import {{ zodResolver }} from '@hookform/resolvers/zod';
-import {{ memo }} from 'react';
+import {{ forwardRef, memo, useImperativeHandle }} from 'react';
 import {{ FormProvider, useForm, useWatch }} from 'react-hook-form';
 import {{ z }} from 'zod';
 import {{
   defaultValue,
   {schema_var_name},
+  {enum_name},
 }} from '@/components/hook-form/schemas/{schema_file_name}';
-
-function {component_name}() {{
-  const form = useForm<z.infer<typeof {schema_var_name}>>({{
-    resolver: zodResolver({schema_var_name}),
-    defaultValues: defaultValue,
-  }});
-
-  const {fields[0] if fields else 'name'} = useWatch({{
-    control: form.control,
-    name: '{fields[0] if fields else 'name'}',
-  }});
-
-  async function onSubmit(data: z.infer<typeof {schema_var_name}>) {{
-    console.log('🚀 ~ {component_name} ~ data:', data);
-  }}
-
-  return (
-    <section className="p-5 h-full flex flex-col">
-      <div className="flex gap-14 flex-1 min-h-0">
-        <FormProvider {{...form}}>
-          <form
-            onSubmit={{form.handleSubmit(onSubmit)}}
-            className="space-y-6 flex-1"
-          >
-            {{/* TODO: Add form fields here */}}
-          </form>
-        </FormProvider>
-      </div>
-    </section>
-  );
+{imports_jsx}
+export interface {component_name}Ref {{
+  submit: () => void;
 }}
+
+export interface {component_name}Props {{
+  className?: string;
+}}
+
+const {component_name} = forwardRef<{component_name}Ref, {component_name}Props>(
+  ({{ className }}, ref) => {{
+    const form = useForm<z.infer<typeof {schema_var_name}>>({{
+      resolver: zodResolver({schema_var_name}),
+      defaultValues: defaultValue,
+    }});
+
+    const {first_field} = useWatch({{
+      control: form.control,
+      name: {first_field_enum},
+    }});
+
+    async function onSubmit(data: z.infer<typeof {schema_var_name}>) {{
+      console.log('🚀 ~ {component_name} ~ data:', data);
+    }}
+
+    useImperativeHandle(ref, () => ({{
+      submit: () => {{
+        form.handleSubmit(onSubmit)();
+      }},
+    }}));
+
+    return (
+      <section className={{cn('flex h-full flex-col p-5', className)}}>
+        <div className="flex min-h-0 flex-1 gap-14">
+          <FormProvider {{...form}}>
+            <form
+              onSubmit={{form.handleSubmit(onSubmit)}}
+              className="flex-1 space-y-6"
+            >
+{fields_jsx}            </form>
+          </FormProvider>
+        </div>
+      </section>
+    );
+  }},
+);
 
 export default memo({component_name});
 """

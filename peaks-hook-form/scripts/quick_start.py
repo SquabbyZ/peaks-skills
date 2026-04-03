@@ -13,11 +13,14 @@ from typing import List, Dict
 # Import other scripts
 from generate_zod_schema import generate_zod_schema
 from create_form_template import create_form_template
-from generate_form_component import generate_input_component, generate_select_component
+from generate_form_component import generate_input_component, generate_select_component, generate_switch_component, generate_textarea_component, generate_text_component
 
 
 def get_field_type(field: Dict) -> str:
     """Determine field component type based on field definition."""
+    if 'component_type' in field:
+        return field['component_type']
+        
     field_type = field.get('type', 'string')
     validation = field.get('validation', '')
     
@@ -103,10 +106,8 @@ def quick_start(
         print("📄 Step 2/3: Generating form template...")
         os.makedirs(output_dir, exist_ok=True)
         
-        field_names = [field['name'] for field in fields]
-        
         try:
-            template_file = create_form_template(form_name, schema_name, field_names, output_dir)
+            template_file = create_form_template(form_name, schema_name, fields, output_dir)
             results['template'] = template_file
             print(f"   ✓ Generated: {template_file}")
         except Exception as e:
@@ -124,23 +125,29 @@ def quick_start(
         os.makedirs(children_dir, exist_ok=True)
         
         for field in fields:
-            field_type = get_field_type(field)
-            component_name = get_component_name(field)
-            
-            # Determine component type
-            if field_type in ['select', 'enum']:
-                component_type = 'select'
-            else:
-                component_type = 'input'
+            if 'component_type' not in field:
+                print(f"   ℹ Skipping component generation for '{field['name']}': no component_type specified")
+                continue
+                
+            component_type = field['component_type'].lower()
             
             try:
-                if component_type == 'select':
-                    component_file = generate_select_component(component_name, children_dir)
+                if component_type in ['select', 'enum']:
+                    component_file = generate_select_component(children_dir)
+                elif component_type in ['switch', 'boolean']:
+                    component_file = generate_switch_component(children_dir)
+                elif component_type in ['textarea', 'textarae']:
+                    component_file = generate_textarea_component(children_dir)
+                elif component_type in ['text', 'display']:
+                    component_file = generate_text_component(children_dir)
+                elif component_type in ['input', 'string', 'email', 'url']:
+                    component_file = generate_input_component(children_dir)
                 else:
-                    component_file = generate_input_component(component_name, children_dir)
+                    print(f"   ℹ Skipping '{field['name']}': unsupported component_type '{component_type}', falling back to generic Input")
+                    component_file = generate_input_component(children_dir)
                 
-                results['components'].append(component_file)
-                print(f"   ✓ Generated: {os.path.basename(component_file)} ({field['name']})")
+                if component_file not in results['components']:
+                    results['components'].append(component_file)
             except Exception as e:
                 print(f"   ✗ Error generating component for {field['name']}: {e}")
     else:
@@ -177,14 +184,14 @@ def main():
 Examples:
   # Generate complete form with fields
   python quick_start.py DatasetSettingsAntd RagConfig --fields '[
-    {"name":"name","type":"string","label":"名称","required":true},
-    {"name":"description","type":"string","label":"描述"},
-    {"name":"apiUrl","type":"string","label":"API 地址","validation":"url"},
-    {"name":"enabled","type":"boolean","label":"启用"}
+    {"name":"name","type":"string","component_type":"input","label":"名称","required":true},
+    {"name":"description","type":"string","component_type":"input","label":"描述"},
+    {"name":"apiUrl","type":"string","component_type":"input","label":"API 地址","validation":"url"},
+    {"name":"enabled","type":"boolean","component_type":"switch","label":"启用"}
   ]'
   
   # Generate in specific directory
-  python quick_start.py UserForm UserSchema --fields '[{"name":"username","type":"string"}]' --output-dir src/pages/users
+  python quick_start.py UserForm UserSchema --fields '[{"name":"username","type":"string","component_type":"input"}]' --output-dir src/pages/users
   
   # Skip certain steps
   python quick_start.py MyForm MySchema --fields '[{"name":"title","type":"string"}]' --skip-components

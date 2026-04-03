@@ -6,21 +6,21 @@
 
 ```
 使用 peaks-hook-form 技能生成一个表单：
-- 表单名称：[FormName]
-- Schema 名称：[SchemaName]
+- 表单名称：[FormName] (例如：UserSettingsForm)
+- 表单目录：[FormDir, 默认：src/components/] (可选项)
+- Schema 名称：[SchemaName, 默认：[FormName].schema.ts] (可选项)
 - 字段列表：
-  * [fieldName] ([fieldType]): [fieldLabel] [验证规则]
-  * [fieldName] ([fieldType]): [fieldLabel] [验证规则]
+  * [fieldName] [componentType] ([fieldType]): [fieldLabel] [验证规则]
+  * [fieldName] [componentType] ([fieldType]): [fieldLabel] [验证规则]
 
 示例：
 使用 peaks-hook-form 技能生成一个表单：
-- 表单名称：DatasetSettingsAntd
-- Schema 名称：RagConfig
+- 表单名称：CreateNewPropmt
 - 字段列表：
-  * name (string): 名称 必填
-  * description (string): 描述
-  * apiUrl (string): API 地址 URL 验证
-  * enabled (boolean): 启用
+  * name input (string): 提示词名称 必填，最多64个字符，只能包含中文、字母、数字、下划线
+  * template textarea (string): 提示词模板，只做为数据展示不可交互
+  * theme select (string): 主题,这个选项是个select
+  * description textarea (string): 描述
 ```
 
 ### 模板 2：简洁命令式
@@ -51,6 +51,7 @@
 字段配置：
 1. 字段名：[name]
    类型：[string|number|boolean|enum|array]
+   组件类型：[input|select|switch] (可选，不指定则不生成该字段组件)
    标签：[label]
    必填：[true/false]
    验证：[min|max|email|url]
@@ -59,6 +60,7 @@
 
 2. 字段名：[name]
    类型：[string|number|boolean|enum|array]
+   组件类型：[input|select|switch] (可选)
    标签：[label]
    ...
 
@@ -73,6 +75,7 @@
 字段配置：
 1. 字段名：username
    类型：string
+   组件类型：input
    标签：用户名
    必填：true
    验证：min(3)
@@ -80,6 +83,7 @@
 
 2. 字段名：email
    类型：string
+   组件类型：input
    标签：邮箱
    必填：true
    验证：email
@@ -87,6 +91,7 @@
 
 3. 字段名：password
    类型：string
+   组件类型：input
    标签：密码
    必填：true
    验证：min(6)
@@ -94,6 +99,7 @@
 
 4. 字段名：agree
    类型：boolean
+   组件类型：switch
    标签：同意协议
    必填：false
 ```
