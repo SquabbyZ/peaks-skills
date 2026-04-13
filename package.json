@@ -1,6 +1,6 @@
 {
   "name": "peaks-skills",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "AI-driven frontend development skills collection for Trae IDE and AI coding assistants",
   "type": "module",
   "bin": {

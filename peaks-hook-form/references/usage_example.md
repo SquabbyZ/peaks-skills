@@ -1,4 +1,4 @@
-# Complete Usage Example
+## Complete Usage Example
 
 This document demonstrates how to use all three scripts together to create a complete form with validation.
 
@@ -142,6 +142,64 @@ export const RagConfigForm = () => {
     </FormProvider>
   );
 };
+```
+
+## Advanced Usage
+
+### Error Position Configuration
+
+Form components support two error display modes:
+
+#### Mode 1: Below (Default)
+
+Error message displays below the input field:
+
+```tsx
+<HookInputFormItem
+  prop="name"
+  label="Name"
+  required
+  errorPosition="below"
+/>
+```
+
+#### Mode 2: Border (Compact)
+
+Error message displays on the top-left corner of the input border:
+
+```tsx
+<HookInputFormItem
+  prop="name"
+  label="Name"
+  required
+  errorPosition="border"
+/>
+```
+
+### Custom Margin Bottom
+
+Customize the bottom margin of form items:
+
+```tsx
+// Tight spacing (compact forms)
+<HookInputFormItem
+  prop="name"
+  label="Name"
+  marginBottom={8}
+/>
+
+// Default spacing (24px)
+<HookInputFormItem
+  prop="name"
+  label="Name"
+/>
+
+// Custom spacing
+<HookInputFormItem
+  prop="name"
+  label="Name"
+  marginBottom="2rem"
+/>
 ```
 
 ## Tips

@@ -66,6 +66,8 @@ A high-efficiency skill collection designed for AI-driven frontend development, 
 - 📝 Auto-generates type-safe fields and Zod validation logic
 - 🧩 Componentized form fields for reuse and extension
 - 🚀 Basic performance optimizations to reduce unnecessary re-renders
+- 🎯 Supports multiple component types: input, select, switch, textarea, text (read-only display)
+- 🔑 Uses enum keys for field access, safer typing
 
 **Prompt Template (Recommended)**:
 
@@ -75,8 +77,8 @@ Use the peaks-hook-form skill to generate a form:
 - Form directory: optional, default src/components/
 - Schema name: optional, default [FormName].schema.ts
 - Fields:
-  * [fieldName] [baseComponentType] ([type]): [label] [validation/requirements]
-  * [fieldName] [baseComponentType] ([type]): [label] [validation/requirements]
+  * [fieldName] [componentType] ([type]): [label] [validation/requirements]
+  * [fieldName] [componentType] ([type]): [label] [validation/requirements]
 ```
 
 ```text
@@ -88,6 +90,7 @@ Use the peaks-hook-form skill to generate a form:
   * template text (string): Prompt template, display-only and non-interactive
   * theme select (string): Theme
   * description textarea (string): Description
+  * enabled switch (boolean): Enable
 ```
 
 **Use Cases**:

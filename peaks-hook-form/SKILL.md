@@ -138,6 +138,16 @@ export interface InputFormItemProps extends Omit<
   tooltip?: string;
   placeholder?: string;
   required?: boolean;
+  /** 是否显示必填标记 *，默认 true，在表格等场景中可设置为 false */
+  showRequiredMark?: boolean;
+  /** label 布局方向，默认 vertical（纵向），可选 horizontal（横向） */
+  layout?: 'vertical' | 'horizontal';
+  /** 横向布局时 label 的宽度，默认 80 */
+  labelWidth?: number;
+  /** 底部外边距，默认使用 Ant Design Form.Item 的默认值（24px），可手动设置覆盖 */
+  marginBottom?: string | number;
+  /** 错误提示位置，默认 'below'（输入框下方），可选 'border'（输入框边框红色） */
+  errorPosition?: 'below' | 'border';
 }
 
 export const InputFormItem = memo(
@@ -147,50 +157,88 @@ export const InputFormItem = memo(
     tooltip,
     placeholder,
     required,
+    showRequiredMark = true,
+    layout = 'vertical',
+    labelWidth = 80,
+    marginBottom,
+    errorPosition = 'below',
     ...restInputProps
   }: InputFormItemProps) => {
-    const { control, trigger, formState } = useFormContext();
+    const { control, trigger } = useFormContext();
 
     return (
       <Controller
         name={prop}
         control={control}
-        render={({ field }) => {
+        render={({ field, fieldState, formState }) => {
           const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-            field.onChange(e);
-            trigger(prop);
+            field.onChange(e.target.value);
+            void trigger(prop);
           };
 
-          const error = formState.errors[prop];
+          const error = fieldState.error;
           const errorMessage = error?.message as string | undefined;
+          const showError =
+            !!error &&
+            (fieldState.isDirty ||
+              fieldState.isTouched ||
+              formState.isSubmitted);
+
+          // 当 label 为空字符串时，不显示 label 区域（避免显示冒号）
+          const hasLabel = label !== '' && label !== undefined;
+          const hasTooltipOnly = label === '' && tooltip;
 
           return (
             <Form.Item
-              required={required}
+              required={required && showRequiredMark}
+              colon={!!hasLabel || !!hasTooltipOnly}
+              style={marginBottom !== undefined ? { marginBottom } : undefined}
               label={
-                <span className="text-label whitespace-wrap text-base">
-                  {label}
-                  {tooltip && (
-                    <Tooltip className="cursor-pointer" title={tooltip}>
-                      <InfoCircleOutlined className="ml-1 text-sm text-gray-400" />
-                    </Tooltip>
-                  )}
-                </span>
+                hasLabel ? (
+                  <span className="text-label whitespace-wrap text-base">
+                    {label}
+                    {tooltip && (
+                      <Tooltip className="cursor-pointer" title={tooltip}>
+                        <InfoCircleOutlined className="ml-1 text-sm text-gray-400" />
+                      </Tooltip>
+                    )}
+                  </span>
+                ) : hasTooltipOnly ? (
+                  <Tooltip className="cursor-pointer" title={tooltip}>
+                    <InfoCircleOutlined className="ml-1 text-sm text-gray-400" />
+                  </Tooltip>
+                ) : undefined
               }
-              labelCol={{ span: 24 }}
-              wrapperCol={{ span: 24 }}
-              validateStatus={error ? 'error' : ''}
-              help={errorMessage}
+              labelCol={
+                layout === 'horizontal'
+                  ? { flex: `0 0 ${labelWidth}px` }
+                  : { span: 24 }
+              }
+              wrapperCol={layout === 'horizontal' ? { flex: 1 } : { span: 24 }}
+              validateStatus={showError ? 'error' : ''}
+              help={
+                errorPosition === 'below' && showError ? (
+                  <span className="text-red-500">{errorMessage}</span>
+                ) : undefined
+              }
+              className={layout === 'horizontal' ? 'flex items-center' : ''}
             >
-              <Input
-                {...restInputProps}
-                {...field}
-                onChange={handleChange}
-                placeholder={placeholder ?? '请输入'}
-                className="w-full"
-                autoComplete="off"
-                allowClear
-              />
+              <div className="relative w-full">
+                <Input
+                  {...restInputProps}
+                  {...field}
+                  onChange={handleChange}
+                  placeholder={placeholder ?? '请输入'}
+                  className="w-full"
+                  autoComplete="off"
+                  allowClear
+                />
+                {errorPosition === 'border' && showError && errorMessage && (
+                  <div className="pointer-events-none absolute -top-2.5 left-2 bg-white px-1 text-xs text-red-500">
+                    {errorMessage}
+                  </div>
+                )}
+              </div>
             </Form.Item>
           );
         }}
@@ -218,6 +266,16 @@ export interface SelectFormItemProps extends Omit<
   tooltip?: string;
   placeholder?: string;
   required?: boolean;
+  /** 是否显示必填标记 *，默认 true，在表格等场景中可设置为 false */
+  showRequiredMark?: boolean;
+  /** label 布局方向，默认 vertical（纵向），可选 horizontal（横向） */
+  layout?: 'vertical' | 'horizontal';
+  /** 横向布局时 label 的宽度，默认 80 */
+  labelWidth?: number;
+  /** 底部外边距，默认使用 Ant Design Form.Item 的默认值（24px），可手动设置覆盖 */
+  marginBottom?: string | number;
+  /** 错误提示位置，默认 'below'（输入框下方），可选 'border'（输入框边框红色） */
+  errorPosition?: 'below' | 'border';
 }
 
 export const SelectFormItem = memo(
@@ -266,11 +324,16 @@ export const SelectFormItem = memo(
                   </Tooltip>
                 ) : undefined
               }
-              labelCol={{ span: 24 }}
-              wrapperCol={{ span: 24 }}
+              labelCol={
+                layout === 'horizontal'
+                  ? { flex: `0 0 ${labelWidth}px` }
+                  : { span: 24 }
+              }
+              wrapperCol={layout === 'horizontal' ? { flex: 1 } : { span: 24 }}
               validateStatus={error ? 'error' : ''}
               help={errorMessage}
-              required={required}
+              required={required && showRequiredMark}
+              className={layout === 'horizontal' ? 'flex items-center' : ''}
             >
               <Select
                 {...restSelectProps}

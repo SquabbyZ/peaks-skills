@@ -1,7 +1,7 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## [Unreleased] - 2026-04-03
+## [1.0.2] - 2026-04-13
 
 ### Changed
 - peaks-hook-form: Add `{SchemaName}FormKey` enum and use enum keys in Zod schema + `defaultValue` for consistent field access.
@@ -10,9 +10,11 @@ All notable changes to this project will be documented in this file.
 - peaks-hook-form: `generate_form_component.py` generates generic field components (no longer per-field `FieldName` variants) and expands supported components (e.g. `switch`); CLI usage updated accordingly.
 
 ### Docs
-- README (ZH/EN): Update peaks-hook-form section with a more complete recommended prompt template (including optional form dir, default schema name, and field format) and simplified feature bullets.
+- README (ZH/EN): Update peaks-hook-form section with enhanced features (multiple component types support, enum key access), improved prompt template format, and added switch example.
 - peaks-hook-form: Update `prompt_templates.md` template 1 to include defaults and `componentType` in field format; refresh example content.
 - peaks-hook-form: Update `SKILL.md` examples for `generate_form_component.py` to match generic component generation and include switch generation.
 
-### Chore
-- Staged changes currently include Python bytecode cache files (`__pycache__/*.pyc`). Consider excluding them via `.gitignore` if not intended for release artifacts.
+## [1.0.1] - 2026-04-03
+
+### Changed
+- Initial release with peaks-hook-form bidirectional sync capabilities

@@ -66,17 +66,19 @@
 - 📝 自动生成类型安全的表单字段与 Zod 校验逻辑
 - 🧩 表单字段组件化，便于复用与扩展
 - 🚀 默认做基础性能优化，减少不必要的重渲染
+- 🎯 支持多种组件类型：input、select、switch、textarea、text（只读展示）
+- 🔑 使用枚举键访问字段，类型更安全
 
 **提示词模板（推荐）**：
 
 ```text
 使用 peaks-hook-form 技能生成一个表单：
 - 表单名称：[FormName] (例如：UserSettingsForm)
-- 表单目录  默认值为src/components/，可选项
-- Schema 名称：默认值为[FormName].schema.ts ，可选项
+- 表单目录：默认值为 src/components/，可选项
+- Schema 名称：默认值为 [FormName].schema.ts，可选项
 - 字段列表：
-  * [字段名] [组件基础类型] ([类型]): [标签名称] [验证规则/其他要求]
-  * [字段名] [组件基础类型] ([类型]): [标签名称] [验证规则/其他要求]
+  * [字段名] [组件类型] ([类型]): [标签名称] [验证规则/其他要求]
+  * [字段名] [组件类型] ([类型]): [标签名称] [验证规则/其他要求]
 ```
 
 ```text
@@ -84,10 +86,11 @@
 使用 peaks-hook-form 技能生成一个表单：
 - 表单名称：CreateNewPropmt
 - 字段列表：
-  * name input (string): 提示词名称 必填，最多64个字符，只能包含中文、字母、数字、下划线
+  * name input (string): 提示词名称 必填，最多 64 个字符，只能包含中文、字母数字、下划线
   * template text (string): 提示词模板，只做为数据展示不可交互
   * theme select (string): 主题
-  * description textarae (string): 描述
+  * description textarea (string): 描述
+  * enabled switch (boolean): 启用
 ```
 
 **使用场景**：
