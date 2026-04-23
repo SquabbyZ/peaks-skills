@@ -36,6 +36,19 @@ All notable changes to this project will be documented in this file.
 - **辅助脚本增强**：scripts/use_template.py 确保所有隐藏文件（.husky/、.trae/、.npmrc 等）正确复制
 - **完整的 Trae Skills 集成**：预配置 peaks-api-create、peaks-hook-form、peaks-pixso-code-sync 技能
 
+#### peaks-react-prompt-editor
+
+- **新增技能**：树形结构的 React Prompt 编辑器组件库使用指南
+- **核心功能文档**：
+  - 树形节点编排和拖拽排序
+  - AI 优化流式输出（支持 OpenAI/Dify/百炼）
+  - @变量插入系统和自定义数据选择器
+  - 高度可定制的 UI（工具栏、节点操作、顶部区域）
+  - 预览模式（只读编辑器/Markdown 渲染）
+  - 国际化支持（zhCN/enUS）
+  - 主题切换（system/light/dark）
+  - 节点依赖管理
+
 ### Changed
 
 #### peaks-hook-form

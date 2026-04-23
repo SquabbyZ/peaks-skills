@@ -133,6 +133,56 @@
 - 需要标准化的 API 调用层
 - 希望自动生成测试和 Mock
 
+### 5. peaks-react-prompt-editor
+
+**功能**：树形结构的 React Prompt 编辑器组件库
+
+**核心特性**：
+
+- 🌳 **树形节点编排**：支持多层级 Prompt 节点管理，可拖拽排序
+- 🤖 **AI 优化流式输出**：内置 AI 优化功能，支持 OpenAI/Dify/百炼等平台
+- 📊 **变量插入系统**：@变量选择器，支持自定义数据源和多选批量插入
+- 🛠️ **高度可定制**：
+  - 自定义工具栏（renderToolbar）
+  - 自定义节点操作（renderNodeActions）
+  - 自定义节点顶部区域（renderNodeTopSlot）
+- 👁️ **预览模式**：支持只读编辑器和 Markdown 渲染两种预览方式
+- 🌍 **国际化支持**：内置中英文语言包（zhCN/enUS）
+- 🎨 **主题切换**：支持 system/light/dark 三种主题模式
+- ⚡ **依赖管理**：节点间可声明依赖关系，运行时自动收集依赖内容
+
+**安装使用**：
+
+```bash
+pnpm add react-prompt-editor antd @ant-design/x
+```
+
+```tsx
+import { PromptEditor, TaskNode } from "react-prompt-editor";
+import "react-prompt-editor/styles/index.css";
+
+const [data, setData] = useState<TaskNode[]>([
+  {
+    id: "1",
+    title: "System Prompt",
+    content: "# Role\nYou are a helpful assistant.",
+    children: [],
+    isLocked: false,
+    hasRun: false,
+  },
+]);
+
+<PromptEditor value={data} onChange={setData} />;
+```
+
+**使用场景**：
+
+- 构建 AI 工作流编辑器
+- 管理复杂 Prompt 结构
+- 集成变量插入功能
+- 实现流式 AI 优化
+- 多语言支持的 Prompt 管理系统
+
 ## 🚀 快速开始
 
 ### 使用 CLI 安装（推荐）
@@ -143,6 +193,7 @@ npx peaks-skills install peaks-react-template
 npx peaks-skills install peaks-pixso-code-sync
 npx peaks-skills install peaks-hook-form
 npx peaks-skills install peaks-api-create
+npx peaks-skills install peaks-react-prompt-editor
 
 # 查看所有可用技能
 npx peaks-skills list
@@ -157,6 +208,7 @@ npx peaks-skills list
 • "从 Pixso 同步这个页面到代码" → peaks-pixso-code-sync
 • "生成一个表单，包含用户名和邮箱" → peaks-hook-form
 • "根据 swagger 生成 API hooks" → peaks-api-create
+• "创建一个 Prompt 编辑器" → peaks-react-prompt-editor
 ```
 
 ## 📚 文档
@@ -173,6 +225,7 @@ npx peaks-skills list
   - [快速开始](./peaks-hook-form/references/quick_start.md)
   - [使用指南](./peaks-hook-form/references/usage_guide.md)
 - **peaks-api-create**: [SKILL.md](./peaks-api-create/SKILL.md)
+- **peaks-react-prompt-editor**: [SKILL.md](./peaks-react-prompt-editor/SKILL.md)
 
 ## 🛠️ 技术栈
 
@@ -254,6 +307,8 @@ npx peaks-skills list
 3. 使用 peaks-hook-form 创建表单
    ↓
 4. 使用 peaks-pixso-code-sync 同步设计稿
+   ↓
+5. 使用 peaks-react-prompt-editor 构建 AI 工作流编辑器
 ```
 
 ### 与现有项目集成
