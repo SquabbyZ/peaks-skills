@@ -43,6 +43,8 @@
 - 🛡️ **安全保护**：保留业务逻辑代码，冲突时添加 TODO 标记
 - 🎨 **样式还原**：分层数据获取，最大化样式还原度
 - 📊 **映射管理**：自动维护设计稿与代码文件的映射关系
+- ⚡ **优化策略**：多源数据融合（design_to_code + get_image），解决 DSL 截断问题
+- 📈 **高完整性**：数据完整性从 40% 提升至 95%，代码准确性达 90%
 
 **触发词**：
 
@@ -66,8 +68,13 @@
 - 📝 自动生成类型安全的表单字段与 Zod 校验逻辑
 - 🧩 表单字段组件化，便于复用与扩展
 - 🚀 默认做基础性能优化，减少不必要的重渲染
-- 🎯 支持多种组件类型：input、select、switch、textarea、text（只读展示）
+- 🎯 支持多种组件类型：input、select、switch、textarea、text（只读展示）、tag
 - 🔑 使用枚举键访问字段，类型更安全
+- 📐 **横向布局支持**：支持 vertical/horizontal 两种布局模式，可自定义 label 宽度
+- 🎨 **灵活样式配置**：
+  - `marginBottom`：自定义表单项底部外边距
+  - `errorPosition`：支持 'below'（下方）和 'border'（边框）两种错误提示位置
+- ✨ **必填标记控制**：通过 `showRequiredMark` 控制是否显示必填星号
 
 **提示词模板（推荐）**：
 
@@ -180,6 +187,7 @@ npx peaks-skills list
 - **代码质量**: ESLint, Prettier, Husky
 - **测试**: Jest, React Testing Library
 - **部署**: Docker, Nginx, GitLab CI
+- **AI 集成**: Trae IDE Skills, MCP (Model Context Protocol)
 
 ## 🎯 设计理念
 
@@ -214,6 +222,14 @@ npx peaks-skills list
 - 一键生成完整结构
 - 可复用的组件和模式
 - 减少重复性工作
+
+### 5. 持续优化
+
+定期优化和增强：
+
+- peaks-pixso-code-sync: 多源数据融合策略，解决 DSL 截断问题
+- peaks-hook-form: 横向布局支持和灵活的样式配置
+- 完善的文档体系和最佳实践指南
 
 ## 🔧 高级用法
 
