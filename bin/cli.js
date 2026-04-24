@@ -22,7 +22,8 @@ const SKILLS = [
   'peaks-react-template',
   'peaks-pixso-code-sync',
   'peaks-hook-form',
-  'peaks-api-create'
+  'peaks-api-create',
+  'peaks-react-prompt-editor'
 ];
 
 /**
@@ -64,23 +65,23 @@ For more information, visit:
 function listSkills() {
   console.log('\n📦 Available Peaks Skills:\n');
   console.log('═'.repeat(60));
-  
+
   SKILLS.forEach((skill, index) => {
     const skillPath = join(ROOT_DIR, skill, 'SKILL.md');
     if (fs.existsSync(skillPath)) {
       const content = fs.readFileSync(skillPath, 'utf-8');
       const nameMatch = content.match(/^name:\s*(.+)/m);
       const descMatch = content.match(/^description:\s*([\s\S]+?)(?:\n---|\n\n|$)/m);
-      
+
       const name = nameMatch ? nameMatch[1].trim() : skill;
       const desc = descMatch ? descMatch[1].trim().split('\n')[0] : 'No description available';
-      
+
       console.log(`\n${index + 1}. ${name}`);
       console.log(`   ${desc}`);
       console.log(`   Package: ${skill}`);
     }
   });
-  
+
   console.log('\n' + '═'.repeat(60));
   console.log('\n💡 Usage: npx peaks-skills install <skill-name>');
   console.log('   Example: npx peaks-skills install peaks-react-template\n');
@@ -103,11 +104,11 @@ function getSkillInfo(skillName) {
   }
 
   const content = fs.readFileSync(skillPath, 'utf-8');
-  
+
   // Extract information
   const nameMatch = content.match(/^name:\s*(.+)/m);
   const descMatch = content.match(/^description:\s*([\s\S]+?)(?:\n---|\n\n|$)/m);
-  
+
   console.log('\n📋 Skill Information:\n');
   console.log('═'.repeat(60));
   console.log(`Name: ${nameMatch ? nameMatch[1].trim() : skillName}`);
@@ -140,25 +141,25 @@ function installSkill(skillName, targetDir = '.') {
 
   console.log(`\n📦 Installing ${skillName}...`);
   console.log('═'.repeat(60));
-  
+
   try {
     // Create target directory
     fs.mkdirSync(targetPath, { recursive: true });
 
     // Copy files using cp command (more reliable for complex structures)
     const isWindows = process.platform === 'win32';
-    
+
     if (isWindows) {
       // Windows: use xcopy
-      execSync(`xcopy /E /I /Y "${sourcePath}\\*" "${targetPath}"`, { 
+      execSync(`xcopy /E /I /Y "${sourcePath}\\*" "${targetPath}"`, {
         stdio: 'inherit',
-        shell: true 
+        shell: true
       });
     } else {
       // Unix-like: use cp
-      execSync(`cp -R "${sourcePath}/." "${targetPath}/"`, { 
+      execSync(`cp -R "${sourcePath}/." "${targetPath}/"`, {
         stdio: 'inherit',
-        shell: true 
+        shell: true
       });
     }
 
@@ -169,7 +170,7 @@ function installSkill(skillName, targetDir = '.') {
     console.log('   1. Open your project in Trae IDE');
     console.log('   2. The skill will be automatically activated');
     console.log('   3. Start using the skill in your AI conversations\n');
-    
+
   } catch (error) {
     console.error('\n❌ Error during installation:', error.message);
     console.error('\n💡 Tip: Try running with administrator privileges\n');
@@ -182,13 +183,13 @@ function installSkill(skillName, targetDir = '.') {
  */
 function initProject() {
   const traeDir = join(process.cwd(), '.trae', 'skills');
-  
+
   console.log('\n🚀 Initializing Peaks Skills...\n');
   console.log('═'.repeat(60));
-  
+
   try {
     fs.mkdirSync(traeDir, { recursive: true });
-    
+
     // Create a README in the skills directory
     const readmePath = join(traeDir, 'README.md');
     const readmeContent = `# Peaks Skills
@@ -208,6 +209,7 @@ npx peaks-skills install <skill-name>
 - peaks-pixso-code-sync
 - peaks-hook-form
 - peaks-api-create
+- peaks-react-prompt-editor
 
 ## Usage
 
@@ -217,9 +219,9 @@ npx peaks-skills install <skill-name>
 
 For more information, visit: https://github.com/your-username/peaks-skills
 `;
-    
+
     fs.writeFileSync(readmePath, readmeContent);
-    
+
     console.log('✅ Peaks Skills initialized successfully!');
     console.log('\n' + '═'.repeat(60));
     console.log(`📍 Skills directory: ${traeDir}`);
@@ -227,7 +229,7 @@ For more information, visit: https://github.com/your-username/peaks-skills
     console.log('   1. Run "npx peaks-skills install <skill-name>" to add skills');
     console.log('   2. Open your project in Trae IDE');
     console.log('   3. Start using the skills!\n');
-    
+
   } catch (error) {
     console.error('\n❌ Error during initialization:', error.message);
     process.exit(1);
@@ -246,7 +248,7 @@ function main() {
     case 'ls':
       listSkills();
       break;
-    
+
     case 'install':
     case 'add':
     case 'get':
@@ -257,7 +259,7 @@ function main() {
       }
       installSkill(args[1], args[2]);
       break;
-    
+
     case 'info':
     case 'show':
       if (!args[1]) {
@@ -267,21 +269,21 @@ function main() {
       }
       getSkillInfo(args[1]);
       break;
-    
+
     case 'init':
       initProject();
       break;
-    
+
     case 'help':
     case '--help':
     case '-h':
       showHelp();
       break;
-    
+
     case undefined:
       showHelp();
       break;
-    
+
     default:
       console.error(`❌ Unknown command: ${command}`);
       console.error('💡 Run "npx peaks-skills help" to see available commands\n');

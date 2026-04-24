@@ -26,7 +26,7 @@ skills:
       - scaffold
       - typescript
       - tailwindcss
-    
+
   - name: peaks-pixso-code-sync
     description: Bidirectional sync between Pixso design files and React code
     category: Design Tools
@@ -36,7 +36,7 @@ skills:
       - sync
       - code-generation
       - ui
-    
+
   - name: peaks-hook-form
     description: Generate React Hook Form + Ant Design forms with Zod validation
     category: Code Generation
@@ -46,7 +46,7 @@ skills:
       - ant-design
       - zod
       - validation
-    
+
   - name: peaks-api-create
     description: Auto-generate React Query hooks from Swagger/OpenAPI specifications
     category: API Tools
@@ -57,17 +57,27 @@ skills:
       - react-query
       - hooks
 
+  - name: peaks-react-prompt-editor
+    description: Tree-structured React prompt editor for AI workflows with variable insertion and AI optimization
+    category: Editor Components
+    tags:
+      - prompt-editor
+      - ai-workflow
+      - tree-editor
+      - variable-insertion
+      - streaming
+
 installation:
   # Method 1: Using npx skills (vercel-labs/skills)
   - method: npx_skills
     command: npx skills add your-username/peaks-skills
     description: Install via vercel-labs/skills CLI
-    
+
   # Method 2: Using peaks-skills CLI
   - method: npx_peaks_skills
     command: npx peaks-skills install peaks-react-template
     description: Install via peaks-skills native CLI
-    
+
   # Method 3: Manual installation
   - method: manual
     steps:
@@ -80,7 +90,7 @@ requirements:
     - Trae IDE (recommended)
     - VS Code (with Trae extension)
     - JetBrains IDEs (with Trae plugin)
-  
+
   runtime:
     - Node.js >= 16.0.0
     - npm >= 7.0.0 or pnpm >= 7.0.0
@@ -99,13 +109,13 @@ compatibility:
     - claude-code
     - windsurf
     - cline
-    
+
   # Supported frameworks
   frameworks:
     - react
     - nextjs
     - umijs
-    
+
   # Supported languages
   languages:
     - typescript
@@ -116,17 +126,17 @@ examples:
     skill: peaks-react-template
     command: npx peaks-skills install peaks-react-template
     description: Scaffold a complete React project with best practices
-    
+
   - title: Generate a form
     skill: peaks-hook-form
     prompt: "Generate a form with username, email, and password fields"
     description: Quickly create forms with validation
-    
+
   - title: Sync design to code
     skill: peaks-pixso-code-sync
     prompt: "Sync this Pixso design to code"
     description: Convert Pixso designs to React components
-    
+
   - title: Generate API hooks
     skill: peaks-api-create
     prompt: "Generate API hooks from https://api.example.com/openapi.json"
@@ -139,6 +149,13 @@ support:
   twitter: null
 
 changelog:
+  - version: 1.0.4
+    date: 2026-04-23
+    changes:
+      - Added peaks-react-prompt-editor skill
+      - Enhanced peaks-pixso-code-sync with multi-source data fusion strategy
+      - Enhanced peaks-hook-form with horizontal layout and flexible styling
+      - Updated documentation and examples
   - version: 1.0.0
     date: 2026-03-31
     changes:

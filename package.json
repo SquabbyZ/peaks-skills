@@ -1,6 +1,6 @@
 {
   "name": "peaks-skills",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "AI-driven frontend development skills collection for Trae IDE and AI coding assistants",
   "type": "module",
   "bin": {
@@ -9,10 +9,12 @@
   "files": [
     "peaks-*/SKILL.md",
     "peaks-*/skill.yaml",
-    "peaks-*/references/",
-    "peaks-*/scripts/",
-    "peaks-*/assets/",
-    "bin/"
+    "peaks-*/references/**/*",
+    "peaks-*/scripts/**/*",
+    "peaks-*/assets/**/*",
+    "bin/",
+    "skill.yaml",
+    "README.md"
   ],
   "scripts": {
     "test": "echo \"No tests specified\" && exit 0",
