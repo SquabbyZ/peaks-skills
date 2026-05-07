@@ -716,6 +716,10 @@ openspec/
 | @bunas/fs-mcp 不可用 | MCP 工具调用失败 | 降级为 Bash/Read 工具手动扫描项目 |
 | settings.json 不存在 | `.claude/settings.json` 不存在 | 跳过 MCP 配置步骤，提示用户可稍后手动配置 |
 | 模板变量替换失败 | 检测到未定义的变量 | 使用空字符串作为默认值，继续处理 |
+| npm/npx 安装失败 | `npx skills add` 或 `npx @fission-ai/openspec` 超时/报错 | 重试 1 次；仍失败则跳过该 skill，记录警告继续 |
+| 网络超时 | MCP 启动或 npx 下载超时 | 增加超时等待（30s）；仍失败则降级或跳过 |
+| 权限不足 | 写入 `.claude/` 或 `.peaks/` 失败 | 提示用户检查目录权限，建议 `chmod -R u+w .claude/` |
+| 磁盘空间不足 | 写入文件时报 ENOSPC | 提示用户清理磁盘空间后重试 |
 
 ### 决策树
 
