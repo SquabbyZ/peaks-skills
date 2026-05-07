@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.4] - 2026-05-07
+
+### Added
+
+#### peaks-sdd
+
+- **新增技能**：规约驱动开发（Spec-Driven Development）工作流
+- **智能项目初始化**：自动检测技术栈（React/NestJS/Tauri/PostgreSQL），动态生成对应的 Agent 配置
+- **完整开发流程**：Constitution → PRD → 设计 → 开发 → Code Review → QA → 部署
+- **系统化 Bug 修复**：reproduce → root cause → fix → test → verify
+- **Checkpoint 门禁**：每个 Phase 完成后必须经过检查点确认，防止失控
+- **Slash Commands**：`/peaksinit`、`/peaksfeat`、`/peaksbug`
+- **跨会话 Memory**：通过 claude-mem MCP 实现上下文持久化
+- **Karpathy 开发原则**：减少 LLM 编码错误的最佳实践指南
+
+---
+
 ## [1.0.3] - 2026-04-23
 
 ### Added

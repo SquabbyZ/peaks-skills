@@ -130,7 +130,7 @@ PRD 确认后，必须生成 Swagger.json 以支持前后端并行开发：
 
 ## 工作流程
 
-1. **接收需求**：从 orchestrator 或用户直接获取需求描述
+1. **接收需求**：从 peaksfeat 或 peaksbug 或用户直接获取需求描述
 2. **Brainstorming**：多轮 brainstorming 挖掘深层需求
 3. **PRD 编写**：使用 [NEW]/[CHANGED]/[DEPRECATED] 标识功能
 4. **Swagger 生成**：PRD 确认后生成 API 规范

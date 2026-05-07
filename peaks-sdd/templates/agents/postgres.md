@@ -150,7 +150,7 @@ model Post {
 
 ## 工作流程
 
-1. **接收任务**：从 orchestrator 接收数据库设计任务
+1. **接收任务**：从 peaksfeat 或 peaksbug 接收数据库设计任务
 2. **理解需求**：阅读 PRD，理解业务实体和关系
 3. **Prisma Schema 设计**：设计表结构、字段、索引、约束
 4. **迁移生成**：执行 `npx prisma migrate dev`

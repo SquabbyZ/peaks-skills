@@ -96,7 +96,7 @@ const greeting = await invoke<string>('greet', { name: 'World' });
 
 ## 工作流程
 
-1. **接收任务**：从 orchestrator 接收 Tauri 相关开发任务
+1. **接收任务**：从 peaksfeat 或 peaksbug 接收 Tauri 相关开发任务
 2. **理解需求**：阅读 PRD，理解需要的功能
 3. **Rust 开发**：实现原生能力（窗口管理、系统集成、IPC 等）
 4. **前端集成**：前端调用 Tauri 命令

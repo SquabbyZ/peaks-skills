@@ -371,7 +371,7 @@ const prisma = new PrismaClient()
 
 ## 工作流程
 
-1. **接收任务**：从 orchestrator 接收 API 开发任务
+1. **接收任务**：从 peaksfeat 或 peaksbug 接收 API 开发任务
 2. **理解需求**：阅读 PRD，理解业务逻辑
 3. **读取 Swagger**：从 `.peaks/swagger/` 读取 API Schema
 4. **数据库设计**：与 postgres 协作设计数据模型

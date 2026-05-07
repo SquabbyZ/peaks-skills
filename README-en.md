@@ -126,6 +126,38 @@ Use the peaks-hook-form skill to generate a form:
 - Need standardized API call layer
 - Want to auto-generate tests and mocks
 
+### 5. peaks-react-prompt-editor
+
+**Function**: Tree-structured React Prompt editor component library
+
+**Core Features**:
+
+- 🌳 **Tree Node Orchestration**: Multi-level Prompt node management with drag-and-drop sorting
+- 🤖 **AI Optimization Streaming Output**: Built-in AI optimization supporting OpenAI/Dify/Bailian platforms
+- 📊 **Variable Insertion System**: @variable selector with custom data sources and multi-select batch insertion
+- 🛠️ **Highly Customizable**:
+  - Custom toolbar (renderToolbar)
+  - Custom node operations (renderNodeActions)
+  - Custom node top area (renderNodeTopSlot)
+- 👁️ **Preview Mode**: Read-only editor and Markdown rendering
+- 🌍 **i18n Support**: Built-in zhCN/enUS language packs
+- 🎨 **Theme Switching**: system/light/dark
+- ⚡ **Dependency Management**: Nodes can declare dependencies
+
+### 6. peaks-sdd
+
+**Function**: Spec-Driven Development workflow
+
+**Core Features**:
+
+- ⚡ **Smart Project Initialization**: Auto-detect tech stack (React/NestJS/Tauri/PostgreSQL) and dynamically generate Agent configs
+- 📋 **Complete Development Flow**: Constitution → PRD → Design → Develop → Code Review → QA → Deploy
+- 🐛 **Systematic Bug Fix**: reproduce → root cause → fix → test → verify
+- 🔧 **Checkpoint Gates**: Each Phase must pass checkpoint confirmation before proceeding
+- 🤖 **Dynamic Agent Generation**: Auto-select and configure Agents based on detected tech stack
+- 💾 **Cross-Session Memory**: Context persistence via claude-mem MCP
+- 🛠️ **Slash Commands**: `/peaksinit`, `/peaksfeat`, `/peaksbug`
+
 ## 🚀 Quick Start
 
 ### Install via CLI (Recommended)
@@ -136,6 +168,8 @@ npx peaks-skills install peaks-react-template
 npx peaks-skills install peaks-pixso-code-sync
 npx peaks-skills install peaks-hook-form
 npx peaks-skills install peaks-api-create
+npx peaks-skills install peaks-react-prompt-editor
+npx peaks-skills install peaks-sdd
 
 # List all available skills
 npx peaks-skills list
@@ -150,6 +184,10 @@ After installation, use natural language in Trae IDE AI conversations:
 • "Sync this page from Pixso to code" → peaks-pixso-code-sync
 • "Generate a form with username and email" → peaks-hook-form
 • "Generate API hooks from swagger" → peaks-api-create
+• "Create a Prompt editor" → peaks-react-prompt-editor
+• "Initialize my project" / "peaksinit" → peaks-sdd
+• "Develop new feature" / "peaksfeat" → peaks-sdd
+• "Fix this bug" / "peaksbug" → peaks-sdd
 ```
 
 ## 📚 Documentation
@@ -166,6 +204,8 @@ Each skill has detailed documentation:
   - [Quick Start](./peaks-hook-form/references/quick_start.md)
   - [Usage Guide](./peaks-hook-form/references/usage_guide.md)
 - **peaks-api-create**: [SKILL.md](./peaks-api-create/SKILL.md)
+- **peaks-react-prompt-editor**: [SKILL.md](./peaks-react-prompt-editor/SKILL.md)
+- **peaks-sdd**: [SKILL.md](./peaks-sdd/SKILL.md)
 
 ## 🛠️ Tech Stack
 
@@ -231,13 +271,21 @@ You can create custom skills based on existing skill templates:
 Multiple skills can be used together:
 
 ```
-1. Use peaks-react-template to create project
+1. Use peaks-sdd (/peaksinit) to initialize project
    ↓
-2. Use peaks-api-create to generate API hooks
+2. Use peaks-react-template to create project structure
    ↓
-3. Use peaks-hook-form to create forms
+3. Use peaks-api-create to generate API hooks
    ↓
-4. Use peaks-pixso-code-sync to sync design files
+4. Use peaks-hook-form to create forms
+   ↓
+5. Use peaks-pixso-code-sync to sync design files
+   ↓
+6. Use peaks-react-prompt-editor to build AI workflow editor
+   ↓
+7. Use peaks-sdd (/peaksfeat) to develop new features
+   ↓
+8. Use peaks-sdd (/peaksbug) to fix bugs
 ```
 
 ### Integration with Existing Projects

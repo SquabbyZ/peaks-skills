@@ -183,6 +183,46 @@ const [data, setData] = useState<TaskNode[]>([
 - 实现流式 AI 优化
 - 多语言支持的 Prompt 管理系统
 
+### 6. peaks-sdd
+
+**功能**：规约驱动开发（Spec-Driven Development）工作流
+
+**核心特性**：
+
+- ⚡ **智能项目初始化**：自动检测技术栈（React/NestJS/Tauri/PostgreSQL），动态生成对应的 Agent 配置
+- 📋 **完整开发流程**：Constitution → PRD → 设计 → 开发 → Code Review → QA → 部署
+- 🐛 **系统化 Bug 修复**：reproduce → root cause → fix → test → verify
+- 🔧 **Checkpoint 门禁**：每个 Phase 完成后必须经过检查点确认，防止失控
+- 🤖 **动态 Agent 生成**：根据检测到的技术栈自动选择和配置 Agent
+- 💾 **跨会话 Memory**：通过 claude-mem MCP 实现上下文持久化
+- 🛠️ **Slash Commands**：`/peaksinit`、`/peaksfeat`、`/peaksbug`
+
+**工作流程**：
+
+| 命令 | 说明 | 适用场景 |
+|------|------|---------|
+| `/peaksinit` | 项目初始化 | 新项目或现有项目配置 Agent |
+| `/peaksfeat` | 功能开发 | 0→1 新项目，复杂项目多团队协作 |
+| `/peaksbug` | Bug 修复 | 问题复现 → 根因分析 → 修复 → 回归测试 |
+
+**技术栈检测**：
+
+| 检测项 | 来源 | 说明 |
+|--------|------|------|
+| 前端框架 | package.json.dependencies.react | React 项目 |
+| 后端框架 | package.json.dependencies.@nestjs/* | NestJS 后端 |
+| 桌面应用 | src-tauri/ 或 tauri.conf.json | Tauri 项目 |
+| 全栈框架 | package.json.dependencies.next | Next.js |
+| 数据库 | typeorm / prisma / drizzle | 数据库 ORM |
+| 测试框架 | @playwright/test / vitest / jest | 测试框架 |
+
+**使用场景**：
+
+- 从零开始的新项目搭建
+- 复杂项目的多方对齐和流程管控
+- 系统化 Bug 修复和根因分析
+- 需要持久化开发上下文的长期项目
+
 ## 🚀 快速开始
 
 ### 使用 CLI 安装（推荐）
@@ -194,6 +234,7 @@ npx peaks-skills install peaks-pixso-code-sync
 npx peaks-skills install peaks-hook-form
 npx peaks-skills install peaks-api-create
 npx peaks-skills install peaks-react-prompt-editor
+npx peaks-skills install peaks-sdd
 
 # 查看所有可用技能
 npx peaks-skills list
@@ -209,6 +250,9 @@ npx peaks-skills list
 • "生成一个表单，包含用户名和邮箱" → peaks-hook-form
 • "根据 swagger 生成 API hooks" → peaks-api-create
 • "创建一个 Prompt 编辑器" → peaks-react-prompt-editor
+• "初始化我的项目" / "peaksinit" → peaks-sdd
+• "开发新功能" / "peaksfeat" → peaks-sdd
+• "修复这个 bug" / "peaksbug" → peaks-sdd
 ```
 
 ## 📚 文档
@@ -226,6 +270,7 @@ npx peaks-skills list
   - [使用指南](./peaks-hook-form/references/usage_guide.md)
 - **peaks-api-create**: [SKILL.md](./peaks-api-create/SKILL.md)
 - **peaks-react-prompt-editor**: [SKILL.md](./peaks-react-prompt-editor/SKILL.md)
+- **peaks-sdd**: [SKILL.md](./peaks-sdd/SKILL.md)
 
 ## 🛠️ 技术栈
 
@@ -300,15 +345,21 @@ npx peaks-skills list
 多个技能可以组合使用：
 
 ```
-1. 使用 peaks-react-template 创建项目
+1. 使用 peaks-sdd (/peaksinit) 初始化项目
    ↓
-2. 使用 peaks-api-create 生成 API hooks
+2. 使用 peaks-react-template 创建项目结构
    ↓
-3. 使用 peaks-hook-form 创建表单
+3. 使用 peaks-api-create 生成 API hooks
    ↓
-4. 使用 peaks-pixso-code-sync 同步设计稿
+4. 使用 peaks-hook-form 创建表单
    ↓
-5. 使用 peaks-react-prompt-editor 构建 AI 工作流编辑器
+5. 使用 peaks-pixso-code-sync 同步设计稿
+   ↓
+6. 使用 peaks-react-prompt-editor 构建 AI 工作流编辑器
+   ↓
+7. 使用 peaks-sdd (/peaksfeat) 开发新功能
+   ↓
+8. 使用 peaks-sdd (/peaksbug) 修复 bug
 ```
 
 ### 与现有项目集成

@@ -67,6 +67,19 @@ skills:
       - variable-insertion
       - streaming
 
+  - name: peaks-sdd
+    description: Spec-Driven Development workflow with Constitution, PRD, Design, Develop, Review, QA, and Deploy phases
+    category: Development Workflow
+    tags:
+      - sdd
+      - spec-driven
+      - project-init
+      - prd
+      - slash-commands
+      - peaksinit
+      - peaksfeat
+      - peaksbug
+
 installation:
   # Method 1: Using npx skills (vercel-labs/skills)
   - method: npx_skills
