@@ -23,7 +23,8 @@ const SKILLS = [
   'peaks-pixso-code-sync',
   'peaks-hook-form',
   'peaks-api-create',
-  'peaks-react-prompt-editor'
+  'peaks-react-prompt-editor',
+  'peaks-sdd'
 ];
 
 /**
@@ -210,6 +211,7 @@ npx peaks-skills install <skill-name>
 - peaks-hook-form
 - peaks-api-create
 - peaks-react-prompt-editor
+- peaks-sdd
 
 ## Usage
 

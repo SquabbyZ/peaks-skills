@@ -9,7 +9,7 @@
 [!\[npm version\](https://img.shields.io/npm/v/peaks-skills.svg null)](https://www.npmjs.com/package/peaks-skills)
 [!\[License: MIT\](https://img.shields.io/badge/License-MIT-yellow.svg null)](https://opensource.org/licenses/MIT)
 [!\[GitHub stars\](https://img.shields.io/github/stars/SquabbyZ/peaks-skills null)](https://github.com/SquabbyZ/peaks-skills)
-
+[![skills.sh](https://skills.sh/b/SquabbyZ/peaks-skills)](https://skills.sh/SquabbyZ/peaks-skills)
 </div>
 
 ## 📦 技能列表
