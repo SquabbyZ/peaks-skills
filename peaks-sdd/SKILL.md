@@ -613,14 +613,36 @@ openspec/
 
 ### Spec-It 工作流 (新项目)
 
-### Phase 1: Constitution
+**输入**：用户需求描述
+**输出**：`.peaks/constitution.md`
 
-定义项目治理原则 → `.peaks/constitution.md`
+#### Phase 1: Constitution
 
-### Phase 2: Specify
+**Step 1.1** — 定义治理原则
+- 确定代码规范、提交约定、审查流程
+- 确定 Agent 调度策略
 
-创建规格说明 → `.peaks/prds/prd-[功能名]-[日期].md`
-使用 `[NEW]` / `[CHANGED]` / `[DEPRECATED]` 标识
+**Step 1.2** — 输出 Constitution
+```
+.peaks/constitution.md
+```
+
+**过渡**：用户确认 Constitution → Phase 2
+
+---
+
+**输入**：Constitution + 用户需求
+**输出**：`.peaks/prds/prd-[功能名]-[日期].md`
+
+#### Phase 2: Specify
+
+**Step 2.1** — 需求分析
+- 使用 brainstorming 分析深层需求
+- 考虑边界场景
+
+**Step 2.2** — 编写 PRD
+- 使用 `[NEW]` / `[CHANGED]` / `[DEPRECATED]` 标识
+- 明确功能点和验收标准
 
 **PRD 输出格式示例**：
 ```markdown
@@ -649,21 +671,70 @@ openspec/
 - 密码加密存储（bcrypt）
 ```
 
-### Phase 3: Plan
+**过渡**：用户确认 PRD → Phase 3
 
-技术实现计划 → `.peaks/plans/plan-[功能名]-[日期].md`
+---
 
-### Phase 4: Tasks
+**输入**：PRD
+**输出**：`.peaks/plans/plan-[功能名]-[日期].md`
 
-任务拆分 → 可执行的任务列表
+#### Phase 3: Plan
 
-### Phase 5: Implement
+**Step 3.1** — 技术方案设计
+- 确定技术栈、架构、API 设计
 
-执行任务，经过质量门禁：
+**Step 3.2** — 产出实现计划
+- 分解为可验证的里程碑
 
+**过渡**：用户确认 Plan → Phase 4
+
+---
+
+**输入**：Plan
+**输出**：`.peaks/tasks/task-[功能名]-[日期].md`
+
+#### Phase 4: Tasks
+
+**Step 4.1** — 任务拆分
+- 按依赖关系排序
+- 标记并行/顺序任务
+
+**Step 4.2** — 分配任务
+- 前端任务 → frontend agent
+- 后端任务 → backend agent
+
+**过渡**：任务分配完成 → Phase 5
+
+---
+
+**输入**：Tasks
+**输出**：代码变更 + 测试报告
+
+#### Phase 5: Implement
+
+**Step 5.1** — 开发
+- Agent 执行分配的任务
+
+**Step 5.2** — 质量门禁
 ```
-Code Review → 安全检查 → QA 验证 → 部署
+┌─ Code Review ──────────────────────┐
+│  CR 通过 → 进入安全检查            │
+│  CR 失败 → 打回修复 → 重新 CR      │
+└─────────────────────────────────────┘
+         ↓
+┌─ 安全检查 ─────────────────────────┐
+│  通过 → 进入 QA 验证               │
+│  失败 → 修复                       │
+└─────────────────────────────────────┘
+         ↓
+┌─ QA 验证 ──────────────────────────┐
+│  测试通过 → 部署                   │
+└─────────────────────────────────────┘
 ```
+
+**Step 5.3** — 部署
+- 执行部署脚本
+- 验证服务可达
 
 ### OpenSpec 工作流 (存量项目迭代)
 
