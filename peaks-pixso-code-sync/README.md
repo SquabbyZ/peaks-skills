@@ -148,7 +148,7 @@
 #### 映射文件
 
 ```
-位置：.trae/skills/peaks-pixso-code-sync/mappings.json
+位置：.claude/skills/peaks-pixso-code-sync/mappings.json
 ```
 
 #### 映射格式
@@ -194,7 +194,7 @@ npx prettier --write src/pages/index.tsx
 ## 📁 文件结构
 
 ```
-.trae/skills/peaks-pixso-code-sync/
+.claude/skills/peaks-pixso-code-sync/
 ├── SKILL.md                          # ✅ 已更新：技能主文档
 ├── skill.yaml                        # ✅ 已有：技能配置文件
 └── references/                       # ✅ 新增：参考文档目录

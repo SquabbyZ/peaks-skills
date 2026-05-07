@@ -113,7 +113,7 @@ prompt-project/
 ├── .husky/                  # Git Hooks configuration
 │   ├── commit-msg          # commit-msg hook
 │   └── pre-commit          # pre-commit hook
-├── .trae/                  # Trae AI skills configuration
+├── .claude/                  # Claude Code skills configuration
 │   └── skills/             # Skills directory
 │       ├── peaks-api-create/
 │       ├── peaks-hook-form/

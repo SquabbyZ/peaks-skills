@@ -151,7 +151,7 @@ AI 处理：
 
 ## 📁 映射关系
 
-**文件位置**：`.trae/skills/peaks-pixso-code-sync/mappings.json`
+**文件位置**：`.claude/skills/peaks-pixso-code-sync/mappings.json`
 
 **格式**：
 
@@ -355,7 +355,7 @@ AI：✅ 同步完成！
 - 保留旧代码
 
 **检查映射？** → 查看：
-`.trae/skills/peaks-pixso-code-sync/mappings.json`
+`.claude/skills/peaks-pixso-code-sync/mappings.json`
 
 ---
 

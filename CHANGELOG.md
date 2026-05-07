@@ -49,9 +49,9 @@ All notable changes to this project will be documented in this file.
 
 #### peaks-react-template
 
-- **AI 编码规则集成**：.trae/rules/peaks-react-template.md，包含严格的 TypeScript 规范（禁止 any）、Tailwind CSS 优先原则、性能优化要求
-- **辅助脚本增强**：scripts/use_template.py 确保所有隐藏文件（.husky/、.trae/、.npmrc 等）正确复制
-- **完整的 Trae Skills 集成**：预配置 peaks-api-create、peaks-hook-form、peaks-pixso-code-sync 技能
+- **AI 编码规则集成**：.claude/rules/peaks-react-template.md，包含严格的 TypeScript 规范（禁止 any）、Tailwind CSS 优先原则、性能优化要求
+- **辅助脚本增强**：scripts/use_template.py 确保所有隐藏文件（.husky/、.claude/、.npmrc 等）正确复制
+- **完整的 Claude Code Skills 集成**：预配置 peaks-api-create、peaks-hook-form、peaks-pixso-code-sync 技能
 
 #### peaks-react-prompt-editor
 
@@ -84,7 +84,7 @@ All notable changes to this project will be documented in this file.
 
 - README: 更新 peaks-pixso-code-sync 和 peaks-hook-form 核心特性描述
 - README: 添加持续优化章节，说明各技能的改进方向
-- README: 技术栈中增加 AI 集成（Trae IDE Skills, MCP）
+- README: 技术栈中增加 AI 集成（Claude Code Skills, MCP）
 - 各技能目录新增多个详细文档，提供完整的使用指南和最佳实践
 
 ---

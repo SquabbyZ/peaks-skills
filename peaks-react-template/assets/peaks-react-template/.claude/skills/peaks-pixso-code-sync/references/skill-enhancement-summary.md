@@ -296,7 +296,7 @@ Disabled           →  disabled:
 ## 项目结构
 
 ```
-.trae/skills/peaks-pixso-code-sync/
+.claude/skills/peaks-pixso-code-sync/
 ├── SKILL.md                      # 技能主文档
 ├── skill.yaml                    # 技能配置文件
 └── references/                   # 参考文档

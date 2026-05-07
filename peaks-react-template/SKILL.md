@@ -56,12 +56,12 @@ src/
 ```
 
 ### AI Rules & Skills
-- **.trae/rules/peaks-react-template.md**: AI coding rules with strict guidelines for:
+- **.claude/rules/peaks-react-template.md**: AI coding rules with strict guidelines for:
   - TypeScript best practices (no `any` type allowed)
   - Tailwind CSS first styling approach
   - Performance optimization requirements
   - Code style and project structure
-- **.trae/skills/**: Pre-configured AI skills for enhanced development
+- **.claude/skills/**: Pre-configured AI skills for enhanced development
   - `peaks-api-create`: API hook generation from Swagger
   - `peaks-hook-form`: React Hook Form + Ant Design forms
   - `peaks-pixso-code-sync`: Pixso design to code synchronization
@@ -75,7 +75,7 @@ src/
 
 ### Method 1: Using the Helper Script (Recommended)
 
-The template includes a helper script that ensures ALL files (including hidden files like `.husky/`, `.trae/`, `.npmrc`, etc.) are copied correctly:
+The template includes a helper script that ensures ALL files (including hidden files like `.husky/`, `.claude/`, `.npmrc`, etc.) are copied correctly:
 
 ```bash
 # Navigate to the skill directory
@@ -86,7 +86,7 @@ python scripts/use_template.py /path/to/your/new-project
 ```
 
 This script will:
-- Copy ALL files including hidden files (`.husky/`, `.trae/`, `.npmrc`, `.eslintrc.js`, etc.)
+- Copy ALL files including hidden files (`.husky/`, `.claude/`, `.npmrc`, `.eslintrc.js`, etc.)
 - Preserve file permissions and timestamps
 - List all hidden files that were copied
 - Display next steps for project setup
@@ -112,7 +112,7 @@ Copy-Item -Path "\path\to\peaks-react-template\assets\peaks-react-template\*" -D
 
 **⚠️ Important:** Make sure to copy hidden files (files starting with `.`). Common hidden files in this template:
 - `.husky/` - Git hooks
-- `.trae/` - AI rules and skills
+- `.claude/` - AI rules and skills
 - `.npmrc` - NPM registry config
 - `.eslintrc.js` - ESLint config
 - `.prettierrc.json` - Prettier config
@@ -151,13 +151,13 @@ After copying the template:
 - Environment-specific configs
 
 ### 4. AI-Powered Development
-- Integrated Trae skills for:
+- Integrated Claude Code skills for:
   - Automatic API hook generation
   - Form component scaffolding
   - Design-to-code synchronization
 
 ### 5. AI Coding Rules
-- Comprehensive AI coding guidelines in `.trae/rules/peaks-react-template.md`:
+- Comprehensive AI coding guidelines in `.claude/rules/peaks-react-template.md`:
   - **Zero tolerance for `any` type** - Must use proper TypeScript types
   - **Tailwind CSS first** - Prefer utility classes over inline styles
   - **Performance requirements** - Core Web Vitals targets and optimization checklist
@@ -175,8 +175,8 @@ The complete project structure including:
 - Deployment scripts
 - Git hooks
 - Documentation
-- AI coding rules (`.trae/rules/peaks-react-template.md`)
-- Trae skills integration
+- AI coding rules (`.claude/rules/peaks-react-template.md`)
+- Claude Code skills integration
 
 **Usage**: Copy the entire `assets/peaks-react-template/` directory to your target location using the helper script or manual copy methods described above.
 
@@ -185,7 +185,7 @@ The complete project structure including:
 Helper script to copy the template while preserving ALL files including hidden files.
 
 **Features:**
-- ✅ Copies ALL files including hidden files (`.husky/`, `.trae/`, `.npmrc`, etc.)
+- ✅ Copies ALL files including hidden files (`.husky/`, `.claude/`, `.npmrc`, etc.)
 - ✅ Preserves file permissions and timestamps
 - ✅ Lists all copied hidden files
 - ✅ Displays next steps for project setup
@@ -210,7 +210,7 @@ python scripts/use_template.py ./my-new-project
 If certain features aren't needed:
 - Remove `.husky/` if not using git hooks
 - Remove `deploy/` if using different deployment strategy
-- Remove `.trae/skills/` if not using AI skills
+- Remove `.claude/skills/` if not using AI skills
 - Remove `jest.config.js` if using different testing framework
 
 ## Quick Start Commands

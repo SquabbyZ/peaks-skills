@@ -26,7 +26,7 @@ Available skills:
 
 ```bash
 npx peaks-skills list              # List all available skills
-npx peaks-skills install <skill>   # Install a skill to .trae/skills/
+npx peaks-skills install <skill>   # Install a skill to .claude/skills/
 npx peaks-skills info <skill>      # Show skill details
 npx peaks-skills init              # Initialize skills directory
 ```

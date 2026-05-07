@@ -194,7 +194,7 @@ className={layout === 'horizontal' ? 'flex items-start' : ''}
 
 ### 更新文件
 
-`.trae/skills/peaks-hook-form/SKILL.md`
+`.claude/skills/peaks-hook-form/SKILL.md`
 
 ### 更新内容
 
@@ -316,9 +316,9 @@ className={layout === 'horizontal' ? 'flex items-start' : ''}
 
 ## 📖 相关文档
 
-- [peaks-hook-form SKILL.md](../.trae/skills/peaks-hook-form/SKILL.md)
-- [Quick Start Guide](../.trae/skills/peaks-hook-form/references/quick_start.md)
-- [Usage Examples](../.trae/skills/peaks-hook-form/references/usage_example.md)
+- [peaks-hook-form SKILL.md](../.claude/skills/peaks-hook-form/SKILL.md)
+- [Quick Start Guide](../.claude/skills/peaks-hook-form/references/quick_start.md)
+- [Usage Examples](../.claude/skills/peaks-hook-form/references/usage_example.md)
 
 ---
 

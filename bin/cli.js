@@ -2,16 +2,15 @@
 
 /**
  * Peaks Skills CLI
- * 
+ *
  * A command-line interface for managing and installing AI coding skills.
- * Supports integration with Trae IDE and other AI coding assistants.
+ * Supports integration with Claude Code and other AI coding assistants.
  */
 
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { execSync } from 'child_process';
 import fs from 'fs';
-import { readFileSync } from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -133,7 +132,7 @@ function installSkill(skillName, targetDir = '.') {
   }
 
   const sourcePath = join(ROOT_DIR, skillName);
-  const targetPath = join(process.cwd(), targetDir, '.trae', 'skills', skillName);
+  const targetPath = join(process.cwd(), targetDir, '.claude', 'skills', skillName);
 
   if (!fs.existsSync(sourcePath)) {
     console.error(`❌ Error: Skill source directory not found: ${sourcePath}`);
@@ -167,10 +166,7 @@ function installSkill(skillName, targetDir = '.') {
     console.log('\n✅ Installation successful!');
     console.log('\n' + '═'.repeat(60));
     console.log(`📍 Installed to: ${targetPath}`);
-    console.log('\n📋 Next steps:');
-    console.log('   1. Open your project in Trae IDE');
-    console.log('   2. The skill will be automatically activated');
-    console.log('   3. Start using the skill in your AI conversations\n');
+    console.log('\n💡 Usage: Restart your AI conversation, then use /peaksinit, /peaksfeat or /peaksbug\n');
 
   } catch (error) {
     console.error('\n❌ Error during installation:', error.message);
@@ -183,16 +179,16 @@ function installSkill(skillName, targetDir = '.') {
  * Initialize peaks-skills in current project
  */
 function initProject() {
-  const traeDir = join(process.cwd(), '.trae', 'skills');
+  const claudeDir = join(process.cwd(), '.claude', 'skills');
 
   console.log('\n🚀 Initializing Peaks Skills...\n');
   console.log('═'.repeat(60));
 
   try {
-    fs.mkdirSync(traeDir, { recursive: true });
+    fs.mkdirSync(claudeDir, { recursive: true });
 
     // Create a README in the skills directory
-    const readmePath = join(traeDir, 'README.md');
+    const readmePath = join(claudeDir, 'README.md');
     const readmeContent = `# Peaks Skills
 
 This directory contains installed AI coding skills for your project.
@@ -215,7 +211,7 @@ npx peaks-skills install <skill-name>
 
 ## Usage
 
-1. Open your project in Trae IDE
+1. Open your project in Claude Code
 2. The skills will be automatically activated
 3. Use natural language to trigger the skills
 
@@ -226,11 +222,11 @@ For more information, visit: https://github.com/your-username/peaks-skills
 
     console.log('✅ Peaks Skills initialized successfully!');
     console.log('\n' + '═'.repeat(60));
-    console.log(`📍 Skills directory: ${traeDir}`);
+    console.log(`📍 Skills directory: ${claudeDir}`);
     console.log('\n📋 Next steps:');
     console.log('   1. Run "npx peaks-skills install <skill-name>" to add skills');
-    console.log('   2. Open your project in Trae IDE');
-    console.log('   3. Start using the skills!\n');
+    console.log('   2. Open your project in Claude Code');
+    console.log('   3. Start using the skills!');
 
   } catch (error) {
     console.error('\n❌ Error during initialization:', error.message);

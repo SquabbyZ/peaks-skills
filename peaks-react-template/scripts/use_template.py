@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Script to copy the peaks-react-template to a target directory.
-This script ensures ALL files including hidden files (.husky, .trae, .npmrc, etc.) are copied.
+This script ensures ALL files including hidden files (.husky, .claude, .npmrc, etc.) are copied.
 
 Usage: python use_template.py [target_directory]
 """

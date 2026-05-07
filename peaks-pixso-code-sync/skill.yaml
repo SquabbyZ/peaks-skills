@@ -3,13 +3,13 @@ version: 1.0.0
 description: 实现Pixso与代码的双向同步，保持设计与代码的一致性
 
 author:
-  name: Trae AI
-  email: contact@trae.ai
+  name: Peaks Skills
+  email: support@peaks-skills.dev
 
 manifest:
   title: Pixso-Code Sync
   description: 双向同步Pixso设计稿与本地代码，确保设计与代码的一致性
-  icon: https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Pixso%20sync%20icon%20with%20code%20and%20design%20sync%20symbol&image_size=square
+  icon: https://raw.githubusercontent.com/SquabbyZ/peaks-skills/main/peaks-pixso-code-sync/icon.svg
   category: Development Tools
   tags:
     - Pixso
@@ -188,7 +188,7 @@ manifest:
 
   mapping_management:
     enabled: true
-    mapping_file: ".trae/skills/peaks-pixso-code-sync/mappings.json"
+    mapping_file: ".claude/skills/peaks-pixso-code-sync/mappings.json"
     mapping_format:
       code_path: string
       pixso_page_id: string

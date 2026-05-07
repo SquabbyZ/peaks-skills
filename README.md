@@ -6,9 +6,9 @@
 
 一个专为 AI 驱动的前端开发设计的高效能技能集合，提供从设计到代码的完整工作流解决方案。
 
-[!\[npm version\](https://img.shields.io/npm/v/peaks-skills.svg null)](https://www.npmjs.com/package/peaks-skills)
-[!\[License: MIT\](https://img.shields.io/badge/License-MIT-yellow.svg null)](https://opensource.org/licenses/MIT)
-[!\[GitHub stars\](https://img.shields.io/github/stars/SquabbyZ/peaks-skills null)](https://github.com/SquabbyZ/peaks-skills)
+[![npm version](https://img.shields.io/npm/v/peaks-skills.svg)](https://www.npmjs.com/package/peaks-skills)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![GitHub stars](https://img.shields.io/github/stars/SquabbyZ/peaks-skills)](https://github.com/SquabbyZ/peaks-skills)
 [![skills.sh](https://skills.sh/b/SquabbyZ/peaks-skills)](https://skills.sh/SquabbyZ/peaks-skills)
 </div>
 
@@ -240,9 +240,9 @@ npx peaks-skills install peaks-sdd
 npx peaks-skills list
 ```
 
-### 在 Trae IDE 中使用
+### 在 Claude Code 中使用
 
-技能安装后，在 Trae IDE 的 AI 对话中直接使用自然语言触发：
+技能安装后，在 Claude Code 的 AI 对话中直接使用自然语言触发：
 
 ```
 • "帮我创建一个 React 项目" → peaks-react-template
@@ -285,7 +285,7 @@ npx peaks-skills list
 - **代码质量**: ESLint, Prettier, Husky
 - **测试**: Jest, React Testing Library
 - **部署**: Docker, Nginx, GitLab CI
-- **AI 集成**: Trae IDE Skills, MCP (Model Context Protocol)
+- **AI 集成**: Claude Code Skills, MCP (Model Context Protocol)
 
 ## 🎯 设计理念
 
@@ -338,7 +338,7 @@ npx peaks-skills list
 1. 复制技能目录结构
 2. 修改 `SKILL.md` 中的配置
 3. 调整工作流程和输出格式
-4. 在 Trae IDE 中注册新技能
+4. 在 Claude Code 中注册新技能
 
 ### 技能组合
 

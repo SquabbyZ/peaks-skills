@@ -68,7 +68,7 @@ Spec-Driven Development workflow:
 
 - Node.js >= 16.0.0
 - React 18+, TypeScript 5+, Tailwind CSS 3, Ant Design 5
-- Works with Trae IDE, Cursor, VS Code, Windsurf, and other AI coding agents
+- Works with Claude Code, Cursor, VS Code, Windsurf, and other AI coding agents
 
 ## Repository
 

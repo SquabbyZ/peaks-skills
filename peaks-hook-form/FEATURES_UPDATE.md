@@ -253,17 +253,17 @@ const showError =
 
 ### 更新文件
 
-1. `.trae/skills/peaks-hook-form/SKILL.md`
+1. `.claude/skills/peaks-hook-form/SKILL.md`
    - 更新 InputFormItem 和 SelectFormItem 模板
    - 添加 `marginBottom` 和 `errorPosition` 属性定义
    - 更新代码示例
 
-2. `.trae/skills/peaks-hook-form/references/usage_example.md`
+2. `.claude/skills/peaks-hook-form/references/usage_example.md`
    - 添加 "Advanced Usage" 章节
    - 详细说明 `errorPosition` 的两种模式
    - 提供 `marginBottom` 的使用示例
 
-3. `.trae/skills/peaks-hook-form/FEATURES_UPDATE.md`（本文件）
+3. `.claude/skills/peaks-hook-form/FEATURES_UPDATE.md`（本文件）
    - 记录本次更新的所有内容
    - 提供技术实现细节
    - 包含使用场景和示例

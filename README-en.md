@@ -6,9 +6,9 @@
 
 A high-efficiency skill collection designed for AI-driven frontend development, providing complete workflow solutions from design to code.
 
-[!\[npm version\](https://img.shields.io/npm/v/peaks-skills.svg null)](https://www.npmjs.com/package/peaks-skills)
-[!\[License: MIT\](https://img.shields.io/badge/License-MIT-yellow.svg null)](https://opensource.org/licenses/MIT)
-[!\[GitHub stars\](https://img.shields.io/github/stars/SquabbyZ/peaks-skills null)](https://github.com/SquabbyZ/peaks-skills)
+[![npm version](https://img.shields.io/npm/v/peaks-skills.svg)](https://www.npmjs.com/package/peaks-skills)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![GitHub stars](https://img.shields.io/github/stars/SquabbyZ/peaks-skills)](https://github.com/SquabbyZ/peaks-skills)
 
 </div>
 
@@ -175,9 +175,9 @@ npx peaks-skills install peaks-sdd
 npx peaks-skills list
 ```
 
-### Using in Trae IDE
+### Using in Claude Code
 
-After installation, use natural language in Trae IDE AI conversations:
+After installation, use natural language in Claude Code AI conversations:
 
 ```
 • "Help me create a React project" → peaks-react-template
@@ -264,7 +264,7 @@ You can create custom skills based on existing skill templates:
 1. Copy the skill directory structure
 2. Modify configuration in `SKILL.md`
 3. Adjust workflows and output formats
-4. Register new skills in Trae IDE
+4. Register new skills in Claude Code
 
 ### Skill Combinations
 

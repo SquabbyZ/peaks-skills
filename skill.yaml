@@ -95,14 +95,14 @@ installation:
   - method: manual
     steps:
       - Clone or download the repository
-      - Copy desired skill directory to .trae/skills/ in your project
+      - Copy desired skill directory to .claude/skills/ in your project
     description: Manual installation by copying files
 
 requirements:
   ide:
-    - Trae IDE (recommended)
-    - VS Code (with Trae extension)
-    - JetBrains IDEs (with Trae plugin)
+    - Claude Code (recommended)
+    - VS Code (with Claude extension)
+    - JetBrains IDEs (with Claude plugin)
 
   runtime:
     - Node.js >= 16.0.0
@@ -117,9 +117,8 @@ requirements:
 compatibility:
   # Supported AI coding platforms
   platforms:
-    - trae
-    - cursor
     - claude-code
+    - cursor
     - windsurf
     - cline
 

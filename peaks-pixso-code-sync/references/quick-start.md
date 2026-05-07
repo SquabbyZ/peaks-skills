@@ -312,7 +312,7 @@ git commit -m "Before Pixso sync"
 
 技能会自动维护映射关系文件：
 
-**文件位置**：`.trae/skills/peaks-pixso-code-sync/mappings.json`
+**文件位置**：`.claude/skills/peaks-pixso-code-sync/mappings.json`
 
 **格式**：
 

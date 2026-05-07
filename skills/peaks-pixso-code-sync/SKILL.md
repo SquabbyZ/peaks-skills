@@ -622,7 +622,7 @@ React 18 + TypeScript + Umijs + TailwindCSS 3 + Ant Design 6
 
 ## 映射关系管理
 
-- **映射文件**：`.trae/skills/peaks-pixso-code-sync/mappings.json`
+- **映射文件**：`.claude/skills/peaks-pixso-code-sync/mappings.json`
 - **映射格式**：
   ```json
   {

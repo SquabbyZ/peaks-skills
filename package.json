@@ -1,7 +1,7 @@
 {
   "name": "peaks-skills",
   "version": "1.0.8",
-  "description": "AI-driven frontend development skills collection for Trae IDE and AI coding assistants",
+  "description": "AI-driven frontend development skills collection for Claude Code and AI coding assistants",
   "type": "module",
   "bin": {
     "peaks-skills": "bin/cli.js"
@@ -29,7 +29,6 @@
   },
   "keywords": [
     "ai-skills",
-    "trae",
     "react",
     "nextjs",
     "pixso",
