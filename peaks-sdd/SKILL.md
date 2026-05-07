@@ -1,0 +1,650 @@
+---
+name: peaks-sdd
+description: |
+  Spec-Driven Development (SDD) workflow for TypeScript projects. Use this skill when:
+  - Starting a new project or onboarding to an existing codebase
+  - User wants to define project constitution and governing principles
+  - Creating detailed specifications (specify) for features
+  - Generating technical implementation plans
+  - Breaking work into actionable task lists
+  - Running any /speckit.* commands
+  - Project initialization (dynamically generates .claude/agents/ from templates)
+
+  MCP: @bunas/fs-mcp, @playwright/mcp, chrome-devtools-mcp, gitnexus, claude-mem
+---
+
+# Peaks SDD (Spec-Driven Development)
+
+A Spec-Driven Development workflow for **任意 TypeScript 项目**。自动检测项目技术栈并动态生成对应的 Agent 配置。
+
+## 核心架构
+
+```
+peaks-sdd skill (模板定义)
+    ↓ 初始化时
+@bunas/fs-mcp 扫描项目
+    ↓
+自动检测技术栈：React / NextJS / NestJS / Tauri / Node.js 等
+    ↓
+动态生成 .claude/agents/ (基于检测到的技术栈)
+    ↓
+生成 .claude/hookify.*.local.md
+    ↓
+生成 .claude/session-state.json
+```
+
+## 开发原则（Karpathy Guidelines）
+
+源自 [Andrej Karpathy 的 LLM 编码陷阱观察](https://x.com/karpathy/status/2015883857489522876)，用于减少常见的 LLM 编码错误。
+
+**权衡**：这些原则偏向谨慎而非速度。对于简单任务，请自行判断。
+
+### 1. 编码前先思考
+
+**不要假设。不要隐藏困惑。公开权衡。**
+
+实现前：
+
+- 明确陈述你的假设。如果不确定，先问。
+- 如果存在多种解释，全部呈现——不要默默选择其一。
+- 如果存在更简单的方法，指出它。在合理时反驳。
+- 如果有不清楚的地方，停下来。说出什么让你困惑。先问。
+
+### 2. 简单优先
+
+**用最少的代码解决问题。不要投机。**
+
+- 不要添加需求之外的功能。
+- 不要为一次性代码创建抽象。
+- 不要添加未被请求的"灵活性"或"可配置性"。
+- 不要为不可能的场景添加错误处理。
+- 如果你写了 200 行而可以用 50 行完成，重写它。
+
+问自己："高级工程师会说这太复杂了吗？"如果是，简化。
+
+### 3. 精准修改
+
+**只触碰必须改动的。清理自己造成的混乱。**
+
+编辑现有代码时：
+
+- 不要"改进"相邻的代码、注释或格式。
+- 不要重构没坏的部分。
+- 匹配现有风格，即使你会有不同做法。
+- 如果注意到无关的死代码，提出它——不要删除它。
+
+当你的修改造成孤立代码时：
+
+- 删除因你的修改而不再使用的 import/变量/函数。
+- 不要删除预先存在的死代码，除非被要求。
+
+检验标准：每一行修改都应该能直接追溯到用户的请求。
+
+### 4. 目标驱动执行
+
+**定义成功标准。循环验证直到完成。**
+
+将任务转化为可验证的目标：
+
+- "添加验证" → "为无效输入编写测试，然后让它们通过"
+- "修复 bug" → "编写能复现问题的测试，然后让测试通过"
+- "重构 X" → "确保重构前后测试都通过"
+
+对于多步骤任务，简要说明计划：
+
+```
+1. [步骤] → 验证: [检查]
+2. [步骤] → 验证: [检查]
+3. [步骤] → 验证: [检查]
+```
+
+强有力的成功标准让你能独立循环。弱标准（"让它工作"）需要不断确认。
+
+---
+
+## Phase 0: 项目初始化（动态生成 Agent 配置）
+
+当用户说"初始化项目"、"setup project"、"dynamically generate agents"时，执行：
+
+### Step 0.1: 扫描项目（使用 @bunas/fs-mcp）
+
+使用 `mcp__bunas__fs_mcp__` 工具：
+
+- `read_directory`: 读取项目根目录结构
+- `read_file`: 读取 package.json, CLAUDE.md, CONFIG.md 等
+
+### Step 0.2: 自动检测技术栈
+
+根据 package.json 和目录结构，检测：
+
+| 检测项   | 文件/目录                                 | 说明        |
+| -------- | ----------------------------------------- | ----------- |
+| 前端框架 | package.json 的 dependencies.react        | React 项目  |
+| 后端框架 | package.json 的 dependencies.@nestjs/\*   | NestJS 后端 |
+| 桌面应用 | packages/\*/src-tauri/ 或 tauri.conf.json | Tauri 项目  |
+| 全栈框架 | package.json 的 dependencies.next         | Next.js     |
+| 数据库   | typeorm / prisma / drizzle                | 数据库 ORM  |
+| 测试框架 | @playwright/test / vitest / jest          | 测试框架    |
+
+### Step 0.3: 替换模板变量
+
+根据检测结果，替换模板中的变量：
+
+| 变量                     | 说明         | 示例                         |
+| ------------------------ | ------------ | ---------------------------- |
+| `{{PROJECT_NAME}}`       | 项目目录名   | my-project                   |
+| `{{PROJECT_PATH}}`       | 项目根目录   | /path/to/project             |
+| `{{PACKAGES}}`           | 检测到的子包 | frontend, api, client        |
+| `{{TECH_STACK}}`         | 技术栈描述   | React 18 + TypeScript + Vite |
+| `{{FRONTEND_FRAMEWORK}}` | 前端框架     | react / vue / next           |
+| `{{BACKEND_FRAMEWORK}}`  | 后端框架     | nestjs / express / fastify   |
+| `{{HAS_TAURI}}`          | 是否有 Tauri | true / false                 |
+| `{{HAS_DATABASE}}`       | 是否有数据库 | postgresql / mysql / none    |
+| `{{TEST_FRAMEWORK}}`     | 测试框架     | playwright / vitest / jest   |
+| `{{DEV_PORT}}`           | 开发端口     | 3000 / 5173 / 1420           |
+
+### Step 0.4: 动态选择 Agent 模板
+
+根据检测到的技术栈，选择对应的 Agent：
+
+| 条件                    | 生成 Agent                                                                                       | 说明       |
+| ----------------------- | ------------------------------------------------------------------------------------------------ | ---------- |
+| 检测到 React/Vue        | frontend                                                                                         | 前端专家   |
+| 检测到 NestJS           | backend                                                                                          | 后端专家   |
+| 检测到 Tauri            | tauri                                                                                            | Tauri 专家 |
+| 检测到 PostgreSQL/MySQL | postgres                                                                                         | 数据库专家 |
+| 始终生成                | peaksfeat, product, qa, devops, security-reviewer, code-reviewer-frontend, code-reviewer-backend | 基础 Agent |
+
+### Step 0.5: 生成配置文件
+
+#### Agent 配置（从模板生成）
+
+根据检测到的技术栈，从 `templates/agents/` 目录选择对应模板，替换变量后写入 `.claude/agents/`：
+
+| 来源                    | 目标                                          |
+| ----------------------- | --------------------------------------------- |
+| `templates/agents/*.md` | `.claude/agents/*.md`（增量添加，不覆盖已有） |
+
+#### CLAUDE.md / CONFIG.md（动态识别生成）
+
+**不复制模板**，而是基于项目扫描结果动态生成：
+
+1. **读取已有文件**：使用 @bunas/fs-mcp 读取现有的 CLAUDE.md 和 CONFIG.md
+2. **提取项目信息**：从已有文件中提取技术栈、配置值、目录结构
+3. **生成/补充**：基于检测结果生成或补充内容
+
+| 文件      | 生成逻辑                                             |
+| --------- | ---------------------------------------------------- |
+| CLAUDE.md | 汇总检测到的技术栈、目录结构、开发命令，补充缺失部分 |
+| CONFIG.md | 汇总数据库配置、服务端口、启动命令等，补充缺失部分   |
+
+**增量原则**：两个文件都只补充不覆盖，已有内容完全保留。
+
+#### 其他文件
+
+| 文件                                       | 处理方式                                     |
+| ------------------------------------------ | -------------------------------------------- |
+| `.claude/hookify.context-monitor.local.md` | 如不存在则生成                               |
+| `.claude/session-state.json`               | 如不存在则生成                               |
+| `.peaks/` 目录                             | 创建标准子目录（plans/, prds/, reports/ 等） |
+
+### Step 0.6: 验证初始化结果
+
+生成完成后，验证：
+
+- `.claude/agents/` 目录下已有对应技术的 Agent 配置
+- `CLAUDE.md` 包含正确的技术栈描述
+- `CONFIG.md` 包含正确的服务配置（可选，如项目需要）
+
+### Step 0.7: 集成 MCP 服务器（增量更新 settings.json）
+
+读取现有 `settings.json`，**增量添加**以下 MCP 到 `mcpServers` 字段：
+
+| MCP             | 用途                         | 配置                           |
+| --------------- | ---------------------------- | ------------------------------ |
+| gitnexus        | 代码库知识图谱索引           | `npx -y gitnexus@latest mcp`   |
+| claude-mem      | 跨 session 持久化记忆        | `npx -y @the.dot/mem`          |
+| fs              | 文件系统扫描（项目初始化用） | `@bunas/fs-mcp`                |
+| playwright      | E2E 测试                     | `@playwright/mcp`              |
+| chrome-devtools | Chrome 调试                  | `chrome-devtools-mcp`          |
+| context7        | 文档检索（RAG）              | `@upstash/context7-mcp@latest` |
+| fetch           | HTTP 请求                    | `mcp-fetch-server`             |
+| websearch       | 网页搜索                     | `websearch-mcp`                |
+| docker          | Docker 容器管理              | `@alisaitteke/docker-mcp`      |
+| shadcn          | UI 组件生成                  | `shadcn@latest mcp`            |
+
+```json
+{
+  "mcpServers": {
+    "gitnexus": {
+      "command": "npx",
+      "args": ["-y", "gitnexus@latest", "mcp"]
+    },
+    "claude-mem": {
+      "command": "npx",
+      "args": ["-y", "@the.dot/mem"]
+    },
+    "fs": {
+      "command": "npx",
+      "args": ["-y", "@bunas/fs-mcp"]
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp", "start"]
+    },
+    "chrome-devtools": {
+      "command": "chrome-devtools-mcp"
+    },
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp@latest"]
+    },
+    "fetch": {
+      "command": "npx",
+      "args": ["mcp-fetch-server"]
+    },
+    "websearch": {
+      "command": "npx",
+      "args": ["websearch-mcp"]
+    },
+    "docker": {
+      "command": "npx",
+      "args": ["@alisaitteke/docker-mcp"]
+    },
+    "shadcn": {
+      "command": "npx",
+      "args": ["shadcn@latest", "mcp"]
+    }
+  }
+}
+```
+
+**逻辑**：
+
+1. 读取现有 `settings.json`
+2. 如果不存在 `mcpServers` 字段，创建它
+3. 对于每个 MCP：已存在则跳过，不存在则添加
+4. **不覆盖任何已有的 MCP 配置**
+
+### Step 0.8: 安装 Skills（使用 skills CLI + symlink）
+
+使用 `npx skills add` 命令安装 skills，通过 symlink 方式链接，方便自动更新。
+
+#### Superpowers Skills（17个）
+
+```bash
+npx skills add https://github.com/obra/superpowers --skill brainstorming
+npx skills add https://github.com/obra/superpowers --skill dispatching-parallel-agents
+npx skills add https://github.com/obra/superpowers --skill executing-plans
+npx skills add https://github.com/obra/superpowers --skill finishing-a-development-branch
+npx skills add https://github.com/obra/superpowers --skill receiving-code-review
+npx skills add https://github.com/obra/superpowers --skill requesting-code-review
+npx skills add https://github.com/obra/superpowers --skill subagent-driven-development
+npx skills add https://github.com/obra/superpowers --skill systematic-debugging
+npx skills add https://github.com/obra/superpowers --skill test-driven-development
+npx skills add https://github.com/obra/superpowers --skill using-git-worktrees
+npx skills add https://github.com/obra/superpowers --skill using-superpowers
+npx skills add https://github.com/obra/superpowers --skill verification-before-completion
+npx skills add https://github.com/obra/superpowers --skill writing-plans
+npx skills add https://github.com/obra/superpowers --skill writing-skills
+npx skills add https://github.com/obra/superpowers --skill build-error-resolver
+npx skills add https://github.com/obra/superpowers --skill silent-failure-hunter
+npx skills add https://github.com/obra/superpowers --skill performance-optimizer
+```
+
+#### 其他常用 Skills
+
+```bash
+npx skills add https://github.com/vercel-labs/skills --skill find-skills
+npx skills add https://github.com/vercel-labs/skills --skill brainstorming
+npx skills add https://github.com/vercel-labs/skills --skill frontend-design
+npx skills add https://github.com/vercel-labs/skills --skill component-scaffold-generator
+npx skills add https://github.com/vercel-labs/skills --skill design-md
+```
+
+#### Agent 用到的 Skills（检查是否已存在）
+
+检查以下 skills 是否已安装，未安装则添加：
+
+| Skill | 用途 |
+|-------|------|
+| karpathy-guidelines | Karpathy 开发原则 |
+| hookify | Hook 配置管理 |
+| skill-creator | Skill 创建工具 |
+| shadcn | UI 组件 |
+| postgres | PostgreSQL |
+| tauri-v2 | Tauri 桌面应用 |
+| systematic-debugging | 系统化调试（peaksbug 依赖） |
+| build-error-resolver | 构建错误修复（peaksbug 依赖） |
+| silent-failure-hunter | 静默失败检测（peaksbug 依赖） |
+| tdd-guide | 测试驱动开发（peaksbug 依赖） |
+| performance-optimizer | 性能优化（peaksbug 依赖） |
+
+**逻辑**：
+
+1. 运行 `npx skills add <url> --skill <name>` 安装每个 skill
+2. Skills 使用 symlink 方式链接到 `~/.agents/skills/`
+3. 原始仓库更新后，可通过 `npx skills update` 自动同步
+
+#### OpenSpec CLI（用于存量项目迭代）
+
+OpenSpec 是 spec-driven development 工具，适合存量项目的功能迭代：
+
+```bash
+npm install -g @fission-ai/openspec@latest
+```
+
+**使用场景对比**：
+
+| 维度 | Spec-It (peaks-sdd) | OpenSpec |
+|------|---------------------|----------|
+| 项目阶段 | 0→1 新项目，复杂项目 | 1→n 存量项目，功能迭代 |
+| 工作流 | 阶段门禁：PRD → 设计 → 开发 | 流体迭代：propose → apply → archive |
+| 变更方式 | 完整规格说明 | Delta 变更（对现有系统的修改） |
+| 工具 | AI Agent 调度 | Slash commands (`/opsx:*`) |
+
+**决策逻辑**：
+
+```
+收到任务
+    ↓
+检查项目状态
+    ↓
+┌─ 是新项目（无代码或几乎无代码）？ ─────────────────┐
+│                                                    │
+│  ✅ 是 → 使用 Spec-It (peaksfeat)                  │
+│         Constitution → PRD → 设计 → 开发 → 测试     │
+│                                                    │
+│  ❌ 否 → 检查是否复杂项目                           │
+│         ↓                                          │
+│  ┌─ 是复杂项目（多模块/多团队）？ ──────────────┐   │
+│  │                                              │   │
+│  │  ✅ 是 → 使用 Spec-It (peaksfeat)            │   │
+│  │          完整的工作流确保各方对齐              │   │
+│  │                                              │   │
+│  │  ❌ 否 → 检查是功能迭代还是 bug 修复          │   │
+│  └──────────────────────────────────────────────┘   │
+└────────────────────────────────────────────────────┘
+    ↓
+┌─ 功能迭代（存量项目）？ ─────────────────────────────┐
+│                                                    │
+│  ✅ 是 → 使用 OpenSpec                             │
+│         openspec init                              │
+│         /opsx:propose <idea>                       │
+│         /opsx:apply → /opsx:archive                │
+│                                                    │
+│  ❌ 否 → 检查是否是 bug 修复                        │
+└────────────────────────────────────────────────────┘
+    ↓
+┌─ Bug 修复？ ───────────────────────────────────────┐
+│                                                    │
+│  ✅ 是 → 使用 peaksbug                              │
+│         systematic-debugging → 修复 → 回归测试     │
+└────────────────────────────────────────────────────┘
+```
+
+**OpenSpec 常用命令**：
+
+| 命令 | 说明 |
+|------|------|
+| `openspec init` | 初始化 OpenSpec |
+| `/opsx:propose <idea>` | 创建变更提案 |
+| `/opsx:explore` | 探索代码库 |
+| `/opsx:apply` | 实施任务 |
+| `/opsx:archive` | 归档并合并到 specs |
+| `/opsx:new` | 创建新变更（完整工作流） |
+| `/opsx:verify` | 验证实施 |
+
+**OpenSpec 目录结构**：
+
+```
+openspec/
+├── specs/              # 系统当前行为（真理来源）
+│   └── **/*.md
+├── changes/           # 变更提案
+│   ├── [change-name]/
+│   │   ├── proposal.md
+│   │   ├── specs/
+│   │   ├── design.md
+│   │   └── tasks.md
+│   └── archive/
+└── .openspec/
+```
+
+---
+
+## 技术栈检测规则
+
+### 前端检测
+
+```json
+// package.json 检测
+{ "dependencies": { "react": "^18.x" } } → FRONTEND_FRAMEWORK=react
+{ "dependencies": { "vue": "^3.x" } } → FRONTEND_FRAMEWORK=vue
+{ "dependencies": { "next": "^14.x" } } → FRONTEND_FRAMEWORK=next
+```
+
+### 后端检测
+
+```json
+{ "dependencies": { "@nestjs/core": "^10.x" } } → BACKEND_FRAMEWORK=nestjs
+{ "dependencies": { "express": "^4.x" } } → BACKEND_FRAMEWORK=express
+```
+
+### 桌面应用检测
+
+```
+存在 src-tauri/Cargo.toml → HAS_TAURI=true
+存在 tauri.conf.json → HAS_TAURI=true
+```
+
+### 数据库检测
+
+```json
+{ "dependencies": { "typeorm": "^0.3.x" } } → HAS_DATABASE=postgresql
+{ "dependencies": { "@prisma/client": "^5.x" } } → HAS_DATABASE=postgresql
+```
+
+---
+
+## Agent 模板说明
+
+### Spec-It vs OpenSpec 选择
+
+| 场景 | 工具 | 说明 |
+|------|------|------|
+| 新项目 (0→1) | peaksfeat | 完整工作流：Constitution → PRD → 设计 → 开发 → 测试 |
+| 复杂项目 | peaksfeat | 多团队/多模块需要完整对齐 |
+| 存量项目功能迭代 | OpenSpec | 轻量级工作流：propose → apply → archive |
+| Bug 修复 | peaksbug | 系统化调试 → 修复 → 回归测试 |
+
+### 通用 Agent（始终生成）
+
+| Agent                  | 说明                                           |
+| ---------------------- | ---------------------------------------------- |
+| peaksfeat              | 需求开发流程，产品需求分析 + 设计 + 前后端开发 |
+| peaksbug               | Bug 修复流程，根因分析 + 修复 + 回归测试       |
+| product                | 产品需求分析，brainstorming + PRD              |
+| qa                     | 测试工程，E2E + 自动化                         |
+| devops                 | 运维部署，Docker + 环境配置                    |
+| security-reviewer      | 安全审查，OWASP Top 10                         |
+| code-reviewer-frontend | 前端代码审查                                   |
+| code-reviewer-backend  | 后端代码审查                                   |
+
+### 技术栈相关 Agent（按需生成）
+
+| Agent    | 触发条件                      |
+| -------- | ----------------------------- |
+| frontend | 检测到 React/Vue/Next         |
+| backend  | 检测到 NestJS/Express/Fastify |
+| tauri    | 检测到 Tauri                  |
+| postgres | 检测到 PostgreSQL/MySQL       |
+
+---
+
+## 输出目录结构
+
+### Spec-It (peaks-sdd) 目录
+
+```
+.peaks/
+├── plans/          # 开发计划
+├── prds/           # PRD 文档
+├── designs/        # 设计稿截图
+├── test-docs/      # 测试用例
+├── reports/        # 各类报告
+├── auto-tests/     # 自动化测试脚本
+└── deploys/        # 部署脚本
+
+.claude/
+├── agents/         # 动态生成的 Agent 配置
+├── hookify.*.local.md  # Hook 配置
+└── session-state.json  # 会话状态
+```
+
+### OpenSpec 目录（存量项目迭代）
+
+```
+openspec/
+├── specs/              # 系统当前行为（真理来源）
+│   └── **/*.md
+├── changes/            # 变更提案
+│   ├── [change-name]/
+│   │   ├── proposal.md
+│   │   ├── specs/
+│   │   ├── design.md
+│   │   └── tasks.md
+│   └── archive/
+└── .openspec/
+```
+
+**选择规则**：
+- **新项目 (0→1)**：使用 `.peaks/` 目录（Spec-It）
+- **存量项目迭代 (1→n)**：使用 `openspec/` 目录（OpenSpec）
+
+---
+
+## 异常处理与边界条件
+
+### 异常场景与处理
+
+| 场景 | 触发条件 | 处理动作 |
+|------|---------|---------|
+| 项目不是 git 仓库 | `git rev-parse` 失败 | 提示用户"建议先 git init"，若拒绝则继续但不创建分支 |
+| 模板文件缺失 | `templates/agents/*.md` 不存在 | 跳过该模板，记录警告，继续处理其他模板 |
+| context window 不足 | session-state.json 显示 contextEstimate >= 85% | 先 Compact，再继续 |
+| 用户中断流程 | 用户明确表示停止 | 暂停，保存当前进度到 `.peaks/state.json` |
+| @bunas/fs-mcp 不可用 | MCP 工具调用失败 | 降级为 Bash/Read 工具手动扫描项目 |
+| settings.json 不存在 | `.claude/settings.json` 不存在 | 跳过 MCP 配置步骤，提示用户可稍后手动配置 |
+| 模板变量替换失败 | 检测到未定义的变量 | 使用空字符串作为默认值，继续处理 |
+
+### 决策树
+
+```
+收到任务
+    ↓
+检查 git 仓库状态
+    ↓
+┌─ 是 git 仓库？ ─────────────────────┐
+│  ✅ 是 → 继续                        │
+│  ❌ 否 → 提示 git init 或跳过分支    │
+└─────────────────────────────────────┘
+    ↓
+检查 contextEstimate
+    ↓
+┌─ context >= 85%？ ─────────────────┐
+│  ✅ 是 → 先 Compact 再继续            │
+│  ❌ 否 → 继续                        │
+└─────────────────────────────────────┘
+    ↓
+执行主流程
+```
+
+---
+
+## SDD 工作流
+
+### 选择正确的工作流
+
+```
+新项目 (0→1) 或 复杂项目
+  → Spec-It (peaks-sdd)
+  → Phase 1-5
+
+存量项目功能迭代 (1→n)
+  → OpenSpec
+  → /opsx:propose → /opsx:apply → /opsx:archive
+```
+
+### Spec-It 工作流 (新项目)
+
+### Phase 1: Constitution
+
+定义项目治理原则 → `.peaks/constitution.md`
+
+### Phase 2: Specify
+
+创建规格说明 → `.peaks/prds/prd-[功能名]-[日期].md`
+使用 `[NEW]` / `[CHANGED]` / `[DEPRECATED]` 标识
+
+### Phase 3: Plan
+
+技术实现计划 → `.peaks/plans/plan-[功能名]-[日期].md`
+
+### Phase 4: Tasks
+
+任务拆分 → 可执行的任务列表
+
+### Phase 5: Implement
+
+执行任务，经过质量门禁：
+
+```
+Code Review → 安全检查 → QA 验证 → 部署
+```
+
+### OpenSpec 工作流 (存量项目迭代)
+
+OpenSpec 使用轻量级的流体工作流：
+
+```
+/opsx:propose ──► /opsx:specs ──► /opsx:design ──► /opsx:tasks ──► /opsx:apply ──► /opsx:archive
+     ↓                ↓               ↓              ↓              ↓
+  创建提案        编写规格        技术设计        任务拆分        实施           归档
+```
+
+**目录**：`openspec/changes/[change-name]/`
+
+---
+
+## 触发关键词
+
+### Spec-It (peaks-sdd) - 新项目
+
+- "初始化项目" / "setup project"
+- "dynamically generate agents" / "动态生成 agents"
+- "定义 constitution" / "constitution"
+- "specify" / "规格" / "需求分析"
+- "技术计划" / "implementation plan"
+- "任务拆分" / "break down tasks"
+- "/speckit.constitution" / "/speckit.specify" / "/speckit.plan" / "/speckit.tasks"
+- "创建 PRD" / "需求文档"
+- "SDD" / "spec-driven"
+
+### OpenSpec - 存量项目迭代
+
+- "迭代" / "iteration" / "feature"
+- "添加功能" / "add feature"
+- "openspec init"
+- "/opsx:propose" / "/opsx:apply" / "/opsx:archive"
+- "specs" / "变更提案"
+
+---
+
+## 关键原则
+
+1. **动态生成** — 根据检测到的技术栈，动态生成对应的 Agent 配置
+2. **通用框架** — 适用于任意 TypeScript 项目，不局限于特定框架
+3. **Spec first, code second** — 规格在代码之前
+4. **What & Why, not How** — 关注目标和价值
+5. **Traceability** — 每个代码变更都可追溯到规格
