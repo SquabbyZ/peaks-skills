@@ -10,7 +10,10 @@ description: |
   - Running any /speckit.* commands
   - Project initialization (dynamically generates .claude/agents/ from templates)
 
-  MCP: @bunas/fs-mcp, @playwright/mcp, chrome-devtools-mcp, gitnexus, claude-mem
+  Trigger: init、初始化、setup、dynamically generate agents、peaks-sdd
+
+  MCP: @bunas/fs-mcp, @playwright/mcp, chrome-devtools-mcp, gitnexus, claude-mcp
+user-invocable: true
 ---
 
 # Peaks SDD (Spec-Driven Development)
@@ -845,6 +848,54 @@ OpenSpec 使用轻量级的流体工作流：
 ```
 
 **目录**：`openspec/changes/[change-name]/`
+
+---
+
+## Slash Commands（用户入口）
+
+peaks-sdd 提供三个快捷命令，覆盖主要开发场景：
+
+| 命令 | 说明 | 输入 |
+|------|------|------|
+| `/peaksinit` | 初始化项目 | 无（扫描当前项目） |
+| `/peaksfeat` | 功能开发 | 自然语言需求或 PRD |
+| `/peaksbug` | Bug 修复 | bug 现象描述 |
+
+### /peaksinit - 项目初始化
+
+```
+/peaksinit
+```
+
+扫描当前项目，检测技术栈，自动生成：
+- `.claude/agents/` Agent 配置
+- `.peaks/` 工作目录结构
+
+**执行流程**：Phase 0（第 105-232 行）
+
+---
+
+### /peaksfeat - 功能开发
+
+```
+/peaksfeat 添加用户登录功能，支持邮箱+密码
+```
+
+或者直接粘贴 PRD 内容，自动进入完整开发流程。
+
+**执行流程**：Checkpoint 0 → Phase 1-5（第 689-835 行）
+
+---
+
+### /peaksbug - Bug 修复
+
+```
+/peaksbug 登录按钮点击没反应
+```
+
+自动分析复现 → 根因分析 → 修复 → 测试 → 验证。
+
+**执行流程**：Phase 1-6（上方 commands/peaksbug.md）
 
 ---
 

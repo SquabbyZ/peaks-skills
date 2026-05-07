@@ -1,0 +1,17 @@
+[
+  {
+    "id": 1,
+    "prompt": "初始化我的项目",
+    "expected": "扫描项目技术栈，生成 .claude/agents/ 配置，创建 .peaks/ 目录结构"
+  },
+  {
+    "id": 2,
+    "prompt": "添加用户登录功能，支持邮箱+密码",
+    "expected": "进入完整 Spec-It 工作流：Constitution → PRD → Plan → Tasks → Agent开发 → 测试 → 部署"
+  },
+  {
+    "id": 3,
+    "prompt": "登录按钮点击没反应",
+    "expected": "进入 peaksbug 流程：复现问题 → 根因分析 → 修复 → CodeReview → 回归测试 → 输出报告"
+  }
+]
