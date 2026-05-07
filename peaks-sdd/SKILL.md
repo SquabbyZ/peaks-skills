@@ -492,19 +492,21 @@ openspec/
 | 复杂项目 | peaksfeat | 多团队/多模块需要完整对齐 |
 | 存量项目功能迭代 | OpenSpec | 轻量级工作流：propose → apply → archive |
 | Bug 修复 | peaksbug | 系统化调试 → 修复 → 回归测试 |
+| Issue 管理 | triage | 状态机流转 → Agent Brief |
 
 ### 通用 Agent（始终生成）
 
-| Agent                  | 说明                                           |
-| ---------------------- | ---------------------------------------------- |
-| peaksfeat              | 需求开发流程，产品需求分析 + 设计 + 前后端开发 |
-| peaksbug               | Bug 修复流程，根因分析 + 修复 + 回归测试       |
-| product                | 产品需求分析，brainstorming + PRD              |
-| qa                     | 测试工程，E2E + 自动化                         |
-| devops                 | 运维部署，Docker + 环境配置                    |
-| security-reviewer      | 安全审查，OWASP Top 10                         |
-| code-reviewer-frontend | 前端代码审查                                   |
-| code-reviewer-backend  | 后端代码审查                                   |
+| Agent                  | 说明 | Matt Pocock 技能 |
+| ---------------------- | ---------------------------------------------- | ---------------- |
+| peaksfeat              | 需求开发流程，产品需求分析 + 设计 + 前后端开发 | grill-me, prototype, zoom-out |
+| peaksbug               | Bug 修复流程，根因分析 + 修复 + 回归测试 | diagnose (Phase 1-6) |
+| product                | 产品需求分析，brainstorming + PRD + CONTEXT.md | grill-with-docs |
+| qa                     | 测试工程，E2E + 自动化 + TDD | tdd, caveman |
+| triage                 | Issue 分类，状态机流转，Agent Brief | triage |
+| devops                 | 运维部署，Docker + 环境配置 | - |
+| security-reviewer       | 安全审查，OWASP Top 10 | - |
+| code-reviewer-frontend | 前端代码审查 | - |
+| code-reviewer-backend  | 后端代码审查 | - |
 
 ### 技术栈相关 Agent（按需生成）
 
@@ -529,7 +531,9 @@ openspec/
 ├── test-docs/      # 测试用例
 ├── reports/        # 各类报告
 ├── auto-tests/     # 自动化测试脚本
-└── deploys/        # 部署脚本
+├── deploys/        # 部署脚本
+├── bugs/           # Bug 分析报告 (peaksbug)
+└── fixes/          # 修复记录 (peaksbug)
 
 .claude/
 ├── agents/         # 动态生成的 Agent 配置
@@ -611,6 +615,7 @@ openspec/
 | **Checkpoint 3** | Phase 3 结束后 | Plan 是否可行、风险是否可控 |
 | **Checkpoint 4** | Phase 4 结束后 | 任务分配是否合理、依赖是否正确 |
 | **Checkpoint 5** | Phase 5 结束后 | 代码变更是否满足 PRD、测试是否通过 |
+| **Checkpoint 6** | 部署完成后 | 服务是否可达、功能是否正常、数据是否完整 |
 
 **检查点模板**：
 ```
@@ -624,6 +629,27 @@ openspec/
 │                                                    │
 │  ✅ 确认 → 进入下一 Phase                          │
 │  ❌ 有问题 → 描述问题 → 修复后重新确认             │
+└────────────────────────────────────────────────────┘
+```
+
+### Checkpoint 6: 部署后验证（部署完成）
+
+```
+┌─ Checkpoint 6: 部署后验证 ─────────────────────────┐
+│                                                    │
+│  产出：                                            │
+│  - .peaks/deploys/deploy-[环境]-[日期].log         │
+│  - 部署验证报告                                    │
+│                                                    │
+│  请确认：                                          │
+│  - [ ] 所有服务端口可达                           │
+│  - [ ] 健康检查端点返回正常                       │
+│  - [ ] 数据库迁移完成（无数据丢失）               │
+│  - [ ] 关键功能可正常访问                         │
+│  - [ ] 日志无 ERROR 级别错误                      │
+│                                                    │
+│  ✅ 确认 → 部署完成，通知用户                      │
+│  ❌ 有问题 → 回滚或修复后重新验证                 │
 └────────────────────────────────────────────────────┘
 ```
 
