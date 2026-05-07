@@ -821,9 +821,30 @@ openspec/
 - 确定 Agent 调度策略
 
 **Step 1.2** — 输出 Constitution
+
+**Constitution 输出格式示例**：
+```markdown
+# Constitution - [项目名]
+
+## 代码规范
+- TypeScript strict mode
+- ESLint + Prettier
+- 组件 PascalCase，工具函数 camelCase
+
+## 提交约定
+- Conventional Commits (feat/fix/refactor)
+- PR 必须经过 Code Review
+
+## Agent 调度策略
+- 前端变更 → frontend agent → code-reviewer-frontend
+- 后端变更 → backend agent → code-reviewer-backend
+- 所有变更 → security-reviewer → qa
+
+## 质量门禁
+- Code Review → 安全检查 → QA 验证
 ```
-.peaks/constitution.md
-```
+
+输出路径：`.peaks/constitution.md`
 
 **过渡**：用户确认 Constitution → Phase 2
 
@@ -884,6 +905,29 @@ openspec/
 **Step 3.2** — 产出实现计划
 - 分解为可验证的里程碑
 
+**Plan 输出格式示例**：
+```markdown
+# Plan - 用户登录功能
+
+## 技术方案
+- 前端：React + React Hook Form + Zod
+- 后端：NestJS + JWT + bcrypt
+- 数据库：PostgreSQL (users 表)
+
+## 里程碑
+| # | 里程碑 | 依赖 | 预计工时 |
+|---|--------|------|---------|
+| M1 | 数据库表设计 | 无 | 0.5d |
+| M2 | 后端登录 API | M1 | 1d |
+| M3 | 前端登录页面 | 无 | 1d |
+| M4 | 前后端联调 | M2, M3 | 0.5d |
+
+## 风险
+- JWT 刷新机制需额外设计
+```
+
+输出路径：`.peaks/plans/plan-[功能名]-[日期].md`
+
 **过渡**：用户确认 Plan → Phase 4
 
 ---
@@ -896,6 +940,20 @@ openspec/
 **Step 4.1** — 任务拆分
 - 按依赖关系排序
 - 标记并行/顺序任务
+
+**Tasks 输出格式示例**：
+```markdown
+# Tasks - 用户登录功能
+
+## 并行任务（无依赖）
+- [ ] T1: [frontend] 创建 LoginForm 组件 (React Hook Form + Zod)
+- [ ] T2: [backend] 创建 POST /api/auth/login 端点
+
+## 顺序任务
+- [ ] T3: [backend] 实现 JWT 签发和验证 (依赖 T2)
+- [ ] T4: [frontend] 对接登录 API (依赖 T1, T2)
+- [ ] T5: [qa] E2E 测试登录流程 (依赖 T4)
+```
 
 **Step 4.2** — 分配任务
 - 前端任务 → frontend agent
@@ -947,6 +1005,37 @@ OpenSpec 使用轻量级的流体工作流：
 ```
 
 **目录**：`openspec/changes/[change-name]/`
+
+**完整示例**：
+
+```bash
+# 1. 初始化（首次使用）
+openspec init
+
+# 2. 创建变更提案
+# 用户：/opsx:propose 给登录页添加"记住我"功能
+# → 产出：openspec/changes/add-remember-me/proposal.md
+
+# 3. 编写规格
+# 用户：/opsx:specs
+# → 产出：openspec/changes/add-remember-me/specs/login.md
+
+# 4. 技术设计
+# 用户：/opsx:design
+# → 产出：openspec/changes/add-remember-me/design.md
+
+# 5. 任务拆分
+# 用户：/opsx:tasks
+# → 产出：openspec/changes/add-remember-me/tasks.md
+
+# 6. 实施
+# 用户：/opsx:apply
+# → 执行 tasks.md 中的各个任务
+
+# 7. 归档
+# 用户：/opsx:archive
+# → 合并到 openspec/specs/，清理 changes/ 目录
+```
 
 ---
 
