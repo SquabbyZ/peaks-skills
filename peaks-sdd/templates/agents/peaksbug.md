@@ -19,9 +19,9 @@ tools:
 
 skills:
   - systematic-debugging
-  - tdd-guide
-  - code-reviewer
-  - security-reviewer
+  - test-driven-development
+  - code-review
+  - security-review
 
 memory: project
 
@@ -84,6 +84,19 @@ maxTurns: 50
 
 收到 bug 报告后，严格按照以下步骤执行：
 
+## 强制产出清单（每个 Phase 必须完成）
+
+**每个阶段的产出物是必须的，不是可选的！未产出文件 = 任务未完成。**
+
+| Phase | 必须产出的文件 | 文件路径 |
+|-------|---------------|---------|
+| Phase 2（Bug 分析） | Bug 分析报告 | `.peaks/bugs/bug-[描述]-[YYYYMMDD].md` |
+| Phase 5（修复实施） | 修复记录 | `.peaks/fixes/fix-[描述]-[YYYYMMDD].md` |
+| Phase 7（回归测试） | 回归测试脚本 | `.peaks/auto-tests/regression-[描述]-[YYYYMMDD].md` |
+| Phase 8（修复报告） | 修复报告 | `.peaks/reports/report-[描述]-[YYYYMMDD].md` |
+
+**验收规则**：任务完成前，检查上述 4 个文件是否都已存在。缺少任何一个，补全后再结束。
+
 ### 第一步：探索项目（必须先做）
 
 使用 Bash 和 Read 工具了解项目现状：
@@ -106,25 +119,22 @@ maxTurns: 50
 
 | Bug 类型 | 调用 Skill | 描述 |
 |---------|-----------|------|
-| 构建/编译错误 | `build-error-resolver` | 编译失败、类型错误、链接错误 |
 | 运行时崩溃 | `systematic-debugging` | 崩溃、panic、segmentation fault |
-| 静默失败 | `silent-failure-hunter` | 错误被吞掉、返回错误但无日志 |
-| 逻辑错误 | `tdd-guide` | 行为不符合预期、功能错误 |
-| 性能问题 | `performance-optimizer` | 慢、内存泄漏、CPU 高 |
-| 安全漏洞 | `security-reviewer` | XSS、注入、认证绕过等 |
+| 逻辑错误 | `test-driven-development` | 行为不符合预期、功能错误 |
+| UI/交互问题 | `systematic-debugging` + `code-review` | 前端显示、交互行为 |
+| 安全漏洞 | `security-review` | XSS、注入、认证绕过等 |
 
 **技术栈检测后选择合适的 Skill：**
-- **纯前端 Bug**：优先 `systematic-debugging` + `tdd-guide`
-- **纯后端 Bug**：优先 `systematic-debugging` + `build-error-resolver`
+- **纯前端 Bug**：优先 `systematic-debugging` + `test-driven-development`
+- **纯后端 Bug**：优先 `systematic-debugging` + `test-driven-development`
 - **混合 Bug**：根据具体位置选择
 
 **使用 Skill tool 调用**：
 ```
-Skill: build-error-resolver
 Skill: systematic-debugging
-Skill: tdd-guide
-Skill: performance-optimizer
-Skill: security-reviewer
+Skill: test-driven-development
+Skill: code-review
+Skill: security-review
 ```
 
 ### 第三步：系统化调试（diagnose Skill）
@@ -363,10 +373,9 @@ Skill: security-reviewer
 | Skill | 用途 | 调度关键词 |
 |-------|------|-----------|
 | `systematic-debugging` | 根因分析、执行路径追踪 | 崩溃、panic、root cause |
-| `build-error-resolver` | 编译错误、类型错误、链接错误 | 编译失败、build error |
-| `silent-failure-hunter` | 静默失败、错误被吞掉 | 静默失败、no error、swallowed |
-| `tdd-guide` | 测试驱动修复、回归测试 | 测试、验证、TDD |
-| `performance-optimizer` | 性能问题、内存泄漏 | 慢、leak、CPU 高 |
+| `test-driven-development` | 测试驱动修复、回归测试 | 测试、验证、TDD |
+| `code-review` | 代码审查 | review、审查、质量 |
+| `security-review` | 安全漏洞扫描 | XSS、注入、认证 |
 
 ### Agent（使用 Agent tool 调度）
 

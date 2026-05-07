@@ -23,8 +23,8 @@ tools:
 
 skills:
   - systematic-debugging
-  - tdd-guide
-  - code-reviewer
+  - test-driven-development
+  - code-review
 
 memory: project
 

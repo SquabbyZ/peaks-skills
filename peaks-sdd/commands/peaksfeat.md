@@ -36,9 +36,36 @@ effort: high
 
 # /peaksfeat - 功能开发
 
-## 调度优化后的 peaksfeat Agent
+## ⚡ 自动决策：Spec-It vs OpenSpec
 
-将任务委托给优化后的 peaksfeat agent 模板执行。
+**无需用户确认，自动判断使用哪个工作流！**
+
+### 自动决策逻辑
+
+```
+Step 1: 检测项目状态
+├── 检查 .peaks/constitution.md 是否存在 → 已初始化项目
+├── 检查 openspec/ 目录是否存在 → 已配置 OpenSpec
+└── 检查 git log 提交数量 → 判断新/旧项目
+
+Step 2: 自动选择
+┌─ 存量项目 + openspec 已初始化？ ──────────────────┐
+│  ✅ 是 → 使用 OpenSpec 工作流                      │
+│         自动调用 /opsx:propose 执行                 │
+│                                                    │
+│  ❌ 否 → 使用 Spec-It (peaksfeat) 工作流          │
+│         Constitution → PRD → 设计 → 开发            │
+└───────────────────────────────────────────────────┘
+```
+
+### 判断标准
+
+| 条件 | 工作流 | 说明 |
+|------|--------|------|
+| openspec/ 已存在 | OpenSpec | 存量项目迭代 |
+| 项目有大量代码和提交 | OpenSpec | 已建立的项目 |
+| 新项目（.peaks/ 也不存在） | Spec-It | 从头开始 |
+| 用户明确说"从头开始开发" | Spec-It | 新项目 |
 
 ---
 
@@ -49,6 +76,28 @@ effort: high
 ---
 
 ## 执行计划
+
+### 路径 A：OpenSpec（存量项目迭代）
+
+如果检测到是存量项目（openspec/ 已存在或有大量代码），自动执行：
+
+```
+1. 检查 openspec/ 是否已初始化
+   - 如果没有：先运行 'npx -y @fission-ai/openspec@latest init'
+
+2. 自动创建变更提案：
+   /opsx:propose {{input}}
+
+3. 自动执行后续流程：
+   /opsx:specs → /opsx:design → /opsx:tasks → /opsx:apply
+
+4. 完成后归档：
+   /opsx:archive
+```
+
+### 路径 B：Spec-It（新项目或复杂项目）
+
+如果检测到是新项目或复杂项目，使用 peaksfeat agent：
 
 使用 **Agent tool** 调用 `templates/agents/peaksfeat.md` 执行完整工作流。
 

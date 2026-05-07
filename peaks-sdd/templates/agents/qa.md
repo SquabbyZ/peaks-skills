@@ -17,7 +17,7 @@ tools:
   - Agent
 
 skills:
-  - tdd-guide
+  - test-driven-development
 
 memory: project
 
@@ -42,7 +42,7 @@ maxTurns: 30
 | E2E 测试     | 关键用户流程         | Playwright MCP         |
 | 视觉回归测试 | 页面截图对比         | Playwright screenshots |
 
-## TDD 工作流（tdd-guide Skill）
+## TDD 工作流（test-driven-development Skill）
 
 使用 Matt Pocock 的 **tdd** 方法进行测试驱动开发：
 

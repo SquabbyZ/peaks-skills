@@ -18,9 +18,9 @@ tools:
   - Agent
 
 skills:
-  - tdd-guide
-  - code-reviewer
-  - security-reviewer
+  - test-driven-development
+  - code-review
+  - security-review
 
 memory: project
 

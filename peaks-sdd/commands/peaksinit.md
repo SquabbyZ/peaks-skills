@@ -106,15 +106,75 @@ find . -name "*.json" -maxdepth 2 | head -20
 
 ### Step 0.4: 生成 Agent 配置
 
-根据检测结果，从 `templates/agents/` 选择对应模板，替换变量后写入 `.claude/agents/`：
+**关键：必须读取模板、替换变量、写入实际文件，不能使用 symlink！**
 
-| 条件 | 生成 Agent |
-|------|------------|
-| 检测到 React/Vue | frontend.md |
-| 检测到 NestJS | backend.md |
-| 检测到 Tauri | tauri.md |
-| 检测到 PostgreSQL/MySQL | postgres.md |
-| 始终生成 | peaksfeat, product, qa, devops, triage |
+根据检测结果，生成**所有 Agent 模板**，并根据项目类型动态调整。
+
+### Step 0.4: 生成 Agent 配置
+
+**策略：生成所有 Agent，根据项目类型动态标记适用性**
+
+**所有 Agent 模板列表**：
+| Agent | 说明 | 默认状态 |
+|-------|------|---------|
+| peaksfeat | 功能开发流程管理 | ✅ 始终生成 |
+| peaksbug | Bug 修复流程管理 | ✅ 始终生成 |
+| product | 产品需求分析 | ✅ 始终生成 |
+| qa | 测试工程 | ✅ 始终生成 |
+| design | UI/UX 设计 | ⚠️ 仅前端项目 |
+| frontend | 前端开发专家 | ⚠️ 仅前端项目 |
+| backend | 后端开发专家 | ⚠️ 仅后端项目 |
+| tauri | Tauri 桌面应用 | ⚠️ 仅 Tauri 项目 |
+| postgres | PostgreSQL 专家 | ⚠️ 仅数据库项目 |
+| code-reviewer-frontend | 前端代码审查 | ✅ 始终生成（前端项目启用） |
+| code-reviewer-backend | 后端代码审查 | ⚠️ 后端项目启用 |
+| security-reviewer | 安全审查 | ✅ 始终生成 |
+| devops | 运维部署 | ⚠️ 按需生成 |
+| triage | Issue 分类 | ⚠️ 按需生成 |
+
+**动态调整逻辑**：
+```
+读取模板 → 替换项目变量 → 检查项目类型 → 添加适用性标记 → 写入
+```
+
+**适用性标记**（在 agent 文件开头添加）：
+```markdown
+## 适用性
+
+- **项目类型**: 纯前端项目
+- **状态**: ✅ 启用（可用于本项目）
+```
+
+或者对于不适用的 agent：
+```markdown
+## 适用性
+
+- **项目类型**: 纯前端项目
+- **状态**: ❌ 不适用（本项目为纯前端，无后端代码）
+```
+
+**替换的变量**：
+- `{{PROJECT_PATH}}` → 项目根目录（如 `/Users/xxx/prompt-project`）
+- `{{PROJECT_NAME}}` → 项目目录名（如 `prompt-project`）
+- `{{TECH_STACK}}` → 检测到的技术栈描述
+- `{{FRONTEND_FRAMEWORK}}` → react / vue / next
+- `{{TEST_FRAMEWORK}}` → jest / vitest / playwright
+- `{{DEV_PORT}}` → 开发端口
+
+**执行步骤**：
+1. 读取模板文件内容（使用 Read 工具）
+2. 替换所有 `{{VARIABLE}}` 占位符
+3. 将替换后的内容写入 `.claude/agents/<name>.md`（使用 Write 工具，**不是 symlink**）
+
+```bash
+# ❌ 错误：创建 symlink（不替换变量，agent 无法获取项目上下文）
+ln -s /path/to/template agents/frontend.md
+
+# ✅ 正确：读取模板、替换变量、写入文件
+# 1. Read /path/to/templates/agents/frontend.md
+# 2. 替换 {{PROJECT_PATH}} 等变量
+# 3. Write .claude/agents/frontend.md
+```
 
 ### Step 0.5: 创建目录结构
 
@@ -129,6 +189,28 @@ find . -name "*.json" -maxdepth 2 | head -20
 ├── bugs/
 └── fixes/
 ```
+
+### Step 0.5.1: 初始化 OpenSpec（用于存量项目迭代）
+
+**重要：OpenSpec 必须初始化，不能跳过！**
+
+```bash
+cd {{PROJECT_PATH}}
+npx -y @fission-ai/openspec@latest init
+```
+
+这会自动创建 OpenSpec 目录结构：
+```
+openspec/
+├── specs/              # 系统当前行为（真理来源）
+├── changes/           # 变更提案
+│   └── archive/
+└── .openspec/
+```
+
+**注意**：
+- OpenSpec 是给存量项目迭代使用的，初始化后 `/opsx:*` 命令才可用
+- 如果 npm 安装失败，尝试：`npm install -g @fission-ai/openspec@latest`
 
 ### Step 0.6: 验证结果
 

@@ -430,9 +430,9 @@ npx skills add https://github.com/obra/superpowers --skill using-superpowers
 npx skills add https://github.com/obra/superpowers --skill verification-before-completion
 npx skills add https://github.com/obra/superpowers --skill writing-plans
 npx skills add https://github.com/obra/superpowers --skill writing-skills
-npx skills add https://github.com/obra/superpowers --skill build-error-resolver
-npx skills add https://github.com/obra/superpowers --skill silent-failure-hunter
-npx skills add https://github.com/obra/superpowers --skill performance-optimizer
+# npx skills add removed: build-error-resolver not available
+# npx skills add removed: silent-failure-hunter not available
+# npx skills add removed: performance-optimizer not available
 ```
 
 #### 其他常用 Skills
@@ -458,10 +458,10 @@ npx skills add https://github.com/vercel-labs/skills --skill design-md
 | postgres | PostgreSQL |
 | tauri-v2 | Tauri 桌面应用 |
 | systematic-debugging | 系统化调试（peaksbug 依赖） |
-| build-error-resolver | 构建错误修复（peaksbug 依赖） |
-| silent-failure-hunter | 静默失败检测（peaksbug 依赖） |
-| tdd-guide | 测试驱动开发（peaksbug 依赖） |
-| performance-optimizer | 性能优化（peaksbug 依赖） |
+
+
+| test-driven-development | 测试驱动开发（peaksbug 依赖） |
+
 
 **逻辑**：
 
