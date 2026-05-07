@@ -113,6 +113,12 @@ peaks-sdd skill (模板定义)
 - `read_directory`: 读取项目根目录结构
 - `read_file`: 读取 package.json, CLAUDE.md, CONFIG.md 等
 
+**示例调用**：
+```
+mcp__bunas__fs_mcp__read_directory(path: "/path/to/project")
+mcp__bunas__fs_mcp__read_file(path: "/path/to/project/package.json")
+```
+
 ### Step 0.2: 自动检测技术栈
 
 根据 package.json 和目录结构，检测：
@@ -195,6 +201,35 @@ peaks-sdd skill (模板定义)
 - `.claude/agents/` 目录下已有对应技术的 Agent 配置
 - `CLAUDE.md` 包含正确的技术栈描述
 - `CONFIG.md` 包含正确的服务配置（可选，如项目需要）
+
+**验证命令**：
+```bash
+# 检查 Agent 配置是否生成
+ls -la .claude/agents/
+
+# 检查 CLAUDE.md 是否包含技术栈
+grep -E "(React|NestJS|Tauri)" CLAUDE.md
+
+# 检查 .peaks 目录结构
+find .peaks -type d
+```
+
+**成功输出示例**：
+```
+.claude/agents/
+├── frontend.md
+├── backend.md
+├── peaksfeat.md
+├── product.md
+├── qa.md
+└── ...
+
+.peaks/
+├── plans/
+├── prds/
+├── reports/
+└── ...
+```
 
 ### Step 0.7: 集成 MCP 服务器（增量更新 settings.json）
 
@@ -586,6 +621,33 @@ openspec/
 
 创建规格说明 → `.peaks/prds/prd-[功能名]-[日期].md`
 使用 `[NEW]` / `[CHANGED]` / `[DEPRECATED]` 标识
+
+**PRD 输出格式示例**：
+```markdown
+# PRD - 用户登录功能
+
+## 概述
+### 背景
+用户需要一个安全的登录入口来访问个人数据。
+
+### 目标
+提供邮箱+密码登录，支持记住登录状态。
+
+## 功能列表
+
+### [NEW] 邮箱登录
+- 用户输入邮箱和密码
+- 系统验证凭证
+- 成功后跳转首页
+
+### [CHANGED] 记住登录
+- 原：7天有效期
+- 新：30天有效期
+
+## 非功能性需求
+- 登录响应时间 < 500ms
+- 密码加密存储（bcrypt）
+```
 
 ### Phase 3: Plan
 
