@@ -970,7 +970,7 @@ peaks-sdd 提供三个快捷命令，覆盖主要开发场景：
 - `.claude/agents/` Agent 配置
 - `.peaks/` 工作目录结构
 
-**执行流程**：Phase 0（第 105-232 行）
+**执行流程**：Phase 0: 项目初始化（详见上方 Step 0.1-0.8）
 
 ---
 
@@ -982,7 +982,7 @@ peaks-sdd 提供三个快捷命令，覆盖主要开发场景：
 
 或者直接粘贴 PRD 内容，自动进入完整开发流程。
 
-**执行流程**：Checkpoint 0 → Phase 1-5（第 689-835 行）
+**执行流程**：Checkpoint 0 → Phase 1-5（详见上方 SDD 工作流章节）
 
 ---
 
@@ -1067,3 +1067,28 @@ peaks-sdd 提供三个快捷命令，覆盖主要开发场景：
 3. **Spec first, code second** — 规格在代码之前
 4. **What & Why, not How** — 关注目标和价值
 5. **Traceability** — 每个代码变更都可追溯到规格
+
+---
+
+## 资源文件索引
+
+| 路径 | 用途 |
+|------|------|
+| `references/dispatch-quickref.md` | Agent 调度速查表、质量门禁、文件命名规范 |
+| `commands/peaksinit.md` | /peaksinit 命令实现 |
+| `commands/peaksfeat.md` | /peaksfeat 命令实现（轻量包装器，调用 Agent） |
+| `commands/peaksbug.md` | /peaksbug 命令实现（轻量包装器，调用 Agent） |
+| `templates/agents/peaksfeat.md` | 功能开发完整工作流（12步） |
+| `templates/agents/peaksbug.md` | Bug 修复工作流 |
+| `templates/agents/product.md` | 产品需求分析（grill-me、PRD、Swagger） |
+| `templates/agents/frontend.md` | 前端专家 |
+| `templates/agents/backend.md` | 后端专家 |
+| `templates/agents/qa.md` | 测试工程 |
+| `templates/agents/devops.md` | 运维部署 |
+| `templates/agents/security-reviewer.md` | 安全审查 |
+| `templates/agents/code-reviewer-frontend.md` | 前端代码审查 |
+| `templates/agents/code-reviewer-backend.md` | 后端代码审查 |
+| `templates/agents/design.md` | UI 设计 |
+| `templates/agents/triage.md` | Issue 分类 |
+| `templates/agents/postgres.md` | 数据库专家 |
+| `templates/agents/tauri.md` | Tauri 桌面应用 |
