@@ -690,7 +690,6 @@ openspec/
 
 | 场景 | 触发条件 | 处理动作 |
 |------|---------|---------|
-| 在主分支开发 | 当前分支是 main/master/develop/release/*/hotfix/* | 创建新分支：feature/<功能名> 或 bugfix/<功能名> |
 | 项目不是 git 仓库 | `git rev-parse` 失败 | 提示用户"建议先 git init"，若拒绝则继续但不创建分支 |
 | 模板文件缺失 | `templates/agents/*.md` 不存在 | 跳过该模板，记录警告，继续处理其他模板 |
 | context window 不足 | session-state.json 显示 contextEstimate >= 85% | 先 Compact，再继续 |
@@ -710,17 +709,6 @@ openspec/
 │  ✅ 是 → 继续                        │
 │  ❌ 否 → 提示 git init 或跳过分支    │
 └─────────────────────────────────────┘
-    ↓
-检查当前分支
-    ↓
-┌─ 分支是 main/master/develop 或 release/* / hotfix/*？ ─┐
-│                                                    │
-│  ✅ 是 → 创建新分支继续                              │
-│        - 功能开发：feature/<功能名>                  │
-│        - Bug 修复：bugfix/<功能名>                   │
-│                                                    │
-│  ❌ 否 → 继续（在当前分支上开发）                    │
-└────────────────────────────────────────────────────┘
     ↓
 检查 contextEstimate
     ↓
