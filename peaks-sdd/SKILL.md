@@ -809,7 +809,7 @@ openspec/
 #### Phase 5: Implement
 
 **Step 5.1** — 开发
-- Agent 执行分配的任务
+- Agent 执行分配的任务（详见 peaksfeat.md 第八步）
 
 **Step 5.2** — 质量门禁
 ```
@@ -829,8 +829,10 @@ openspec/
 ```
 
 **Step 5.3** — 部署
-- 执行部署脚本
-- 验证服务可达
+- 执行部署脚本（详见 peaksfeat.md 第十一步）
+- 进入 **Checkpoint 6: 部署后验证**
+
+> **精简说明**：Phase 5 引用 peaksfeat.md 的详细工作流（开发→测试→报告→部署），避免重复描述。
 
 ### OpenSpec 工作流 (存量项目迭代)
 
