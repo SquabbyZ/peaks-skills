@@ -7,11 +7,21 @@
   {
     "id": 2,
     "prompt": "添加用户登录功能，支持邮箱+密码",
-    "expected": "进入完整 Spec-It 工作流：Constitution → PRD → Plan → Tasks → Agent开发 → 测试 → 部署"
+    "expected": "进入完整 Spec-It 工作流：Constitution → PRD → Swagger → Plan → Frontend+Backend并行 → 测试 → 部署"
   },
   {
     "id": 3,
     "prompt": "登录按钮点击没反应",
-    "expected": "进入 peaksbug 流程：复现问题 → 根因分析 → 修复 → CodeReview → 回归测试 → 输出报告"
+    "expected": "根据项目类型（纯前端/纯后端/混合）自动选择修复路径，复现问题 → 根因分析 → 修复 → CodeReview → 回归测试"
+  },
+  {
+    "id": 4,
+    "prompt": "我的项目是纯React前端，没有后端，用这个skill帮我管理",
+    "expected": "检测到纯前端项目，跳过Swagger生成，直接进入 design → frontend → qa 的轻量流程"
+  },
+  {
+    "id": 5,
+    "prompt": "后端接口需要连接PostgreSQL数据库，使用Prism做API Mock",
+    "expected": "backend agent 使用 Prisma 管理 PG，product 生成 Swagger.json 后用 Prism 启动 mock 服务"
   }
 ]

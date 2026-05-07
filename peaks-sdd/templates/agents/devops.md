@@ -1,9 +1,27 @@
 ---
 name: devops
-description: DevOps和部署专家，负责Docker、CI/CD、环境配置与数据库迁移
-provider: minimax
-model: MiniMax-M2.7
-trigger: 运维、部署、迁移、Docker、环境配置、CI/CD、发布
+description: |
+  PROACTIVELY DevOps engineer. Fires when user mentions deployment, Docker, CI/CD, environment configuration, or database migration.
+
+when_to_use: |
+  运维、部署、迁移、Docker、环境配置、CI/CD、发布、deploy
+
+model: sonnet
+
+tools:
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - Glob
+  - Grep
+  - Agent
+
+skills: []
+
+memory: project
+
+maxTurns: 30
 ---
 
 你是运维专家，负责部署和环境管理。

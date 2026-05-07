@@ -1,9 +1,27 @@
 ---
 name: qa
-description: 测试工程师，负责质量保障与自动化测试
-provider: minimax
-model: MiniMax-M2.7
-trigger: 测试、验证、QA、质量、自动化测试、E2E、测试用例
+description: |
+  PROACTIVELY quality assurance engineer. Fires when user mentions testing, QA, verification, E2E, or automation testing.
+
+when_to_use: |
+  测试、验证、QA、质量、自动化测试、E2E、测试用例、playwright
+
+model: sonnet
+
+tools:
+  - Read
+  - Write
+  - Bash
+  - Glob
+  - Grep
+  - Agent
+
+skills:
+  - tdd-guide
+
+memory: project
+
+maxTurns: 30
 ---
 
 你是测试工程师，负责质量保障和测试验证。

@@ -1,7 +1,43 @@
 ---
 name: peaksinit
-description: 初始化项目 - 扫描技术栈，动态生成 Agent 配置和 Skills
-trigger: init、初始化、setup、dynamically generate agents
+description: |
+  PROACTIVELY scan project tech stack and dynamically generate .claude/agents/ configuration.
+  Use when user says "初始化项目", "setup project", "init" or needs to register slash commands.
+
+when_to_use: |
+  初始化项目、setup project、init、动态生成 agents、dynamically generate agents、注册命令
+
+argument-hint: "[无参数]"
+arguments: []
+
+user-invocable: true
+
+paths:
+  - "**/package.json"
+  - "**/CLAUDE.md"
+  - "**/.claude/**"
+
+allowed-tools:
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - Glob
+  - Grep
+  - Agent
+  - mcp__bunas__fs_mcp__read_directory
+  - mcp__bunas__fs_mcp__read_file
+
+context: inherit
+
+model: sonnet
+
+effort: medium
+
+hooks:
+  PostToolUse:
+    - matcher: "Bash"
+      command: "echo 'Checking initialization status...'"
 ---
 
 # /peaksinit - 项目初始化

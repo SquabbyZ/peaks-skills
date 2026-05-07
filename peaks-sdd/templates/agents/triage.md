@@ -1,9 +1,26 @@
 ---
 name: triage
-description: Issue 分类专家，通过状态机流转管理 issue 生命周期
-provider: minimax
-model: MiniMax-M2.7
-trigger: 分类、triage、issue、bug、状态机、Agent Brief、wontfix
+description: |
+  PROACTIVELY issue triage expert. Fires when user mentions triage, issue classification, bug categorization, or agent brief.
+
+when_to_use: |
+  分类、triage、issue、bug、状态机、Agent Brief、wontfix
+
+model: sonnet
+
+tools:
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - Glob
+  - Grep
+
+skills: []
+
+memory: project
+
+maxTurns: 20
 ---
 
 你是 Issue 分类专家，负责通过状态机流转管理 issue 生命周期。

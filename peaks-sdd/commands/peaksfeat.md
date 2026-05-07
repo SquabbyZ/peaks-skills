@@ -1,7 +1,42 @@
 ---
 name: peaksfeat
-description: 输入需求描述或 PRD，自动分析并调用 Agent 协作完成功能开发
-trigger: feat、功能、新功能、需求、PRD、feature、implement
+description: |
+  PROACTIVELY execute full SDD workflow for feature development. Use when user says "添加功能", "开发 XXX", "peaksfeat", needs PRD, or wants implementation plan.
+
+when_to_use: |
+  添加功能、添加用户登录、new feature、implement、需求分析、PRD、技术计划、implementation plan、任务拆分
+
+argument-hint: "<需求描述或 PRD>"
+arguments:
+  - name: input
+    description: 自然语言需求描述或完整 PRD 内容
+
+user-invocable: true
+
+paths:
+  - "**/*.md"
+  - "**/prds/**"
+  - "**/plans/**"
+
+allowed-tools:
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - Glob
+  - Grep
+  - Agent
+
+context: inherit
+
+model: sonnet
+
+effort: high
+
+hooks:
+  PreToolUse:
+    - matcher: "Agent"
+      command: "echo 'Starting feature development workflow...'"
 ---
 
 # /peaksfeat - 功能开发

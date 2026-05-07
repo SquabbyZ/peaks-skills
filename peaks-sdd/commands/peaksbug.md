@@ -1,7 +1,43 @@
 ---
 name: peaksbug
-description: 输入 bug 现象描述，自动分析根因并调用 Agent 协作完成修复
-trigger: bug、修复、fix、问题、报错、error、bugfix
+description: |
+  PROACTIVELY execute systematic debugging workflow. Use when user says "bug", "修复", "报错", "登录按钮点击没反应", or needs to fix an error.
+
+when_to_use: |
+  bug、修复、fix、问题、报错、error、bugfix、登录按钮点击没反应、接口返回 500、加载很慢
+
+argument-hint: "<bug 现象描述>"
+arguments:
+  - name: input
+    description: bug 的自然语言描述或错误信息
+
+user-invocable: true
+
+paths:
+  - "**/*.md"
+  - "**/bugs/**"
+  - "**/*.ts"
+  - "**/*.tsx"
+
+allowed-tools:
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - Glob
+  - Grep
+  - Agent
+
+context: inherit
+
+model: sonnet
+
+effort: high
+
+hooks:
+  PreToolUse:
+    - matcher: "Agent"
+      command: "echo 'Starting bug fix workflow...'"
 ---
 
 # /peaksbug - Bug 修复

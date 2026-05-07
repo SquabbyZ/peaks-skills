@@ -1,18 +1,40 @@
 ---
 name: peaks-sdd
 description: |
-  Spec-Driven Development (SDD) workflow for TypeScript projects. Use this skill when:
-  - Starting a new project or onboarding to an existing codebase
-  - User wants to define project constitution and governing principles
-  - Creating detailed specifications (specify) for features
-  - Generating technical implementation plans
-  - Breaking work into actionable task lists
-  - Running any /speckit.* commands
-  - Project initialization (dynamically generates .claude/agents/ from templates)
+  Spec-Driven Development (SDD) workflow. PROACTIVELY when user mentions initialization, setup, project constitution, PRD, specification, technical plan, or task breakdown.
+  - User says "初始化项目" / "setup project" / "init"
+  - User wants to define project constitution or governing principles
+  - User needs detailed specifications for features
+  - User asks for technical implementation plans
+  - User wants to break work into actionable tasks
+  - User runs /peaksinit, /peaksfeat, or /peaksbug
 
-  Trigger: init、初始化、setup、dynamically generate agents、peaks-sdd
+when_to_use: |
+  初始化、setup、init、constitution、PRD、specify、规格、implementation plan、计划、task breakdown、任务拆分
 
-  MCP: @bunas/fs-mcp, @playwright/mcp, chrome-devtools-mcp, gitnexus, claude-mcp
+paths:
+  - "**/package.json"
+  - "**/.claude/**"
+  - "**/peaksinit"
+  - "**/peaksfeat"
+  - "**/peaksbug"
+
+allowed-tools:
+  - Read
+  - Edit
+  - Write
+  - Bash
+  - Agent
+  - Glob
+  - Grep
+
+context: inherit
+
+mcp-servers:
+  - fs
+  - gitnexus
+  - claude-mem
+
 user-invocable: true
 ---
 
@@ -35,6 +57,71 @@ peaks-sdd skill (模板定义)
     ↓
 生成 .claude/session-state.json
 ```
+
+## Memory 管理
+
+### 记忆文件位置
+
+| 文件 | 作用域 | 用途 | 是否入 Git |
+|------|--------|------|-----------|
+| `CLAUDE.md` | 项目级 | 项目说明、上下文、规则 | ✅ 必入 |
+| `CLAUDE.local.md` | 个人偏好 | 本地偏好设置 | ❌ 需 .gitignore |
+| `.claude/rules/*.md` | 规则文件 | 懒加载规则（按路径触发） | ✅ 必入 |
+| `.peaks/` | 工作目录 | PRD、Plan、报告等产出物 | ✅ 必入 |
+| `~/.claude/CLAUDE.md` | 全局 | 所有项目的通用规则 | N/A |
+| `~/.claude/projects/<project>/memory/` | 项目记忆 | claude-mem 持久化 | ❌ |
+
+### 懒加载规则（Paths Frontmatter）
+
+使用 `paths` YAML frontmatter 实现按文件路径懒加载规则：
+
+```yaml
+---
+name: react-patterns
+description: React 开发规范
+paths:
+  - "**/*.tsx"
+  - "**/*.jsx"
+---
+
+# React Patterns
+
+当检测到 .tsx/.jsx 文件时加载此规则...
+```
+
+### 保持 CLAUDE.md 精简
+
+> **原则**：CLAUDE.md 应 < 200 行。超过时归档到 `.peaks/`。
+
+| 文件 | 行数限制 | 超过时 |
+|------|---------|--------|
+| `CLAUDE.md` | < 200 行 | 归档到 `.peaks/context/` |
+| `.claude/rules/*.md` | 无限制 | 懒加载，不占主上下文 |
+
+### Agent Memory 作用域
+
+| 作用域 | 用途 | 生命周期 |
+|--------|------|---------|
+| `memory: project` | 项目上下文（技术栈、架构） | 跨 Agent 调用保持 |
+| `memory: user` | 用户偏好、工作方式 | 跨项目保持 |
+| `memory: local` | 单次任务临时数据 | 仅当前 Agent |
+
+### peaks-sdd Memory 策略
+
+1. **项目初始化后**：CLAUDE.md 包含技术栈、目录结构、开发命令
+2. **Phase 1-6 产出**：归档到 `.peaks/prds/`、`.peaks/plans/` 等
+3. **跨会话记忆**：claude-mem MCP 自动持久化关键上下文
+4. **定期 Compact**：`/compact` 触发时自动清理冗余上下文
+
+### Context 估算与 Compact
+
+| Context 占用 | 建议动作 |
+|-------------|---------|
+| < 50% | 正常继续 |
+| 50-85% | 关注，/compact 可选 |
+| > 85% | **必须** `/compact` 后再继续 |
+
+---
 
 ## 开发原则（Karpathy Guidelines）
 
@@ -896,6 +983,44 @@ peaks-sdd 提供三个快捷命令，覆盖主要开发场景：
 自动分析复现 → 根因分析 → 修复 → 测试 → 验证。
 
 **执行流程**：Phase 1-6（上方 commands/peaksbug.md）
+
+---
+
+## ⚠️ Gotchas (Claude 失败点总结)
+
+> 随着使用积累的 Claude Code 常见失败模式，触发时需特别注意：
+
+### 工作流相关
+
+| Gotcha | 触发条件 | 应对方式 |
+|--------|---------|---------|
+| **Agent 忘记上下文** | 多轮对话后 Agent 无法回忆早期决策 | Checkpoint 0-6 强制用户确认，每个 Phase 产出物归档 |
+| **规格蔓延** | 用户不断添加未包含在 PRD 中的需求 | Phase 2 后新增需求必须走 Checkpoint 2 确认 |
+| **Agent 自主代码生成** | Phase 5 中 Agent 跳过 Code Review 直接提交 | Checkpoint 5 强制门禁：CR → 安全检查 → QA |
+| **Context 溢出** | 复杂项目多轮对话后 context 超过 85% | Phase 0 提示 `/compact`，自动触发 SessionStart 检查 |
+
+### 命令相关
+
+| Gotcha | 触发条件 | 应对方式 |
+|--------|---------|---------|
+| **命令未注册** | peaksinit 未执行时调用 /peaksfeat | Checkpoint 0 检测命令可用性，未注册则引导用户先说"初始化我的项目" |
+| **命令注册路径错误** | 项目在子目录中，命令路径相对错误 | 使用绝对路径或相对于 `.claude/settings.json` 的路径 |
+| **命令覆盖** | 多次执行 peaksinit 覆盖已有命令 | Step 0.7 增量添加逻辑：已存在则跳过 |
+
+### 技术栈检测相关
+
+| Gotcha | 触发条件 | 应对方式 |
+|--------|---------|---------|
+| **Monorepo 检测失败** | package.json 在 root 但实际代码在 packages/ | 同时检测 root + packages/*/package.json |
+| **混用框架** | 同时检测到 React + NestJS | 生成 frontend + backend 两个 Agent |
+| **遗漏隐式依赖** | 只检测 package.json，忽略 workspace 配置 | 检测 pnpm-workspace.yaml, lerna.json, turbo.json |
+
+### Memory 相关
+
+| Gotcha | 触发条件 | 应对方式 |
+|--------|---------|---------|
+| **跨会话丢失上下文** | claude-mem 未正确初始化 | peaksinit Step 0.7 验证 claude-mem 已注册 |
+| **CLAUDE.md 膨胀** | 多轮迭代后 CLAUDE.md 超过 200 行 | 定期归档到 .peaks/，保持主文件精简 |
 
 ---
 
