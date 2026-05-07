@@ -85,6 +85,11 @@ maxTurns: 50
    - 如果 >= 70%，询问用户是否先 compact
    - 如果 < 70%，正常继续
 
+**技术栈检测结果应用**：
+- 检测为纯前端 → 第九步跳过 backend/postgres，仅调度 frontend + qa
+- 检测为纯后端 → 第九步跳过 frontend/design，仅调度 backend + qa
+- 检测为混合 → 第九步调度 frontend + backend + postgres 并行
+
 ### 第二步：产品需求分析（必须先做）
 
 **所有功能开发前，必须先由产品专家进行需求分析和方案设计。**
@@ -99,6 +104,10 @@ maxTurns: 50
    - 交叉验证：用户描述与代码实现是否一致
 3. 与用户进行**多轮交互**，直到用户明确表示没有需要改动的内容
 4. product 根据经验指出不足，**直到 PRD 完善**
+
+**纯前端项目简化**：
+- 如果用户在第一步明确说"轻量"、"快速」、「简单」，跳过 grill-me 多轮追问
+- 直接基于用户描述生成简要 PRD，进入 design 阶段
 5. 产出 PRD 文档到 `.peaks/prds/prd-[功能名]-[日期].md`
 
 **PRD 标识格式**（agent 必须能 100% 识别，用户能感知改动点）：
@@ -239,8 +248,9 @@ npx prism mock --help
 
 **混合项目流程**：
 - Swagger.json 生成后，前端和后端并行开发
-- frontend 参考 Swagger.json 定义接口
-- backend 参考 Swagger.json 定义 Schema
+- frontend 参考 Swagger.json 定义接口，使用 Prism Mock 先行开发
+- backend 参考 Swagger.json 定义 Schema，同时启动 Prism Mock 供前端调用
+- **启动 Mock 服务**：`npx prism mock .peaks/swagger/swagger-[功能名].json --port 3001`
 
 每个开发任务都必须经过质量门禁（见下方）。
 
