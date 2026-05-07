@@ -10,28 +10,29 @@ npx skills add peaks-sdd
 
 ## 快速开始
 
-### 首次使用
+### 首次使用（必须用自然语言触发）
 
-安装后，说：
+安装后，**在对话中直接输入以下任一语句**触发初始化：
 
 ```
-初始化我的项目
+使用 peaks-sdd 技能初始化我的项目
 ```
 
-这会触发 peaksinit 工作流，自动完成：
-- 检测项目技术栈（React / NextJS / NestJS 等）
-- 生成 `.claude/agents/` Agent 配置
-- 创建 `.peaks/` 工作目录
-- **注册三个 slash commands**：`/peaksinit` `/peaksfeat` `/peaksbug`
-- 安装常用 Skills 和 MCP 服务器
+或
 
-### 日常使用
+```
+peaks-sdd 初始化项目
+```
 
-命令注册完成后，直接使用：
+> **为什么不能用 `/peaksinit`？** 因为 `/peaksinit` 这个 slash command 是在初始化**过程中**才注册的。首次使用时它还不存在，必须用自然语言触发。
+
+### 日常使用（初始化完成后）
+
+初始化成功后，三个 slash command 就注册好了，可以直接使用：
 
 | 命令 | 说明 | 示例 |
 |------|------|------|
-| `/peaksinit` | 初始化项目 | 扫描技术栈，生成 Agent 配置 |
+| `/peaksinit` | 重新扫描项目配置 | 重新检测技术栈、更新 Agent 配置 |
 | `/peaksfeat` | 功能开发 | 添加用户登录功能 |
 | `/peaksbug` | Bug 修复 | 登录报错500 |
 

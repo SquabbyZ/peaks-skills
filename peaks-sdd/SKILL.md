@@ -10,7 +10,7 @@ description: |
   - User runs /peaksinit, /peaksfeat, or /peaksbug
 
 when_to_use: |
-  初始化、setup、init、constitution、PRD、specify、规格、implementation plan、计划、task breakdown、任务拆分
+  初始化我的项目、初始化项目、setup project、setup this project、dynamically generate agents、动态生成 agents、setup 完整开发流程、设置项目规范
 
 paths:
   - "**/package.json"
