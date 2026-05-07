@@ -223,10 +223,13 @@ npx prism mock --help
 | 混合   | frontend + backend | 需要（并行开发） |
 
 **纯前端项目流程**：
-1. 跳过第七步（API 生成）
-2. 直接调度 design（如需要）
-3. 调度 frontend 开发
-4. 调度 qa 测试
+1. **可选：简化 product 阶段** — 如果用户明确说"轻量"或"快速"，跳过 grill-me PRD，直接进入 design
+2. 跳过第七步（API 生成）
+3. 直接调度 design（如需要，复杂页面建议先设计，简单 CRUD 可跳过）
+4. 调度 frontend 开发
+5. 调度 qa 测试
+
+**简化 product 阶段判断**：用户说"轻量"、"快速」、「简单」时适用。此时直接基于用户描述生成简要 PRD，跳过 grill-me 多轮追问。
 
 **纯后端项目流程**：
 1. 第七步生成 Swagger.json

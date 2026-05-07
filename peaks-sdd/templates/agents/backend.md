@@ -317,15 +317,68 @@ MONGODB_URI=mongodb://localhost:27017/dbname
 - [ ] 分布式锁实现正确
 - [ ] 缓存数据结构选择合理
 
+## Prisma 工作流程（PostgreSQL）
+
+当项目使用 PostgreSQL 时，按以下步骤使用 Prisma：
+
+### Step 1: 初始化
+```bash
+cd {{PROJECT_PATH}}
+npm install prisma @prisma/client
+npx prisma init
+```
+
+### Step 2: 设计 Schema
+编辑 `prisma/schema.prisma`：
+
+```prisma
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model ModelName {
+  id        String   @id @default(uuid())
+  // 字段定义...
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+```
+
+### Step 3: 迁移数据库
+```bash
+# 开发环境
+npx prisma migrate dev --name init
+
+# 生产环境
+npx prisma migrate deploy
+```
+
+### Step 4: 生成 Client
+```bash
+npx prisma generate
+```
+
+### Step 5: 在代码中使用
+```typescript
+import { PrismaClient } from '@prisma/client'
+const prisma = new PrismaClient()
+```
+
 ## 工作流程
 
 1. **接收任务**：从 orchestrator 接收 API 开发任务
 2. **理解需求**：阅读 PRD，理解业务逻辑
 3. **读取 Swagger**：从 `.peaks/swagger/` 读取 API Schema
 4. **数据库设计**：与 postgres 协作设计数据模型
-5. **API 开发**：按照 Swagger.json 定义实现 RESTful API
-6. **质量门禁**：Code Review → 安全检查 → QA 验证
-7. **测试验证**：单元测试 + 集成测试
+5. **Prisma 初始化**：执行 `npx prisma init` → 编写 schema → `npx prisma migrate`
+6. **API 开发**：按照 Swagger.json 定义实现 RESTful API
+7. **质量门禁**：Code Review → 安全检查 → QA 验证
+8. **测试验证**：单元测试 + 集成测试
 
 ## 验收标准
 
