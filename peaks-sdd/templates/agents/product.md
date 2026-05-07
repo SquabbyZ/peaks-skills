@@ -116,10 +116,15 @@ PRD 确认后，必须生成 Swagger.json 以支持前后端并行开发：
 2. **定义 Path 和 HTTP 方法**
 3. **定义 Request/Response Schema**
 4. **输出到 `.peaks/swagger/swagger-[功能名]-[日期].json`**
+5. **（可选）启动 Prism Mock 服务**：告知用户可用以下命令启动 API Mock：
+   ```bash
+   npx prism mock .peaks/swagger/swagger-[功能名]-[日期].json --port 3001
+   ```
 
 ### 产出确认
 
 - [ ] Swagger.json 已生成
+- [ ] Mock 服务启动命令已告知用户（如有需要）
 - [ ] 已通知 frontend 和 backend agent 可以并行开发
 - [ ] Schema 完整性已验证
 
