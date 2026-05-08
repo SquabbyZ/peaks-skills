@@ -1,7 +1,12 @@
 ---
 name: peaks-sdd
-description: Spec-Driven Development workflow. Use when user mentions 初始化项目, setup project, constitution, PRD, bug, 报错, 修复, or needs to develop features or fix bugs.
+description: Spec-Driven Development (SDD) workflow for TypeScript projects. 当用户说初始化项目、setup project、init、bug、报错、修复、添加功能、PRD、技术计划、实现计划，或需要开发功能/修复 bug 时使用。支持动态生成 Agent 配置、Constitution、PRD、Plan、Tasks、Implement 完整流程。
 user-invocable: true
+triggers:
+  - "初始化项目" / "setup project" / "init"
+  - "bug" / "报错" / "修复" / "登录按钮没反应"
+  - "添加功能" / "PRD" / "技术计划" / "实现计划"
+  - "/peaksinit" / "/peaksfeat" / "/peaksbug"
 ---
 
 # Peaks SDD (Spec-Driven Development)
