@@ -6,6 +6,8 @@ description: |
 when_to_use: |
   后端审查、CR、code review、代码审查、NestJS审查、backend review
 
+color: cyan
+
 model: sonnet
 
 tools:

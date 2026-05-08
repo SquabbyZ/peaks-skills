@@ -6,6 +6,8 @@ description: |
 when_to_use: |
   数据库、表、SQL、迁移、索引、PostgreSQL、数据模型、database
 
+color: blue
+
 model: sonnet
 
 tools:

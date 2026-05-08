@@ -6,6 +6,8 @@ description: |
 when_to_use: |
   安全、漏洞、security、渗透、OWASP、认证、授权、XSS、SQL注入、security review
 
+color: red
+
 model: sonnet
 
 tools:

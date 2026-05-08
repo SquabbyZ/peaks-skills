@@ -6,6 +6,8 @@ description: |
 when_to_use: |
   后端、接口、API、服务、逻辑、后端开发、Node.js、NestJS、Express、数据库、ORM
 
+color: green
+
 model: sonnet
 
 tools:

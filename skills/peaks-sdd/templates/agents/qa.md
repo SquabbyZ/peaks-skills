@@ -6,6 +6,8 @@ description: |
 when_to_use: |
   测试、验证、QA、质量、自动化测试、E2E、测试用例、playwright
 
+color: pink
+
 model: sonnet
 
 tools:

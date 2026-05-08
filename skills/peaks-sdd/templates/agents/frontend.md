@@ -6,6 +6,8 @@ description: |
 when_to_use: |
   前端、页面、组件、样式、交互、UI实现、前端开发、React、Vue、Next.js、浏览器测试
 
+color: blue
+
 model: sonnet
 
 tools:

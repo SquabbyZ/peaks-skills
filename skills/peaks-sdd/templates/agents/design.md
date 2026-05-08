@@ -6,6 +6,8 @@ description: |
 when_to_use: |
   设计、UI、视觉、设计稿、Figma、交互、界面风格、UI design
 
+color: purple
+
 model: sonnet
 
 tools:

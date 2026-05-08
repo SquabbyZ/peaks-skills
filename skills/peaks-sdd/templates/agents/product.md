@@ -6,6 +6,8 @@ description: |
 when_to_use: |
   需求、PRD、方案、产品策略、brainstorming、用户故事、需求分析、功能列表
 
+color: yellow
+
 model: sonnet
 
 tools:
