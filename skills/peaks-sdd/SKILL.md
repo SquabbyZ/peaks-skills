@@ -8,15 +8,25 @@ user-invocable: true
 
 ## 自动决策 (Auto-Detection)
 
-当用户运行 `/peaks-sdd` 时,根据输入内容自动判断工作流:
+当用户运行 `/peaks-sdd` 时:
 
 | 检测关键词 | 工作流 |
 |-----------|--------|
-| 初始化项目、setup project、init | **项目初始化** - 扫描技术栈,生成 Agent 配置 |
-| bug、报错、修复、登录按钮没反应、接口返回 500、没反应 | **Bug 修复** - 8 阶段系统化调试 |
-| 添加功能、需求、PRD、技术计划、实现计划 | **功能开发** - Constitution → PRD → Design → Develop → QA |
+| 初始化项目、setup project、init | **首次使用** - 扫描技术栈,生成 `.claude/agents/` 配置 |
+| bug、报错、修复、登录按钮没反应、接口返回 500、没反应 | **Bug 修复** - 使用生成的 Agent 执行 8 阶段调试 |
+| 添加功能、需求、PRD、技术计划、实现计划 | **功能开发** - 使用生成的 Agent 执行 Constitution → PRD → Design → Develop → QA |
 
-**无需用户选择,自动判断执行!**
+**首次使用自动初始化,之后直接使用生成的 agents!**
+
+生成的 agents 示例:
+```
+.claude/agents/
+├── frontend.md       # 前端专家(根据 React/Vue 检测结果生成)
+├── backend.md        # 后端专家(根据 Node/ NestJS 检测结果生成)
+├── product.md        # 产品需求
+├── qa.md             # 测试专家
+└── ...
+```
 
 ## 使用方式
 
@@ -1040,7 +1050,7 @@ openspec/
 #### Phase 5: Implement
 
 **Step 5.1** — 开发
-- Agent 执行分配的任务（详见 templates/agents/peaksfeat.md）
+- Agent 执行分配的任务（使用 `.claude/agents/peaksfeat.md` 中定义的工作流）
 
 **Step 5.2** — 质量门禁
 ```
@@ -1060,7 +1070,7 @@ openspec/
 ```
 
 **Step 5.3** — 部署
-- 执行部署脚本（详见 templates/agents/peaksfeat.md）
+- 执行部署脚本（使用 `.claude/agents/devops.md` 中定义的部署流程）
 - 进入 **Checkpoint 6: 部署后验证**
 
 ### OpenSpec 工作流 (存量项目迭代)
@@ -1152,7 +1162,7 @@ peaks-sdd 提供三个快捷命令，覆盖主要开发场景：
 
 自动分析复现 → 根因分析 → 修复 → 测试 → 验证。
 
-**执行流程**：Phase 1-6（详见 templates/agents/peaksbug.md）
+**执行流程**：Phase 1-6（使用 `.claude/agents/peaksbug.md` 中定义的调试工作流）
 
 ---
 
@@ -1233,17 +1243,5 @@ peaks-sdd 提供三个快捷命令，覆盖主要开发场景：
 | 路径 | 用途 |
 |------|------|
 | `references/dispatch-quickref.md` | Agent 调度速查表、质量门禁、文件命名规范 |
-| `templates/agents/peaksfeat.md` | 功能开发完整工作流（12步） |
-| `templates/agents/peaksbug.md` | Bug 修复工作流 |
-| `templates/agents/product.md` | 产品需求分析（grill-me、PRD、Swagger） |
-| `templates/agents/frontend.md` | 前端专家 |
-| `templates/agents/backend.md` | 后端专家 |
-| `templates/agents/qa.md` | 测试工程 |
-| `templates/agents/devops.md` | 运维部署 |
-| `templates/agents/security-reviewer.md` | 安全审查 |
-| `templates/agents/code-reviewer-frontend.md` | 前端代码审查 |
-| `templates/agents/code-reviewer-backend.md` | 后端代码审查 |
-| `templates/agents/design.md` | UI 设计 |
-| `templates/agents/triage.md` | Issue 分类 |
-| `templates/agents/postgres.md` | 数据库专家 |
-| `templates/agents/tauri.md` | Tauri 桌面应用 |
+| `templates/agents/*.md` | **初始化时使用** - 模板,根据技术栈生成 `.claude/agents/` |
+| `.claude/agents/*.md` | **实际运行时使用** - 初始化后生成的 agents |
