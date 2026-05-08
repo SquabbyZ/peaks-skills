@@ -230,6 +230,18 @@ const [data, setData] = useState<TaskNode[]>([
 
 ## 🚀 快速开始
 
+### 通过 skills.sh 安装（兼容 Vercel agent-skills 生态）
+
+```bash
+# 安装全部技能
+npx skills add SquabbyZ/peaks-skills
+
+# 仅安装单个技能
+npx skills add SquabbyZ/peaks-skills/skills/peaks-sdd
+```
+
+技能会被解压到 `.claude/skills/`,Claude Code、Cursor 等支持 SKILL.md 规范的 agent 会自动发现并按 description 触发。
+
 ### 使用 CLI 安装（推荐）
 
 ```bash

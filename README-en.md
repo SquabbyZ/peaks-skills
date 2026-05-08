@@ -171,6 +171,18 @@ Use the peaks-hook-form skill to generate a form:
 | `/peaksupdate` | Update peaks-sdd | Update to latest version and sync Agent templates |
 | `/peakscheck` | Check for updates | Auto-triggered (parallel, non-blocking) |
 
+### Install via skills.sh (Vercel agent-skills compatible)
+
+```bash
+# Install all skills
+npx skills add SquabbyZ/peaks-skills
+
+# Install a single skill
+npx skills add SquabbyZ/peaks-skills/skills/peaks-sdd
+```
+
+Skills are unpacked into `.claude/skills/` and auto-discovered by Claude Code, Cursor, and any agent that supports the SKILL.md spec.
+
 ### Install via CLI (Recommended)
 
 ```bash

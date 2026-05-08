@@ -1,13 +1,6 @@
 ---
 name: peaks-sdd
-description: |
-  Spec-Driven Development (SDD) workflow. PROACTIVELY when user mentions initialization, setup, project constitution, PRD, specification, technical plan, or task breakdown.
-  - User says "初始化项目" / "setup project" / "init"
-  - User wants to define project constitution or governing principles
-  - User needs detailed specifications for features
-  - User asks for technical implementation plans
-  - User wants to break work into actionable tasks
-  - User runs /peaksinit, /peaksfeat, or /peaksbug
+description: Spec-Driven Development (SDD) workflow covering project initialization, constitution, PRD authoring, technical planning, and task breakdown. Use when the user mentions 初始化项目, setup project, init, constitution, PRD, specification, implementation plan, task breakdown, or runs /peaksinit, /peaksfeat, /peaksbug.
 
 when_to_use: |
   初始化、setup、init、constitution、PRD、specify、规格、implementation plan、计划、task breakdown、任务拆分
