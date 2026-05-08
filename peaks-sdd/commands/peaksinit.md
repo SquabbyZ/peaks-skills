@@ -272,29 +272,129 @@ cat .claude/settings.json | grep -A 10 '"commands"'
 
 确认三个命令都已注册。
 
-## 输出示例
+### Step 0.9: 生成初始化报告
+
+**初始化完成后，必须向用户出具完整报告，汇总所有执行操作。**
+
+将报告同时输出到控制台（用户可见）和保存到文件。
+
+**报告文件路径**：`.peaks/reports/init-report-[YYYYMMDD].md`
+
+**报告模板**：
+
+```markdown
+# peaks-sdd 初始化报告
+
+**项目**: {{PROJECT_NAME}}
+**路径**: {{PROJECT_PATH}}
+**时间**: [当前时间]
+
+---
+
+## 1. 技术栈检测
+
+| 检测项 | 结果 |
+|--------|------|
+| 前端框架 | [检测结果，如 React 18 / Vue 3 / 未检测到] |
+| 后端框架 | [检测结果，如 NestJS / 未检测到] |
+| 桌面应用 | [检测结果，如 Tauri / 未检测到] |
+| 数据库 | [检测结果，如 PostgreSQL (Prisma) / 未检测到] |
+| 测试框架 | [检测结果，如 Vitest / Playwright / 未检测到] |
+| 项目类型 | [纯前端 / 纯后端 / 混合项目] |
+
+## 2. 生成的 Agent 配置
+
+已生成到 `.claude/agents/`：
+
+| Agent | 状态 | 说明 |
+|-------|------|------|
+| peaksfeat | ✅ 启用 | 功能开发流程管理 |
+| peaksbug | ✅ 启用 | Bug 修复流程管理 |
+| product | ✅ 启用 | 产品需求分析 |
+| qa | ✅ 启用 | 测试工程 |
+| frontend | ✅ 启用 / ❌ 不适用 | 前端开发专家 |
+| backend | ✅ 启用 / ❌ 不适用 | 后端开发专家 |
+| design | ✅ 启用 / ❌ 不适用 | UI/UX 设计 |
+| ... | ... | ... |
+
+## 3. 已安装的 Skills
+
+| Skill | 来源 | 用途 |
+|-------|------|------|
+| [skill 名称] | [仓库地址] | [简要说明] |
+| ... | ... | ... |
+
+## 4. 已注册的 Commands
+
+| 命令 | 说明 |
+|------|------|
+| `/peaksinit` | 项目初始化 |
+| `/peaksfeat` | 功能开发（Spec-It / OpenSpec） |
+| `/peaksbug` | Bug 修复 |
+
+## 5. 创建的目录结构
 
 ```
-✅ 项目扫描完成
+.peaks/
+├── plans/          # 开发计划
+├── prds/           # PRD 文档
+├── swagger/        # API 规范
+├── designs/        # 设计稿
+├── test-docs/      # 测试用例
+├── reports/        # 各类报告
+├── auto-tests/     # 自动化测试
+├── deploys/        # 部署脚本
+├── bugs/           # Bug 分析
+└── fixes/          # 修复记录
 
-技术栈检测结果:
-  - React 18 + TypeScript + Vite
-  - Jest 测试框架
+.claude/
+├── agents/         # [数量] 个 Agent 配置
+└── settings.json   # Command 注册
+```
 
-生成的 Agent 配置:
-  .claude/agents/
-  ├── frontend.md
-  ├── peaksfeat.md
-  ├── product.md
-  ├── qa.md
-  └── triage.md
+## 6. 快速开始
 
-.peaks/ 目录已创建
+初始化完成！你现在可以使用以下命令：
 
-Slash Commands 已注册:
-  - /peaksinit  ✓
-  - /peaksfeat  ✓
-  - /peaksbug   ✓
+| 命令 | 用途 | 示例 |
+|------|------|------|
+| `/peaksfeat` | 开发新功能 | `/peaksfeat 添加用户登录` |
+| `/peaksbug` | 修复 Bug | `/peaksbug 登录按钮点击没反应` |
+
+**下一步建议**：
+- 使用 `/peaksfeat <需求描述>` 开始第一个功能开发
+- 查看 `.peaks/` 目录了解工作流产出物结构
+```
+
+**执行要求**：
+1. 将上述模板中的 `[占位符]` 替换为实际检测结果
+2. 保存报告到 `.peaks/reports/init-report-[YYYYMMDD].md`
+3. 在控制台输出**精简版报告**给用户（包含技术栈、Agent 列表、Commands 列表、快速开始）
+4. 报告中的 Skills 列表必须包含所有实际安装的 skill
+
+## 输出示例（控制台精简版）
+
+```
+✅ peaks-sdd 初始化完成
+
+技术栈: React 18 + TypeScript + Vite | 纯前端项目
+
+Agent 配置 (8 个):
+  ✅ peaksfeat          功能开发流程管理
+  ✅ peaksbug           Bug 修复流程管理
+  ✅ product            产品需求分析
+  ✅ qa                 测试工程
+  ✅ frontend           前端开发专家
+  ✅ design             UI/UX 设计
+  ✅ code-reviewer-frontend  前端代码审查
+  ✅ security-reviewer  安全审查
+
+Commands 已注册:
+  /peaksinit  /peaksfeat  /peaksbug
+
+Skills 已安装: 28 个
+
+📄 完整报告: .peaks/reports/init-report-20260508.md
 ```
 
 ## 提示
