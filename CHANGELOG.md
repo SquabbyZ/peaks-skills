@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 ## [1.0.13] - 2026-05-08
 
+### Added
+
+**peaks-sdd UI 库检测**:
+- Step 0.2 新增 UI 库检测（antd / mui / chakra / radix / shadcn）
+- Step 0.3 新增 `{{UI_LIBRARY}}` 模板变量
+- 技术栈检测规则新增 UI 库检测章节
+
 ### Fixed
 
 **peaks-sdd 初始化流程**:

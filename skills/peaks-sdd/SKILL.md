@@ -264,6 +264,7 @@ mcp__bunas__fs_mcp__read_file(path: "/path/to/project/package.json")
 | 全栈框架 | package.json 的 dependencies.next         | Next.js     |
 | 数据库   | typeorm / prisma / drizzle                | 数据库 ORM  |
 | 测试框架 | @playwright/test / vitest / jest          | 测试框架    |
+| UI 库    | antd / @mui/material / @chakra-ui/react / radix-ui | UI 组件库 |
 
 ### Step 0.3: 替换模板变量
 
@@ -277,6 +278,7 @@ mcp__bunas__fs_mcp__read_file(path: "/path/to/project/package.json")
 | `{{TECH_STACK}}`         | 技术栈描述   | React 18 + TypeScript + Vite |
 | `{{FRONTEND_FRAMEWORK}}` | 前端框架     | react / vue / next           |
 | `{{BACKEND_FRAMEWORK}}`  | 后端框架     | nestjs / express / fastify   |
+| `{{UI_LIBRARY}}`          | UI 组件库    | antd / mui / chakra / radix  |
 | `{{HAS_TAURI}}`          | 是否有 Tauri | true / false                 |
 | `{{HAS_DATABASE}}`       | 是否有数据库 | postgresql / mysql / none    |
 | `{{TEST_FRAMEWORK}}`     | 测试框架     | playwright / vitest / jest   |
@@ -654,6 +656,29 @@ openspec/
 { "dependencies": { "vue": "^3.x" } } → FRONTEND_FRAMEWORK=vue
 { "dependencies": { "next": "^14.x" } } → FRONTEND_FRAMEWORK=next
 ```
+
+### UI 库检测
+
+```json
+// package.json 检测（按优先级）
+{ "dependencies": { "antd": "^5.x" } } → UI_LIBRARY=antd
+{ "dependencies": { "@mui/material": "^5.x" } } → UI_LIBRARY=mui
+{ "dependencies": { "@chakra-ui/react": "^3.x" } } → UI_LIBRARY=chakra
+{ "dependencies": { "@radix-ui/react-dialog": "^1.x" } } → UI_LIBRARY=radix
+{ "dependencies": { "shadcn": "^1.x" } } → UI_LIBRARY=shadcn
+{ "dependencies": { "antd": "^4.x" } } → UI_LIBRARY=antd
+```
+
+**UI 库对应模板变量**：
+
+| UI_LIBRARY | 说明 | 模板后缀 |
+|------------|------|---------|
+| antd | Ant Design 5 | _antd |
+| mui | Material UI 5 | _mui |
+| chakra | Chakra UI | _chakra |
+| radix | Radix UI (headless) | _radix |
+| shadcn | shadcn/ui | _shadcn |
+| none | 未检测到 | (无后缀) |
 
 ### 后端检测
 
