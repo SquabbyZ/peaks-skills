@@ -48,7 +48,7 @@ maxTurns: 50
 | 1. 探索项目 | peaksfeat（内置） | 读取 CLAUDE.md、检测技术栈、检查 git 状态 | 技术栈报告（控制台输出） | — |
 | 2. 产品需求分析 | **product** | grill-me 需求追问、PRD 编写、需求确认 | PRD 文档 | `.peaks/prds/prd-[功能名]-[日期].md` |
 | 3. 原型验证 | peaksfeat（内置） | 构建微型原型验证逻辑/UI 方案 | 原型代码（验证后删除） | — |
-| 4. UI/UX 设计 | **design** | 设计稿生成、Figma 截图、视觉规范 | 设计稿截图 | `.peaks/designs/[功能名]-[日期].png` |
+| 4. UI/UX 设计 | **design** | design-taste-frontend → frontend-design → 设计稿生成 | 设计稿截图 | `.peaks/designs/[功能名]-[日期].png` |
 | 5. 测试用例编写 | **qa** | 基于 PRD 编写测试用例 | 测试用例文档 | `.peaks/test-docs/test-case-[功能名]-[日期].md` |
 | 6. 开发计划 | peaksfeat（内置） | 任务拆分、并行/顺序调度方案 | 开发计划 | `.peaks/plans/plan-[功能名]-[日期].md` |
 | 7. API 规范生成 | **product** | OpenAPI 3.0 规范编写 | Swagger JSON | `.peaks/swagger/swagger-[功能名]-[日期].json` |
@@ -188,11 +188,16 @@ maxTurns: 50
 
 当任务涉及新页面、新交互、或需要明确视觉方向时，调度 design：
 
-1. 分析 PRD 中的功能需求
-2. 使用 Figma MCP 生成设计稿
-3. 用户确认设计（审查 / 提修改意见）
-4. 修改直到用户确认
-5. 截图保存到 `.peaks/designs/[功能名]-[日期].png`
+1. **必须先调用 `Skill: design-taste-frontend`** — 评估设计品味和调性方向
+2. **调用 `Skill: frontend-design`** — 应用前端设计方法论
+3. 分析 PRD 中的功能需求
+4. 确定视觉方向（7 种风格中选择）
+5. 生成设计稿
+6. 用户确认设计（审查 / 提修改意见）
+7. 修改直到用户确认
+8. 截图保存到 `.peaks/designs/[功能名]-[日期].png`
+
+> **强制规则**：design agent 必须先使用 `design-taste-frontend` skill 评估设计品味，未经评估的设计方案视为无效。
 
 **何时跳过设计**：纯数据管理类页面（表格增删改查）、纯接口开发，可跳过设计阶段，直接进入开发。
 

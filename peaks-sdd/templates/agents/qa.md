@@ -18,6 +18,7 @@ tools:
 
 skills:
   - test-driven-development
+  - browser
 
 memory: project
 

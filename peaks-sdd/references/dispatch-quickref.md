@@ -23,6 +23,7 @@
 | security-reviewer | 始终 | OWASP 安全审查 |
 | code-reviewer-frontend | 有前端变更 | 前端代码审查 |
 | code-reviewer-backend | 有后端变更 | 后端代码审查 |
+| design | 新页面/复杂交互 | UI 设计、设计稿、视觉规范（必须先调 design-taste-frontend） |
 
 ## Skill 调度矩阵
 
@@ -33,6 +34,8 @@
 | `code-review` | peaksfeat, peaksbug | 代码审查方法论 |
 | `security-review` | peaksfeat, peaksbug | 安全漏洞扫描方法论 |
 | `browser` | frontend, peaksbug | Browserbase 浏览器自动化、E2E 测试 |
+| `design-taste-frontend` | design | 设计品味评估（**必须最先调用**） |
+| `frontend-design` | design | 前端设计方法论（design-taste-frontend 之后调用） |
 
 ## 质量门禁
 
