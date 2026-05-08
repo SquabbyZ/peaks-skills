@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.13] - 2026-05-08
+
+### Fixed
+
+**peaks-sdd 初始化流程**:
+- Step 0.8 新增 `improve-codebase-architecture` skill 安装（所有 agent 模板引用但之前未安装）
+
+---
+
 ## [1.0.12] - 2026-05-08
 
 ### Changed

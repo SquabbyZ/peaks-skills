@@ -500,6 +500,7 @@ npx skills add https://github.com/hyf0/vue-skills --skill vue-debug-guides
 
 | Skill | 用途 |
 |-------|------|
+| improve-codebase-architecture | 代码库架构分析与改进（所有 agent 模板引用） |
 | karpathy-guidelines | Karpathy 开发原则 |
 | hookify | Hook 配置管理 |
 | skill-creator | Skill 创建工具 |
@@ -511,6 +512,12 @@ npx skills add https://github.com/hyf0/vue-skills --skill vue-debug-guides
 | frontend-design | 前端设计方法论（design agent 组合使用） |
 | systematic-debugging | 系统化调试（peaksbug 依赖） |
 | test-driven-development | 测试驱动开发（peaksbug 依赖） |
+
+#### 架构改进 Skill
+
+```bash
+npx skills add https://github.com/mattpocock/skills --skill improve-codebase-architecture
+```
 
 
 **逻辑**：
