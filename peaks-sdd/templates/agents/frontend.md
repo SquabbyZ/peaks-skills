@@ -26,6 +26,13 @@ skills:
   - test-driven-development
   - code-review
   - browser
+  - vercel-react-best-practices
+  - vercel-react-native-skills
+  - vercel-react-view-transitions
+  - react:components
+  - vue-best-practices
+  - vue
+  - vue-debug-guides
 
 memory: project
 

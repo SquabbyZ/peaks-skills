@@ -458,6 +458,18 @@ npx skills add https://github.com/anthropics/skills --skill frontend-design
 npx skills add https://github.com/leonxlnx/taste-skill --skill design-taste-frontend
 ```
 
+#### Frontend Framework Skills
+
+```bash
+npx skills add https://github.com/vercel-labs/agent-skills --skill vercel-react-best-practices
+npx skills add https://github.com/vercel-labs/agent-skills --skill vercel-react-native-skills
+npx skills add https://github.com/vercel-labs/agent-skills --skill vercel-react-view-transitions
+npx skills add https://github.com/google-labs-code/stitch-skills --skill react:components
+npx skills add https://github.com/hyf0/vue-skills --skill vue-best-practices
+npx skills add https://github.com/antfu/skills --skill vue
+npx skills add https://github.com/hyf0/vue-skills --skill vue-debug-guides
+```
+
 #### Agent 用到的 Skills（检查是否已存在）
 
 检查以下 skills 是否已安装，未安装则添加：
