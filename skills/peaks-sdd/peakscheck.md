@@ -1,30 +1,3 @@
----
-name: peakscheck
-description: |
-  PROACTIVELY check if peaks-sdd skill has a new version available. Fires automatically when user uses any peaks-sdd command.
-
-when_to_use: |
-  检查 peaks-sdd 更新、检查更新、技能更新
-
-argument-hint: "[无参数]"
-arguments: []
-
-user-invocable: false
-
-paths: []
-
-allowed-tools:
-  - Read
-  - Bash
-  - Grep
-
-context: inherit
-
-model: sonnet
-
-effort: low
----
-
 # /peakscheck - 检查 peaks-sdd 更新
 
 并行检查 peaks-sdd 是否有新版本可用。

@@ -1,32 +1,3 @@
----
-name: peaksupdate
-description: |
-  PROACTIVELY update peaks-sdd to the latest version from remote repository.
-  Use when user says "更新 peaks-sdd", "update skill", or confirms "/peakscheck" suggestion.
-
-when_to_use: |
-  更新 peaks-sdd、更新技能、upgrade skill
-
-argument-hint: "[无参数]"
-arguments: []
-
-user-invocable: true
-
-paths:
-  - "~/.claude/skills/peaks-sdd/**"
-
-allowed-tools:
-  - Read
-  - Bash
-  - Grep
-
-context: inherit
-
-model: sonnet
-
-effort: low
----
-
 # /peaksupdate - 更新 peaks-sdd
 
 将 peaks-sdd 更新到最新版本，并同步项目配置。
