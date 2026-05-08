@@ -4,6 +4,22 @@ All notable changes to this project will be documented in this file.
 
 ## [1.0.12] - 2026-05-08
 
+### Changed
+
+**统一 Skills 目录结构**:
+- 所有 skill 从根目录移至 `skills/` 目录,作为单一来源
+- `npx peaks-skills install` 路径从 `<skill>/` 改为 `skills/<skill>/`
+- 删除了根目录 `peaks-sdd/`,保留 `skills/peaks-sdd/` 完整副本(包含 commands, templates, references)
+- `bin/cli.js` 更新路径引用,从 `skills/` 目录读取所有 skill
+
+**skills.sh 收录准备**:
+- 优化 `skills/` 目录结构,符合 vercel-labs/agent-skills 规范
+- README / README-en 新增 `npx skills add` 安装说明
+
+---
+
+## [1.0.12] - 2026-05-08
+
 ### Added
 
 #### peaks-sdd

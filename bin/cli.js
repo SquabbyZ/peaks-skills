@@ -67,7 +67,7 @@ function listSkills() {
   console.log('═'.repeat(60));
 
   SKILLS.forEach((skill, index) => {
-    const skillPath = join(ROOT_DIR, skill, 'SKILL.md');
+    const skillPath = join(ROOT_DIR, 'skills', skill, 'SKILL.md');
     if (fs.existsSync(skillPath)) {
       const content = fs.readFileSync(skillPath, 'utf-8');
       const nameMatch = content.match(/^name:\s*(.+)/m);
@@ -97,7 +97,7 @@ function getSkillInfo(skillName) {
     process.exit(1);
   }
 
-  const skillPath = join(ROOT_DIR, skillName, 'SKILL.md');
+  const skillPath = join(ROOT_DIR, 'skills', skillName, 'SKILL.md');
   if (!fs.existsSync(skillPath)) {
     console.error(`❌ Error: Skill file not found for '${skillName}'`);
     process.exit(1);
@@ -131,7 +131,7 @@ function installSkill(skillName, targetDir = '.') {
     process.exit(1);
   }
 
-  const sourcePath = join(ROOT_DIR, skillName);
+  const sourcePath = join(ROOT_DIR, 'skills', skillName);
   const targetPath = join(process.cwd(), targetDir, '.claude', 'skills', skillName);
 
   if (!fs.existsSync(sourcePath)) {
