@@ -1,6 +1,6 @@
 {
   "name": "peaks-skills",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "AI-driven frontend development skills collection for Claude Code and AI coding assistants",
   "type": "module",
   "bin": {
@@ -17,7 +17,8 @@
     "skills/",
     "bin/",
     "skill.yaml",
-    "README.md"
+    "README.md",
+    "CHANGELOG.md"
   ],
   "scripts": {
     "test": "echo \"No tests specified\" && exit 0",

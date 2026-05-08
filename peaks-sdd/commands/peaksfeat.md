@@ -75,6 +75,23 @@ Step 2: 自动选择
 
 ---
 
+## ⚡ 并行检查更新
+
+**与主流程并行执行，不阻塞**：
+
+```bash
+cd ~/.claude/skills/peaks-sdd && git fetch origin --quiet 2>/dev/null
+LOCAL=$(git rev-parse --short HEAD 2>/dev/null || echo "NONE")
+REMOTE=$(git rev-parse --short origin/main 2>/dev/null || echo "NONE")
+
+if [ "$LOCAL" != "$REMOTE" ] && [ "$REMOTE" != "NONE" ]; then
+  echo "🔔 peaks-sdd 有新版本: $REMOTE (当前: $LOCAL)"
+  echo "回复「是」运行 /peaksupdate 更新"
+fi
+```
+
+---
+
 ## 执行计划
 
 ### 路径 A：OpenSpec（存量项目迭代）

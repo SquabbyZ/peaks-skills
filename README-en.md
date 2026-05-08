@@ -150,15 +150,26 @@ Use the peaks-hook-form skill to generate a form:
 
 **Core Features**:
 
-- ⚡ **Smart Project Initialization**: Auto-detect tech stack (React/NestJS/Tauri/PostgreSQL) and dynamically generate Agent configs
+- ⚡ **Smart Project Initialization**: Auto-detect tech stack (React/Vue2/Vue3/NestJS/Tauri/PostgreSQL) and dynamically generate Agent configs
 - 📋 **Complete Development Flow**: Constitution → PRD → Design → Develop → Code Review → QA → Deploy
 - 🐛 **Systematic Bug Fix**: reproduce → root cause → fix → test → verify
 - 🔧 **Checkpoint Gates**: Each Phase must pass checkpoint confirmation before proceeding
 - 🤖 **Dynamic Agent Generation**: Auto-select and configure Agents based on detected tech stack
 - 💾 **Cross-Session Memory**: Context persistence via claude-mem MCP
-- 🛠️ **Slash Commands**: `/peaksinit`, `/peaksfeat`, `/peaksbug`
+- 🛠️ **Slash Commands**: `/peaksinit`, `/peaksfeat`, `/peaksbug`, `/peaksupdate`, `/peakscheck`
+- 🔔 **Auto Update Check**: Check for new versions when using any command, prompt user to update
+- 🏗️ **Incremental Update**: Running `/peaksinit` on an already-initialized project performs incremental Agent template updates
+- 🌐 **Full Vue Support**: Vue2 (Options API + Vuex) and Vue3 (Composition API + Pinia) development guidelines and code review
 
-## 🚀 Quick Start
+**Workflows**:
+
+| Command | Description | Use Case |
+|---------|-------------|----------|
+| `/peaksinit` | Project init/incremental update | New project or update Agent config |
+| `/peaksfeat` | Feature development | Greenfield projects, complex multi-team projects |
+| `/peaksbug` | Bug fixing | Reproduce → Root cause → Fix → Regression test |
+| `/peaksupdate` | Update peaks-sdd | Update to latest version and sync Agent templates |
+| `/peakscheck` | Check for updates | Auto-triggered (parallel, non-blocking) |
 
 ### Install via CLI (Recommended)
 
@@ -188,6 +199,7 @@ After installation, use natural language in Claude Code AI conversations:
 • "Initialize my project" / "peaksinit" → peaks-sdd
 • "Develop new feature" / "peaksfeat" → peaks-sdd
 • "Fix this bug" / "peaksbug" → peaks-sdd
+• "Update peaks-sdd" / "peaksupdate" → peaks-sdd
 ```
 
 ## 📚 Documentation
@@ -286,6 +298,8 @@ Multiple skills can be used together:
 7. Use peaks-sdd (/peaksfeat) to develop new features
    ↓
 8. Use peaks-sdd (/peaksbug) to fix bugs
+   ↓
+9. Use peaks-sdd (/peaksupdate) to keep peaks-sdd up-to-date
 ```
 
 ### Integration with Existing Projects

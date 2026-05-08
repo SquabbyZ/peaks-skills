@@ -189,21 +189,26 @@ const [data, setData] = useState<TaskNode[]>([
 
 **核心特性**：
 
-- ⚡ **智能项目初始化**：自动检测技术栈（React/NestJS/Tauri/PostgreSQL），动态生成对应的 Agent 配置
+- ⚡ **智能项目初始化**：自动检测技术栈（React/Vue2/Vue3/NestJS/Tauri/PostgreSQL），动态生成对应的 Agent 配置
 - 📋 **完整开发流程**：Constitution → PRD → 设计 → 开发 → Code Review → QA → 部署
 - 🐛 **系统化 Bug 修复**：reproduce → root cause → fix → test → verify
 - 🔧 **Checkpoint 门禁**：每个 Phase 完成后必须经过检查点确认，防止失控
 - 🤖 **动态 Agent 生成**：根据检测到的技术栈自动选择和配置 Agent
 - 💾 **跨会话 Memory**：通过 claude-mem MCP 实现上下文持久化
-- 🛠️ **Slash Commands**：`/peaksinit`、`/peaksfeat`、`/peaksbug`
+- 🛠️ **Slash Commands**：`/peaksinit`、`/peaksfeat`、`/peaksbug`、`/peaksupdate`、`/peakscheck`
+- 🔔 **自动更新检查**：使用任一命令时自动检查新版本，提示用户更新
+- 🏗️ **增量更新**：已初始化项目再次运行 `/peaksinit` 时自动增量更新 Agent 模板
+- 🌐 **Vue 全面支持**：Vue2（Options API + Vuex）和 Vue3（Composition API + Pinia）开发规范和代码审查
 
 **工作流程**：
 
 | 命令 | 说明 | 适用场景 |
 |------|------|---------|
-| `/peaksinit` | 项目初始化 | 新项目或现有项目配置 Agent |
+| `/peaksinit` | 项目初始化/增量更新 | 新项目或现有项目配置/更新 Agent |
 | `/peaksfeat` | 功能开发 | 0→1 新项目，复杂项目多团队协作 |
 | `/peaksbug` | Bug 修复 | 问题复现 → 根因分析 → 修复 → 回归测试 |
+| `/peaksupdate` | 更新 peaks-sdd | 更新到最新版本并同步 Agent 模板 |
+| `/peakscheck` | 检查更新 | 自动检查（并行触发，不阻塞主命令） |
 
 **技术栈检测**：
 
@@ -253,6 +258,7 @@ npx peaks-skills list
 • "初始化我的项目" / "peaksinit" → peaks-sdd
 • "开发新功能" / "peaksfeat" → peaks-sdd
 • "修复这个 bug" / "peaksbug" → peaks-sdd
+• "更新 peaks-sdd" / "peaksupdate" → peaks-sdd
 ```
 
 ## 📚 文档
@@ -360,6 +366,8 @@ npx peaks-skills list
 7. 使用 peaks-sdd (/peaksfeat) 开发新功能
    ↓
 8. 使用 peaks-sdd (/peaksbug) 修复 bug
+   ↓
+9. 使用 peaks-sdd (/peaksupdate) 保持 peaks-sdd 最新
 ```
 
 ### 与现有项目集成

@@ -2,6 +2,77 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.12] - 2026-05-08
+
+### Added
+
+#### peaks-sdd
+
+**新增 Commands**：
+- `/peakscheck` - 自动检查 peaks-sdd 是否有新版本（并行触发，不阻塞主命令）
+- `/peaksupdate` - 更新 peaks-sdd 到最新版本，生成更新报告
+
+**增量更新支持**：
+- 初始化时检测项目是否已配置，已配置则执行增量更新
+- Agent 模板对比更新机制，避免重复生成
+
+**Vue 支持增强**：
+- frontend Agent 新增 Vue2（Options API）和 Vue3（Composition API）开发规范
+  - Vue2: Options API 顺序、Vuex 状态管理、响应式陷阱、`$set` 使用
+  - Vue3: setup() 语法、Pinia 状态管理、`<script setup lang="ts">`
+- code-reviewer-frontend Agent 支持 React + Vue2 + Vue3 三种框架审查
+  - Vue2: Options API 顺序、Vuex 规范、响应式陷阱
+  - Vue3: Composition API、Pinia、TypeScript 支持
+
+**全局 Skills 配置**：
+- 所有 Agent 模板新增 `improve-codebase-architecture` + `find-skills` skills
+- peaksinit 初始化时自动安装这两个全局 Skills
+
+**npm 链接**：
+- 更新报告、初始化报告新增 npm 包链接 https://www.npmjs.com/package/peaks-skills
+
+### Updated
+
+#### peaks-sdd
+
+**并行检查更新机制**：
+- `/peaksinit`、`/peaksfeat`、`/peaksbug` 执行前并行检查 peaks-sdd 版本
+- 检测到新版本时提示用户是否更新
+
+**peaksinit 增强**：
+- Step 0.3.1 新增 `improve-codebase-architecture` 架构分析步骤
+- 结合 `@bunas/fs-mcp` 读取关键文件，深度理解项目结构
+- 新增 `{{PROJECT_ARCHITECTURE}}` 变量用于 Agent 生成
+
+**Agent 模板同步**：
+- 14 个 Agent 模板全部更新，新增 skills 配置
+- peaksinit 报告新增「Agent 配置同步状态」表格
+
+---
+
+## [1.0.11] - 2026-05-08
+
+### Added
+
+#### peaks-sdd
+
+- **实测验证**：使用 CardList 滚动加载 bug 进行完整 bug 修复工作流测试
+- **根因分析**：识别 IntersectionObserver 生命周期问题（useEffect 依赖导致 observer 重建死循环）
+- **强制产出门禁**：4 个产出文件（bugs/fixes/auto-tests/reports）必须全部落盘
+- **P0/P1/P2 优化分级**：
+  - P0: 最终验收门禁（强制验证 4 个产出文件）
+  - P1: 主动检查点（Phase 末尾验证）
+  - P2: 改动量自检（单一文件 > 50 行需说明，> 100 行必须拆分）
+
+### Updated
+
+#### peaks-sdd
+
+- peaksbug.md: 582 行（+102 行），完善验证检查点
+- commands/peaksbug.md: 同步 Phase 1-8 编号，新增最终门禁说明
+
+---
+
 ## [1.0.4] - 2026-05-07
 
 ### Added

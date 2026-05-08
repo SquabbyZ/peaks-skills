@@ -53,14 +53,16 @@ hooks:
 │  "初始化我的项目" 或 "setup this project"            │
 │                                                       │
 │  这将触发 peaksinit 工作流，并自动完成：             │
-│  ✓ 检测项目技术栈（React / NextJS / NestJS 等）     │
+│  ✓ 检测项目技术栈（React / Vue / NextJS 等）        │
 │  ✓ 生成 .claude/agents/ Agent 配置                  │
 │  ✓ 创建 .peaks/ 工作目录                            │
 │  ✓ 注册 /peaksinit /peaksfeat /peaksbug 命令        │
-│  ✓ 安装常用 Skills 和 MCP 服务器                     │
+│  ✓ 安装 improve-codebase-architecture + find-skills │
+│  ✓ 自动检查 peaks-sdd 更新                          │
 │                                                       │
-│  命令注册完成后，三个 slash commands 将全局可用：    │
+│  命令注册完成后，五个 slash commands 将全局可用：    │
 │  /peaksinit  /peaksfeat  /peaksbug                  │
+│  /peaksupdate  /peakscheck（自动触发）              │
 │                                                       │
 └───────────────────────────────────────────────────────┘
 ```
@@ -103,6 +105,23 @@ cat .claude/settings.json 2>/dev/null | grep -q "peaksinit" && echo "COMMANDS_RE
 
 - 如果是 git 仓库：记录分支和状态
 - 如果不是：提示用户先 `git init`（可选跳过）
+
+### ⚡ 并行检查更新
+
+**在执行主流程前先检查 peaks-sdd 版本，不阻塞初始化流程**：
+
+```bash
+cd ~/.claude/skills/peaks-sdd && git fetch origin --quiet 2>/dev/null
+LOCAL=$(git rev-parse --short HEAD 2>/dev/null || echo "NONE")
+REMOTE=$(git rev-parse --short origin/main 2>/dev/null || echo "NONE")
+
+if [ "$LOCAL" = "$REMOTE" ] || [ "$REMOTE" = "NONE" ]; then
+  echo "✅ peaks-sdd 已是最新版本 ($LOCAL)"
+else
+  echo "🔔 peaks-sdd 有新版本: $REMOTE (当前: $LOCAL)"
+  echo "如需更新请运行: /peaksupdate"
+fi
+```
 
 ### Step 0.2: 扫描项目（使用 MCP 或 Bash）
 
@@ -309,6 +328,8 @@ cat .claude/settings.json 2>/dev/null || echo '{}'
 | `/peaksinit` | peaks-sdd/commands/peaksinit.md | 项目初始化 |
 | `/peaksfeat` | peaks-sdd/commands/peaksfeat.md | 功能开发 |
 | `/peaksbug` | peaks-sdd/commands/peaksbug.md | Bug 修复 |
+| `/peaksupdate` | peaks-sdd/commands/peaksupdate.md | 更新 peaks-sdd |
+| `/peakscheck` | peaks-sdd/commands/peakscheck.md | 检查更新（自动触发） |
 
 **注册逻辑**：
 
@@ -325,7 +346,9 @@ cat .claude/settings.json 2>/dev/null || echo '{}'
   "commands": {
     "peaksinit": "peaks-sdd/commands/peaksinit.md",
     "peaksfeat": "peaks-sdd/commands/peaksfeat.md",
-    "peaksbug": "peaks-sdd/commands/peaksbug.md"
+    "peaksbug": "peaks-sdd/commands/peaksbug.md",
+    "peaksupdate": "peaks-sdd/commands/peaksupdate.md",
+    "peakscheck": "peaks-sdd/commands/peakscheck.md"
   }
 }
 ```
@@ -343,7 +366,7 @@ cat .claude/settings.json 2>/dev/null || echo '{}'
 cat .claude/settings.json | grep -A 10 '"commands"'
 ```
 
-确认三个命令都已注册。
+确认五个命令都已注册（peaksinit, peaksfeat, peaksbug, peaksupdate, peakscheck）。
 
 ### Step 0.9: 生成初始化报告
 
@@ -362,6 +385,7 @@ cat .claude/settings.json | grep -A 10 '"commands"'
 **路径**: {{PROJECT_PATH}}
 **时间**: [当前时间]
 **模式**: [首次初始化 / 增量更新]
+**npm**: https://www.npmjs.com/package/peaks-skills
 
 ---
 
@@ -417,8 +441,12 @@ cat .claude/settings.json | grep -A 10 '"commands"'
 | `/peaksinit` | 项目初始化 |
 | `/peaksfeat` | 功能开发（Spec-It / OpenSpec） |
 | `/peaksbug` | Bug 修复 |
+| `/peaksupdate` | 更新 peaks-sdd |
+| `/peakscheck` | 检查更新（自动触发） |
 
-## 5. 创建的目录结构
+**npm 包**: https://www.npmjs.com/package/peaks-skills
+
+## 6. 创建的目录结构
 
 ```
 .peaks/
@@ -438,17 +466,20 @@ cat .claude/settings.json | grep -A 10 '"commands"'
 └── settings.json   # Command 注册
 ```
 
-## 6. 快速开始
+## 7. 快速开始
 
 初始化完成！你现在可以使用以下命令：
 
 | 命令 | 用途 | 示例 |
 |------|------|------|
+| `/peaksinit` | 初始化/更新项目 | `/peaksinit` |
 | `/peaksfeat` | 开发新功能 | `/peaksfeat 添加用户登录` |
 | `/peaksbug` | 修复 Bug | `/peaksbug 登录按钮点击没反应` |
+| `/peaksupdate` | 更新 peaks-sdd | `/peaksupdate` |
 
 **下一步建议**：
 - 使用 `/peaksfeat <需求描述>` 开始第一个功能开发
+- 运行 `/peaksupdate` 更新到最新版本
 - 查看 `.peaks/` 目录了解工作流产出物结构
 ```
 
