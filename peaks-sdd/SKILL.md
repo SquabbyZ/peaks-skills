@@ -131,11 +131,40 @@ paths:
 
 ### Context 估算与 Compact
 
-| Context 占用 | 建议动作 |
-|-------------|---------|
+| Context 占用 | 动作 |
+|-------------|------|
 | < 50% | 正常继续 |
-| 50-85% | 关注，/compact 可选 |
-| > 85% | **必须** `/compact` 后再继续 |
+| 50-70% | 关注，产出中间文件减轻 context 压力 |
+| >= 70% | **强制**：产出当前阶段文件 → 执行 `/compact` → 继续 |
+| >= 85% | **阻断**：停止当前工作 → `/compact` → 用户确认后继续 |
+
+**自动管理机制**（通过 hook 实现）：
+- PreToolUse hook 在每次工具调用前检查 contextEstimate
+- >= 70%：输出警告但允许继续（用户可选择先 compact）
+- >= 85%：阻断工具调用，强制先 compact
+
+**与 /loop 配合**：
+- 长任务使用 `/loop` 动态唤醒，每次唤醒检查 context 状态
+- 每个 loop 迭代优先产出文件（.peaks/ 目录），而非依赖 context 传递
+- context 过高时 loop 自动触发 compact 流程
+
+### /loop 集成策略
+
+peaks-sdd 利用 Claude Code 的 `/loop`（ScheduleWakeup）实现长任务自治：
+
+**适用场景**：
+
+| 场景 | loop 用法 | 收益 |
+|------|----------|------|
+| peaksfeat Step 9（多模块开发） | 每个模块一次 loop 迭代 | 独立 context，避免溢出 |
+| peaksbug Phase 3（diagnose 探测） | 自动重试假设验证循环 | 无需人工等待 |
+| 长任务中断恢复 | loop 从 .peaks/ 产出文件恢复 | 跨 session 持续 |
+
+**loop 执行原则**：
+1. **产出优先**：每次 loop 迭代必须将中间结果写入 `.peaks/` 文件
+2. **上下文最小化**：loop prompt 只包含当前任务描述 + .peaks/ 中的必要文件路径
+3. **context 守门**：loop 唤醒时第一件事检查 contextEstimate，>= 70% 先 compact
+4. **渐进精化**：复杂任务拆分为多个 loop，每个 loop 完成一个可验证的子目标
 
 ---
 

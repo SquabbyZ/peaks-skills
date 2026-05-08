@@ -443,3 +443,38 @@ Skill: security-review
 5. **完整记录** — 所有产出保存到 .peaks/ 目录
 6. **Skill vs Agent** — Skill 用于专项诊断（调试/测试/性能），Agent 用于实际开发
 7. **Context 监控** — 每个阶段完成后更新 session-state.json
+
+## Context 管理与 /loop 策略
+
+### Context 守门规则
+
+每个阶段完成后检查 contextEstimate：
+- < 50%：正常继续
+- 50-70%：将 Bug 分析/修复记录写入 .peaks/ 文件
+- >= 70%：**强制**写入产出 → `/compact` → 继续
+- >= 85%：**阻断**，必须 `/compact`
+
+### /loop 自动探测循环
+
+Phase 3（diagnose）的假设验证循环天然适合 `/loop`：
+
+```
+peaksbug 调度（主 session）
+  ├─ Phase 1-2: 探索 + Bug 分类（正常执行）
+  ├─ Phase 3: diagnose 探测循环（/loop 自治）
+  │    ├─ loop 迭代 1: 构建反馈循环 → 复现 → 写入 .peaks/bugs/
+  │    ├─ loop 迭代 2: 假设 1 探测 → 结果写入 .peaks/bugs/
+  │    ├─ loop 迭代 3: 假设 2 探测 → 结果写入 .peaks/bugs/
+  │    └─ 确认根因 → 退出 loop
+  ├─ Phase 4-5: 修复 + TDD 验证（正常执行）
+  ├─ Phase 6-8: 质量门禁 + 报告（正常执行）
+```
+
+**loop prompt 模板**：
+```
+Bug 描述：[用户报告的现象]
+当前假设：[本次验证的假设]
+探测方法：[具体的探测步骤]
+参考文件：.peaks/bugs/bug-xxx.md（包含之前的探测结果）
+产出：将探测结果追加到 .peaks/bugs/bug-xxx.md
+```

@@ -1,25 +1,37 @@
 ---
 name: context-monitor
 enabled: true
-event: stop
+event: PreToolUse
 action: warn
 ---
 
 ## Context 使用率检查
 
-检查 .claude/session-state.json 中的 contextEstimate 值：
-- 如果 >= 70%: 提醒用户 context 已超过 70%，建议重启会话或执行 /compact
-- 如果 >= 90%: 强烈警告，context 即将耗尽
+在每次工具调用前，检查 .claude/session-state.json 中的 contextEstimate 值。
 
-## 检查规则
+### 检查规则
 
 | contextEstimate | 动作 |
 |-----------------|------|
-| >= 90% | 🚨 强烈警告：context 即将耗尽，立即执行 /compact |
-| >= 70% | ⚠️ 提醒：context 超过 70%，建议执行 /compact 或重启会话 |
-| < 70% | ✅ 正常：可以继续工作 |
+| >= 85% | 🚨 **阻断**：阻止工具调用，强制提示用户先执行 /compact |
+| >= 70% | ⚠️ **警告**：允许继续但输出醒目警告，建议先 /compact |
+| < 70% | ✅ 正常：放行 |
 
-## 如何更新 contextEstimate
+### 阻断逻辑（>= 85%）
+
+当 contextEstimate >= 85 时：
+1. 输出红色警告：`🚨 Context 已达 ${contextEstimate}%，请先执行 /compact 再继续`
+2. 建议：将当前阶段的产出写入 .peaks/ 文件，然后 /compact
+3. 用户手动 /compact 后 contextEstimate 会重置，hook 自动放行
+
+### 警告逻辑（>= 70%）
+
+当 contextEstimate >= 70 时：
+1. 输出黄色警告：`⚠️ Context 已达 ${contextEstimate}%，建议尽快 /compact`
+2. 允许当前工具调用继续执行
+3. 提醒用户：长任务考虑产出中间文件到 .peaks/ 减轻 context 压力
+
+### 如何更新 contextEstimate
 
 在 .claude/session-state.json 中更新 contextEstimate 值：
 
@@ -42,3 +54,10 @@ Context 增量估算参考：
 - 质量门禁（CR+安全+QA一轮）: +8%
 - 自动化测试执行: +5%
 - 运维部署: +3%
+
+### 与 /loop 配合
+
+当使用 /loop 长任务自治时：
+1. loop 唤醒时自动触发此 hook 检查
+2. context 过高时 loop 自动暂停，等待 /compact
+3. /compact 后手动恢复 loop（ScheduleWakeup 重新调度）

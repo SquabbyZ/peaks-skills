@@ -458,3 +458,38 @@ npx prism mock --help
 10. **Context 监控** — 每个阶段完成后更新 session-state.json
 11. **统一输出到 .peaks** — 所有产出文件必须保存到 .peaks/ 目录
 12. **grill-with-docs** — 需求讨论时对照 CONTEXT.md 挑战模糊术语
+
+## Context 管理与 /loop 策略
+
+### Context 守门规则
+
+每个阶段完成后检查 contextEstimate：
+- < 50%：正常继续下一阶段
+- 50-70%：将当前产出写入 .peaks/ 文件，减轻 context 压力
+- >= 70%：**强制**写入产出文件 → 执行 `/compact` → 确认恢复后继续
+- >= 85%：**阻断**，必须 `/compact` 后才能继续
+
+### /loop 长任务自治
+
+当任务涉及多个模块开发时，使用 `/loop` 实现自治执行：
+
+```
+peaksfeat 调度（主 session）
+  ├─ Step 1-8: 正常执行（PRD、设计、计划）
+  ├─ Step 9: 前端/后端开发（模块级 /loop）
+  │    ├─ loop 迭代 1: 模块 A 开发 → 产出到 .peaks/ → 检查 context
+  │    ├─ loop 迭代 2: 模块 B 开发 → 产出到 .peaks/ → 检查 context
+  │    └─ loop 迭代 N: ... → compact 如需要
+  ├─ Step 10-12: 正常执行（测试、报告、部署）
+```
+
+**loop prompt 模板**：
+```
+当前任务：[具体模块开发任务]
+参考文件：.peaks/prds/prd-xxx.md, .peaks/swagger/swagger-xxx.json
+产出路径：[具体 src/ 路径]
+完成标准：[可验证的目标]
+完成后：将进度写入 .peaks/plans/plan-xxx.md 的 checklist
+```
+
+**关键**：loop 迭代之间不共享 context，通过 .peaks/ 文件传递状态。
