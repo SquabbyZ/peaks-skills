@@ -22,6 +22,7 @@ skills:
   - test-driven-development
   - code-review
   - security-review
+  - browser
 
 memory: project
 
@@ -41,6 +42,46 @@ maxTurns: 50
 | 混合项目（前端+后端） | 调度 frontend + backend（根据 bug 位置） |
 | 有 Tauri              | 额外调度 tauri                     |
 | 有数据库              | postgres agent 协助数据相关 bug    |
+
+## Agent 调度全景图
+
+**每个 Phase 对应调用的 Agent/Skill、执行的任务、产出物：**
+
+| Phase | 调用类型 | 调用目标 | 执行任务 | 产出物 | 路径 |
+|-------|---------|---------|---------|--------|------|
+| 1. 探索项目 | 内置 | peaksfeat（自身） | 读取 CLAUDE.md、检测技术栈、检查 git 状态 | 技术栈报告（控制台输出） | — |
+| 2. Bug 分类 | Skill | `systematic-debugging` | 根因分析方法论加载 | — | — |
+| 2. Bug 分类 | Skill | `test-driven-development` | TDD 方法论加载 | — | — |
+| 3. 系统化调试 | Skill | `systematic-debugging` | Phase 1-6 diagnose 流程：反馈循环→复现→假设→探测→修复→清理 | Bug 分析报告 | `.peaks/bugs/bug-[描述]-[日期].md` |
+| 4. 修复实施 | Agent | **frontend** | 前端代码修复（纯前端/混合项目前端 bug） | 修复记录 | `.peaks/fixes/fix-[描述]-[日期].md` |
+| 4. 修复实施 | Agent | **backend** | 后端代码修复（纯后端/混合项目后端 bug） | 修复记录 | `.peaks/fixes/fix-[描述]-[日期].md` |
+| 5. TDD 验证 | Skill | `test-driven-development` | 编写复现测试(RED)→修复验证(GREEN)→回归测试 | 测试用例 | 项目测试目录 |
+| 6. Code Review | Agent | **code-reviewer-frontend** | 前端修复代码质量审查 | 审查报告 | `.peaks/reports/cr-frontend-[日期].md` |
+| 6. Code Review | Agent | **code-reviewer-backend** | 后端修复代码质量审查 | 审查报告 | `.peaks/reports/cr-backend-[日期].md` |
+| 6. 安全检查 | Skill | `security-review` | OWASP 安全漏洞扫描 | 安全报告 | `.peaks/reports/security-[日期].md` |
+| 7. 回归测试 | 内置 | peaksbug（自身） | 编写自动化回归测试脚本 | 回归测试脚本 | `.peaks/auto-tests/regression-[描述]-[日期].md` |
+| 8. 修复报告 | 内置 | peaksbug（自身） | 汇总修复过程、根因、验证结果 | 修复报告 | `.peaks/reports/report-[描述]-[日期].md` |
+
+**调度流程一目了然**：
+
+```
+Bug 报告 → peaksbug（调度员）
+  ├─ Phase 1:  peaksbug 探索项目（内置）
+  ├─ Phase 2:  Skill: systematic-debugging + test-driven-development
+  ├─ Phase 3:  Skill: systematic-debugging → diagnose Phase 1-6
+  │    ├─ Phase 1: 构建反馈循环
+  │    ├─ Phase 2: 复现 bug
+  │    ├─ Phase 3: 生成排名假设
+  │    ├─ Phase 4: 探测验证
+  │    ├─ Phase 5: 修复 + 回归测试
+  │    └─ Phase 6: 清理 + 复盘
+  ├─ Phase 4:  Agent: frontend / backend → 修复代码
+  ├─ Phase 5:  Skill: tdd-guide → 测试验证
+  ├─ Phase 6:  Agent: code-reviewer-frontend/backend → Code Review
+  │            Skill: security-review → 安全检查
+  ├─ Phase 7:  peaksbug → 回归测试脚本（内置）
+  └─ Phase 8:  peaksbug → 修复报告（内置）
+```
 
 **Bug 分类**：
 - **前端 Bug**：UI 显示、交互行为、浏览器兼容性问题

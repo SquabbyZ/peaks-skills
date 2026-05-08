@@ -39,6 +39,49 @@ maxTurns: 50
 | 有 Tauri              | 额外调度 tauri                     |
 | 有数据库              | 额外调度 postgres                  |
 
+## Agent 调度全景图
+
+**每个 Step 对应调用的 Agent、执行的任务、产出物：**
+
+| Step | 调用 Agent | 执行任务 | 产出物 | 路径 |
+|------|-----------|---------|--------|------|
+| 1. 探索项目 | peaksfeat（内置） | 读取 CLAUDE.md、检测技术栈、检查 git 状态 | 技术栈报告（控制台输出） | — |
+| 2. 产品需求分析 | **product** | grill-me 需求追问、PRD 编写、需求确认 | PRD 文档 | `.peaks/prds/prd-[功能名]-[日期].md` |
+| 3. 原型验证 | peaksfeat（内置） | 构建微型原型验证逻辑/UI 方案 | 原型代码（验证后删除） | — |
+| 4. UI/UX 设计 | **design** | 设计稿生成、Figma 截图、视觉规范 | 设计稿截图 | `.peaks/designs/[功能名]-[日期].png` |
+| 5. 测试用例编写 | **qa** | 基于 PRD 编写测试用例 | 测试用例文档 | `.peaks/test-docs/test-case-[功能名]-[日期].md` |
+| 6. 开发计划 | peaksfeat（内置） | 任务拆分、并行/顺序调度方案 | 开发计划 | `.peaks/plans/plan-[功能名]-[日期].md` |
+| 7. API 规范生成 | **product** | OpenAPI 3.0 规范编写 | Swagger JSON | `.peaks/swagger/swagger-[功能名]-[日期].json` |
+| 8. 数据库设计 | **postgres** | 表设计、Schema 定义、迁移脚本 | 数据库设计文档 | `.peaks/plans/db-[功能名]-[日期].md` |
+| 9. 前端开发 | **frontend** | React/Vue 组件开发、页面实现 | 前端代码 | `src/` 目录 |
+| 9. 后端开发 | **backend** | API 开发、业务逻辑实现 | 后端代码 | `src/` 目录 |
+| 9. Code Review (前端) | **code-reviewer-frontend** | 前端代码质量审查 | 审查报告 | `.peaks/reports/cr-frontend-[日期].md` |
+| 9. Code Review (后端) | **code-reviewer-backend** | 后端代码质量审查 | 审查报告 | `.peaks/reports/cr-backend-[日期].md` |
+| 9. 安全检查 | **security-reviewer** | OWASP Top 10 安全漏洞扫描 | 安全报告 | `.peaks/reports/security-[模块]-[日期].md` |
+| 10. 自动化测试 | **qa** | E2E 测试、回归测试执行 | 测试报告 | `.peaks/reports/test-report-[日期].md` |
+| 11. 报告生成 | **qa** + **devops** | 功能报告、部署脚本 | 报告 + 部署脚本 | `.peaks/reports/` + `.peaks/deploys/` |
+| 12. 运维部署 | **devops** | Docker 构建、服务部署、健康检查 | 部署结果 | `.peaks/deploys/` |
+
+**调度流程一目了然**：
+
+```
+用户需求 → peaksfeat（调度员）
+  ├─ Step 1:  peaksfeat 探索项目（内置）
+  ├─ Step 2:  product → grill-me 需求分析 → PRD
+  ├─ Step 3:  peaksfeat 原型验证（可选，内置）
+  ├─ Step 4:  design → UI 设计稿（可选）
+  ├─ Step 5:  qa → 测试用例
+  ├─ Step 6:  peaksfeat 开发计划（内置）
+  ├─ Step 7:  product → Swagger.json（混合/后端项目）
+  ├─ Step 8:  postgres → 数据库设计（按需）
+  ├─ Step 9:  frontend + backend 并行开发
+  │    ├─ frontend → Code Review → 安全检查 → QA
+  │    └─ backend  → Code Review → 安全检查 → QA
+  ├─ Step 10: qa → 自动化测试
+  ├─ Step 11: qa + devops → 报告 + 部署脚本
+  └─ Step 12: devops → 部署上线
+```
+
 ## .peaks 工作流目录
 
 所有产出文件必须保存到项目根目录的 `.peaks/` 目录下：

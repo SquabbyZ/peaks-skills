@@ -25,6 +25,7 @@ skills:
   - systematic-debugging
   - test-driven-development
   - code-review
+  - browser
 
 memory: project
 

@@ -24,6 +24,16 @@
 | code-reviewer-frontend | 有前端变更 | 前端代码审查 |
 | code-reviewer-backend | 有后端变更 | 后端代码审查 |
 
+## Skill 调度矩阵
+
+| Skill | 调用 Agent | 用途 |
+|-------|-----------|------|
+| `systematic-debugging` | peaksbug | 根因分析、执行路径追踪 |
+| `test-driven-development` | peaksbug, frontend, backend | 测试驱动开发、回归测试 |
+| `code-review` | peaksfeat, peaksbug | 代码审查方法论 |
+| `security-review` | peaksfeat, peaksbug | 安全漏洞扫描方法论 |
+| `browser` | frontend, peaksbug | Browserbase 浏览器自动化、E2E 测试 |
+
 ## 质量门禁
 
 ```

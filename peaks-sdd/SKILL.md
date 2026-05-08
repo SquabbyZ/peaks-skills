@@ -445,6 +445,12 @@ npx skills add https://github.com/vercel-labs/skills --skill component-scaffold-
 npx skills add https://github.com/vercel-labs/skills --skill design-md
 ```
 
+#### Browser Skills
+
+```bash
+npx skills add https://github.com/browserbase/skills --skill browser
+```
+
 #### Agent 用到的 Skills（检查是否已存在）
 
 检查以下 skills 是否已安装，未安装则添加：
@@ -457,9 +463,8 @@ npx skills add https://github.com/vercel-labs/skills --skill design-md
 | shadcn | UI 组件 |
 | postgres | PostgreSQL |
 | tauri-v2 | Tauri 桌面应用 |
+| browser | Browserbase 浏览器自动化（frontend/peaksbug 依赖） |
 | systematic-debugging | 系统化调试（peaksbug 依赖） |
-
-
 | test-driven-development | 测试驱动开发（peaksbug 依赖） |
 
 
