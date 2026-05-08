@@ -325,9 +325,12 @@ mcp__bunas__fs_mcp__read_file(path: "/path/to/project/package.json")
 
 | 文件                                       | 处理方式                                     |
 | ------------------------------------------ | -------------------------------------------- |
-| `.claude/hookify.context-monitor.local.md` | 如不存在则生成                               |
-| `.claude/session-state.json`               | 如不存在则生成                               |
-| `.peaks/` 目录                             | 创建标准子目录（plans/, prds/, reports/ 等） |
+| `.claude/hookify.context-monitor.local.md` | 如不存在则生成（已存在则跳过）               |
+| `.claude/session-state.json`               | 如不存在则生成（已存在则跳过）               |
+| `.peaks/` 目录                             | 创建标准子目录（plans/, prds/, reports/ 等），已存在则跳过 |
+| `.gitnexus/` 目录                          | gitnexus 数据目录（项目根目录），已存在则跳过 |
+| `.claude-mem/` 目录                        | claude-mem 数据目录（项目根目录），已存在则跳过 |
+| `.context7/` 目录                           | context7 缓存目录（项目根目录），已存在则跳过 |
 
 ### Step 0.6: 验证初始化结果
 
@@ -367,27 +370,29 @@ find .peaks -type d
 
 ### Step 0.7: 集成 MCP 服务器（增量更新 settings.json）
 
-读取现有 `settings.json`，**增量添加**以下 MCP 到 `mcpServers` 字段：
+读取现有 `settings.json`，**增量添加**以下 MCP 到 `mcpServers` 字段。
 
-| MCP             | 用途                         | 配置                           |
-| --------------- | ---------------------------- | ------------------------------ |
-| gitnexus        | 代码库知识图谱索引           | `npx -y gitnexus@latest mcp`   |
-| claude-mem      | 跨 session 持久化记忆        | `npx -y @the.dot/mem`          |
-| fs              | 文件系统扫描（项目初始化用） | `@bunas/fs-mcp`                |
-| playwright      | E2E 测试                     | `@playwright/mcp`              |
-| chrome-devtools | Chrome 调试                  | `chrome-devtools-mcp`          |
-| context7        | 文档检索（RAG）              | `@upstash/context7-mcp@latest` |
-| fetch           | HTTP 请求                    | `mcp-fetch-server`             |
-| websearch       | 网页搜索                     | `websearch-mcp`                |
-| docker          | Docker 容器管理              | `@alisaitteke/docker-mcp`      |
-| shadcn          | UI 组件生成                  | `shadcn@latest mcp`            |
+**注意**：部分 MCP 需要使用项目根目录存储数据，使用 `{{PROJECT_PATH}}` 变量自动替换为实际项目路径：
+
+| MCP             | 用途                         | 配置                                      | 数据目录            |
+| --------------- | ---------------------------- | --------------------------------------- | ----------------- |
+| gitnexus        | 代码库知识图谱索引           | `npx -y gitnexus@latest mcp --repo {{PROJECT_PATH}}` | `.gitnexus/`      |
+| claude-mem      | 跨 session 持久化记忆        | `npx -y @the.dot/mem`                  | `.claude-mem/`    |
+| fs              | 文件系统扫描（项目初始化用） | `@bunas/fs-mcp`                        | -                 |
+| playwright      | E2E 测试                     | `@playwright/mcp`                      | -                 |
+| chrome-devtools | Chrome 调试                  | `chrome-devtools-mcp`                  | -                 |
+| context7        | 文档检索（RAG）              | `@upstash/context7-mcp@latest`         | `.context7/`      |
+| fetch           | HTTP 请求                    | `mcp-fetch-server`                     | -                 |
+| websearch       | 网页搜索                     | `websearch-mcp`                        | -                 |
+| docker          | Docker 容器管理              | `@alisaitteke/docker-mcp`              | -                 |
+| shadcn          | UI 组件生成                  | `shadcn@latest mcp`                    | -                 |
 
 ```json
 {
   "mcpServers": {
     "gitnexus": {
       "command": "npx",
-      "args": ["-y", "gitnexus@latest", "mcp"]
+      "args": ["-y", "gitnexus@latest", "mcp", "--repo", "{{PROJECT_PATH}}"]
     },
     "claude-mem": {
       "command": "npx",
@@ -433,6 +438,7 @@ find .peaks -type d
 1. 读取现有 `settings.json`
 2. 如果不存在 `mcpServers` 字段，创建它
 3. 对于每个 MCP：已存在则跳过，不存在则添加
+4. **自动替换 `{{PROJECT_PATH}}`** 为实际项目根目录路径
 4. **不覆盖任何已有的 MCP 配置**
 
 ### Step 0.8: 安装 Skills（使用 skills CLI + symlink）
