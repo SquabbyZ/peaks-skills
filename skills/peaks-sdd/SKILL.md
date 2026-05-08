@@ -1228,60 +1228,16 @@ openspec init
 
 ## Slash Commands（用户入口）
 
-peaks-sdd 提供三个快捷命令，覆盖主要开发场景：
-
-| 命令 | 说明 | 输入 |
-|------|------|------|
-| `/peaksinit` | 初始化项目 | 无（扫描当前项目） |
-| `/peaksfeat` | 功能开发 | 自然语言需求或 PRD |
-| `/peaksbug` | Bug 修复 | bug 现象描述 |
-
-### /peaksinit - 项目初始化
+`/peaks-sdd` 是唯一的入口命令，通过子命令区分场景：
 
 ```
-/peaksinit
+/peaks-sdd init <项目路径>     # 初始化项目
+/peaks-sdd feat <需求描述>      # 功能开发
+/peaks-sdd bug <问题描述>       # Bug 修复
+/peaks-sdd status              # 查看当前状态
 ```
 
-扫描当前项目，检测技术栈，自动生成：
-- `.claude/agents/` Agent 配置
-- `.peaks/` 工作目录结构
-
-**执行流程**：Phase 0: 项目初始化（详见上方 Step 0.1-0.8）
-
----
-
-### /peaksfeat - 功能开发
-
-```
-/peaksfeat 添加用户登录功能，支持邮箱+密码
-```
-
-或者直接粘贴 PRD 内容，自动进入完整开发流程。
-
-**执行流程**：Checkpoint 0 → Phase 1-5（详见上方 SDD 工作流章节）
-
----
-
-### /peaksbug - Bug 修复
-
-```
-/peaksbug 登录按钮点击没反应
-```
-
-自动分析复现 → 根因分析 → 修复 → 测试 → 验证。
-
-**执行流程**：Phase 1-6（使用 `.claude/agents/peaksbug.md` 中定义的调试工作流）
-
-**peaksbug 8 阶段调试流程**：
-
-| Phase | 阶段 | 输出 | 关键操作 |
-|-------|------|------|---------|
-| 1 | 复现 | `.peaks/bugs/repro-[日期].md` | 捕获 Console/Sources/Network 截图 |
-| 2 | 假设 | `.peaks/bugs/hypothesis-[日期].md` | 列出可能根因 (3-5 个) |
-| 3 | 探测 | `console.log` / `debugger` | 验证假设，缩小范围 |
-| 4 | 定位 | 根因代码位置 | 定位到文件:行号 |
-| 5 | 修复 | 代码变更 | 最小改动原则 |
-| 6 | 测试 | 回归测试报告 | 复现用例 + 新增边界测试 |
+**注意**: `/peaksinit`、`/peaksfeat`、`/peaksbug` 不存在，请使用 `/peaks-sdd init` 等完整格式。
 
 ---
 
@@ -1302,9 +1258,9 @@ peaks-sdd 提供三个快捷命令，覆盖主要开发场景：
 
 | Gotcha | 触发条件 | 应对方式 |
 |--------|---------|---------|
-| **命令未注册** | peaksinit 未执行时调用 /peaksfeat | Checkpoint 0 检测命令可用性，未注册则引导用户先说"初始化我的项目" |
-| **命令注册路径错误** | 项目在子目录中，命令路径相对错误 | 使用绝对路径或相对于 `.claude/settings.json` 的路径 |
-| **命令覆盖** | 多次执行 peaksinit 覆盖已有命令 | Step 0.7 增量添加逻辑：已存在则跳过 |
+| **命令未注册** | 未初始化时调用 `/peaks-sdd feat` | Checkpoint 0 检测，未初始化则引导用户执行 `/peaks-sdd init` |
+| **命令格式错误** | 使用了 `/peaksinit` 等不存在的命令 | 提示使用 `/peaks-sdd init` 格式 |
+| **命令覆盖** | 多次执行 init 覆盖已有命令 | Step 0.7 增量添加逻辑：已存在则跳过 |
 
 ### 技术栈检测相关
 
@@ -1318,7 +1274,7 @@ peaks-sdd 提供三个快捷命令，覆盖主要开发场景：
 
 | Gotcha | 触发条件 | 应对方式 |
 |--------|---------|---------|
-| **跨会话丢失上下文** | claude-mem 未正确初始化 | peaksinit Step 0.7 验证 claude-mem 已注册 |
+| **跨会话丢失上下文** | claude-mem 未正确初始化 | Step 0.7 验证 claude-mem 已注册 |
 | **CLAUDE.md 膨胀** | 多轮迭代后 CLAUDE.md 超过 200 行 | 定期归档到 .peaks/，保持主文件精简 |
 
 ---
