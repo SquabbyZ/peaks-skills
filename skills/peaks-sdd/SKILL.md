@@ -622,13 +622,18 @@ npm install -g @fission-ai/openspec@latest
 
 | 命令 | 说明 |
 |------|------|
-| `openspec init` | 初始化 OpenSpec |
+| `openspec init` | 初始化 OpenSpec 项目 |
 | `/opsx:propose <idea>` | 创建变更提案 |
-| `/opsx:explore` | 探索代码库 |
+| `/opsx:explore` | 探索代码库结构 |
+| `/opsx:specs` | 编写或更新规格文档 |
+| `/opsx:design` | 技术设计评审 |
+| `/opsx:tasks` | 任务拆分与分配 |
 | `/opsx:apply` | 实施任务 |
-| `/opsx:archive` | 归档并合并到 specs |
+| `/opsx:sync` | 同步变更到 specs |
 | `/opsx:new` | 创建新变更（完整工作流） |
-| `/opsx:verify` | 验证实施 |
+| `/opsx:ff` | 快速填充所有 artifacts |
+| `/opsx:archive` | 归档并合并到 specs |
+| `/opsx:verify` | 验证实施结果 |
 
 **OpenSpec 目录结构**：
 
