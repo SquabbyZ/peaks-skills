@@ -676,6 +676,15 @@ openspec/
 { "dependencies": { "quasar": "^2.x" } } → UI_LIBRARY=quasar
 { "dependencies": { "@ant-design/vue": "^5.x" } } → UI_LIBRARY=ant-design-vue
 { "dependencies": { "primevue": "^3.x" } } → UI_LIBRARY=primevue
+
+// Vue 2 UI 库
+{ "dependencies": { "element-ui": "^2.x" } } → UI_LIBRARY=element-ui
+{ "dependencies": { "iview": "^3.x" } } → UI_LIBRARY=iview
+{ "dependencies": { "vuetify": "^2.x" } } → UI_LIBRARY=vuetify2
+{ "dependencies": { "bootstrap-vue": "^2.x" } } → UI_LIBRARY=bootstrap-vue
+{ "dependencies": { "buefy": "^0.x" } } → UI_LIBRARY=buefy
+{ "dependencies": { "muse-ui": "^3.x" } } → UI_LIBRARY=muse-ui
+{ "dependencies": { "vue-material": "^1.x" } } → UI_LIBRARY=vue-material
 ```
 
 **UI 库对应模板变量**：
@@ -687,12 +696,19 @@ openspec/
 | chakra | Chakra UI | _chakra | React |
 | radix | Radix UI (headless) | _radix | React |
 | shadcn | shadcn/ui | _shadcn | React |
-| element-plus | Element Plus | _element | Vue |
-| naive-ui | Naive UI | _naive | Vue |
-| vuetify | Vuetify 3 | _vuetify | Vue |
-| quasar | Quasar | _quasar | Vue |
-| ant-design-vue | Ant Design Vue | _ant-design-vue | Vue |
-| primevue | PrimeVue | _primevue | Vue |
+| element-plus | Element Plus | _element | Vue 3 |
+| naive-ui | Naive UI | _naive | Vue 3 |
+| vuetify | Vuetify 3 | _vuetify | Vue 3 |
+| quasar | Quasar | _quasar | Vue 3 |
+| ant-design-vue | Ant Design Vue | _ant-design-vue | Vue 3 |
+| primevue | PrimeVue | _primevue | Vue 3 |
+| element-ui | Element UI | _element-ui | Vue 2 |
+| iview | iView | _iview | Vue 2 |
+| vuetify2 | Vuetify 2 | _vuetify2 | Vue 2 |
+| bootstrap-vue | Bootstrap Vue | _bootstrap-vue | Vue 2 |
+| buefy | Buefy | _buefy | Vue 2 |
+| muse-ui | Muse UI | _muse-ui | Vue 2 |
+| vue-material | Vue Material | _vue-material | Vue 2 |
 | none | 未检测到 | (无后缀) | - |
 
 ### 后端检测
