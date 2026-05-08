@@ -18,6 +18,8 @@ tools:
   - Agent
 
 skills:
+  - improve-codebase-architecture
+  - find-skills
   - systematic-debugging
   - test-driven-development
   - code-review
@@ -129,14 +131,24 @@ Bug 报告 → peaksbug（调度员）
 
 **每个阶段的产出物是必须的，不是可选的！未产出文件 = 任务未完成。**
 
-| Phase | 必须产出的文件 | 文件路径 |
-|-------|---------------|---------|
-| Phase 2（Bug 分析） | Bug 分析报告 | `.peaks/bugs/bug-[描述]-[YYYYMMDD].md` |
-| Phase 5（修复实施） | 修复记录 | `.peaks/fixes/fix-[描述]-[YYYYMMDD].md` |
-| Phase 7（回归测试） | 回归测试脚本 | `.peaks/auto-tests/regression-[描述]-[YYYYMMDD].md` |
-| Phase 8（修复报告） | 修复报告 | `.peaks/reports/report-[描述]-[YYYYMMDD].md` |
+| Phase | 必须产出的文件 | 文件路径 | 验证时机 |
+|-------|---------------|---------|---------|
+| Phase 3（Bug 分析） | Bug 分析报告 | `.peaks/bugs/bug-[描述]-[YYYYMMDD].md` | Phase 3 结束后立刻验证 |
+| Phase 4（修复实施） | 修复记录 | `.peaks/fixes/fix-[描述]-[YYYYMMDD].md` | Phase 4 结束后立刻验证 |
+| Phase 7（回归测试） | 回归测试脚本 | `.peaks/auto-tests/regression-[描述]-[YYYYMMDD].md` | Phase 7 结束后立刻验证 |
+| Phase 8（修复报告） | 修复报告 | `.peaks/reports/report-[描述]-[YYYYMMDD].md` | Phase 8 结束后立刻验证 |
 
-**验收规则**：任务完成前，检查上述 4 个文件是否都已存在。缺少任何一个，补全后再结束。
+**主动验证规则**: 每个 Phase 结束后，立即执行以下验证，不要等到最后:
+1. Phase 3 完成后 → 运行 `ls .peaks/bugs/` 确认报告存在 → **如果不存在，立即创建再继续**
+2. Phase 4 完成后 → 运行 `ls .peaks/fixes/` 确认修复记录存在 → **如果不存在，立即创建再继续**
+3. Phase 7 完成后 → 运行 `ls .peaks/auto-tests/` 确认测试脚本存在 → **如果不存在，立即创建再继续**
+4. Phase 8 完成后 → 运行 `ls .peaks/reports/report-*.md` 确认报告存在 → **如果不存在，立即创建再继续**
+
+**禁止**:
+- ❌ 以"已在回复中说明"代替文件落盘
+- ❌ 跳过验证直接进入下一 Phase
+- ❌ 以"时间不够"为由推迟产出
+- ✅ 正确的做法: 验证失败 → 立刻补全文件 → 验证通过 → 继续
 
 ### 第一步：探索项目（必须先做）
 
@@ -268,6 +280,18 @@ Skill: security-review
 
 ---
 
+
+---
+
+**🔍 Phase 3 产出验证(Bug 分析报告)**:
+
+完成 Phase 3 后,立即验证:
+```bash
+ls .peaks/bugs/bug-[描述]-[YYYYMMDD].md
+```
+- ❌ 文件不存在 → 立即按模板创建后再进入第四步
+- ✅ 文件存在 → 进入第四步
+
 **Bug 分析报告模板**：
 
 ```markdown
@@ -326,6 +350,22 @@ Skill: security-review
 2. **不破坏现有功能** — 确保修复后其他功能正常
 3. **添加日志** — 便于未来排查类似问题
 4. **产出修复记录到 `.peaks/fixes/fix-[问题描述]-[日期].md`**
+5. **改动量自检** — 修复完成后运行 `git diff --stat`:
+   - 单一文件改动 **< 50 行**: ✅ 正常
+   - 单一文件改动 **50-100 行**: ⚠️ 需在修复记录中说明拆分理由
+   - 单一文件改动 **> 100 行**: 🚨 必须拆分到多个独立改动,每个改动单独验证
+
+
+---
+
+**🔍 Phase 4 产出验证(修复记录)**:
+
+完成 Phase 4 后,立即验证:
+```bash
+ls .peaks/fixes/fix-[描述]-[YYYYMMDD].md
+```
+- ❌ 文件不存在 → 立即按模板创建后再进入第五步
+- ✅ 文件存在 → 进入第五步
 
 ### 第五步：测试驱动验证（tdd-guide Skill）
 
@@ -377,6 +417,18 @@ Skill: security-review
 2. 更新项目的测试套件（如果有）
 3. 确保测试脚本可以在 CI 中运行
 
+
+---
+
+**🔍 Phase 7 产出验证(回归测试脚本)**:
+
+完成 Phase 7 后,立即验证:
+```bash
+ls .peaks/auto-tests/regression-[描述]-[YYYYMMDD].md
+```
+- ❌ 文件不存在 → 立即按模板创建后再进入第八步
+- ✅ 文件存在 → 进入第八步
+
 ### 第八步：修复报告
 
 产出最终的修复报告到 `.peaks/reports/report-[问题描述]-[日期].md`：
@@ -406,6 +458,58 @@ Skill: security-review
 ## 风险评估
 [如果有任何风险，记录在此]
 ```
+
+
+## 最终验收门禁(强制)
+
+**每个 Phase 完成后，立即执行产出验证，不要等到最后。**
+
+### Phase 3 后 — Bug 分析报告验证
+
+```bash
+# 验证 bug 分析报告已落盘
+ls .peaks/bugs/bug-[描述]-[YYYYMMDD].md
+# ❌ 文件不存在 → 立即创建，不要跳过
+# ✅ 文件存在 → 进入 Phase 4
+```
+
+### Phase 4 后 — 修复记录验证
+
+```bash
+# 验证修复记录已落盘
+ls .peaks/fixes/fix-[描述]-[YYYYMMDD].md
+# ❌ 文件不存在 → 立即创建，不要跳过
+# ✅ 文件存在 → 进入 Phase 5
+```
+
+### Phase 7 后 — 回归测试脚本验证
+
+```bash
+# 验证回归测试脚本已落盘
+ls .peaks/auto-tests/regression-[描述]-[YYYYMMDD].md
+# ❌ 文件不存在 → 立即创建，不要跳过
+# ✅ 文件存在 → 进入 Phase 8
+```
+
+### Phase 8 后 — 修复报告验证(最终门禁)
+
+```bash
+# 验证所有 4 个强制产出文件
+ls .peaks/bugs/bug-[描述]-[YYYYMMDD].md && \
+ls .peaks/fixes/fix-[描述]-[YYYYMMDD].md && \
+ls .peaks/auto-tests/regression-[描述]-[YYYYMMDD].md && \
+ls .peaks/reports/report-[描述]-[YYYYMMDD].md
+# ✅ 全部存在 → 任务完成
+# ❌ 任意一个不存在 → 必须补全后才能报告"完成"
+```
+
+**禁止以下行为**:
+- ❌ 以"控制台输出"代替文件落盘
+- ❌ 以"回复文本"代替文件落盘
+- ❌ 直接跳到"任务完成"而不验证产出
+- ❌ 用"时间不够"作为理由跳过产出
+
+**验收通过标准**: `ls` 命令对 4 个路径全部返回 0（文件存在），且文件内容非空（>10 行）。
 
 ## Skill 与 Agent 速查表
 

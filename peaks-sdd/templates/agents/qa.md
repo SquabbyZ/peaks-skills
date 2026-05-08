@@ -17,6 +17,8 @@ tools:
   - Agent
 
 skills:
+  - improve-codebase-architecture
+  - find-skills
   - test-driven-development
   - browser
 

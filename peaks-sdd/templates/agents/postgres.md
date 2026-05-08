@@ -16,7 +16,9 @@ tools:
   - Glob
   - Grep
 
-skills: []
+skills:
+  - improve-codebase-architecture
+  - find-skills
 
 memory: project
 

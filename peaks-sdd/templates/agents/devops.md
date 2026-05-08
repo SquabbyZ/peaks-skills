@@ -17,7 +17,9 @@ tools:
   - Grep
   - Agent
 
-skills: []
+skills:
+  - improve-codebase-architecture
+  - find-skills
 
 memory: project
 

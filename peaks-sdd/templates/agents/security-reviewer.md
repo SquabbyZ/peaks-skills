@@ -14,7 +14,9 @@ tools:
   - Glob
   - Edit
 
-skills: []
+skills:
+  - improve-codebase-architecture
+  - find-skills
 
 memory: project
 

@@ -69,6 +69,32 @@ hooks:
 
 ## 执行流程
 
+### Step 0.0: 检测是否已初始化
+
+检测项目是否已完成初始化：
+
+```bash
+# 检查是否存在已有配置
+ls -la .claude/agents/ 2>/dev/null && echo "AGENTS_EXIST"
+ls -la .peaks/ 2>/dev/null && echo "PEAKS_EXIST"
+cat .claude/settings.json 2>/dev/null | grep -q "peaksinit" && echo "COMMANDS_REGISTERED"
+```
+
+**三种状态**：
+
+| 状态 | 含义 | 处理方式 |
+|------|------|---------|
+| 未初始化 | 无 `.claude/agents/` | 执行完整初始化（Step 0.1 - Step 0.9） |
+| 已初始化 | 有 `.claude/agents/` 但模板有更新 | 执行增量更新（跳过 Step 0.5.2/0.5.3/0.7，已存在则跳过） |
+| 同步最新 | 已初始化且模板无更新 | 报告「已是最新」，询问是否强制重置 |
+
+**增量更新逻辑**：
+1. 读取 `peaks-sdd/templates/agents/` 下的模板
+2. 读取 `.claude/agents/` 下的已生成文件
+3. 对比每个 Agent 的模板版本与已生成版本
+4. 如果模板更新，询问用户「是否更新 [Agent名称]」
+5. 批量更新时逐个替换
+
 ### Step 0.1: 检查项目类型
 
 ```
@@ -103,6 +129,31 @@ find . -name "*.json" -maxdepth 2 | head -20
 | 全栈框架 | package.json dependencies.next | Next.js |
 | 数据库 | typeorm / prisma / drizzle | 数据库 ORM |
 | 测试框架 | @playwright/test / vitest / jest | 测试框架 |
+
+### Step 0.3.1: 使用 improve-codebase-architecture 分析项目架构
+
+**关键：在生成 Agent 配置之前，必须先使用 `improve-codebase-architecture` Skill 深度理解项目结构**
+
+1. 优先使用 `@bunas/fs-mcp` 读取关键文件：
+```
+mcp__bunas__fs_mcp__read_directory(path: "{{cwd}}")
+mcp__bunas__fs_mcp__read_file(path: "{{cwd}}/package.json")
+mcp__bunas__fs_mcp__read_file(path: "{{cwd}}/CLAUDE.md")
+mcp__bunas__fs_mcp__read_file(path: "{{cwd}}/tsconfig.json")
+mcp__bunas__fs_mcp__read_directory(path: "{{cwd}}/src")
+mcp__bunas__fs_mcp__read_directory(path: "{{cwd}}/.claude")
+```
+
+2. 然后调用 `improve-codebase-architecture` Skill 分析项目架构：
+```
+Skill: improve-codebase-architecture
+args: "分析 {{cwd}} 项目的整体架构，包括：目录结构、技术栈、模块划分、依赖关系。输出结构化的架构报告用于指导 Agent 生成。"
+```
+
+3. 架构分析结果将用于：
+   - 细化 Agent 模板中的项目路径和模块信息
+   - 确定哪些 Agent 需要调整调度策略
+   - 识别项目特有的开发规范和约定
 
 ### Step 0.4: 生成 Agent 配置
 
@@ -157,6 +208,7 @@ find . -name "*.json" -maxdepth 2 | head -20
 - `{{PROJECT_PATH}}` → 项目根目录（如 `/Users/xxx/prompt-project`）
 - `{{PROJECT_NAME}}` → 项目目录名（如 `prompt-project`）
 - `{{TECH_STACK}}` → 检测到的技术栈描述
+- `{{PROJECT_ARCHITECTURE}}` → improve-codebase-architecture 输出的架构分析结果（目录结构、模块划分、依赖关系）
 - `{{FRONTEND_FRAMEWORK}}` → react / vue / next
 - `{{TEST_FRAMEWORK}}` → jest / vitest / playwright
 - `{{DEV_PORT}}` → 开发端口
@@ -176,7 +228,28 @@ ln -s /path/to/template agents/frontend.md
 # 3. Write .claude/agents/frontend.md
 ```
 
-### Step 0.5: 创建目录结构
+### Step 0.5.1: 安装全局 Skills（improve-codebase-architecture + find-skills）
+
+**关键：这两个 Skill 必须安装到全局（.claude/skills/），所有 Agent 都会使用！**
+
+```bash
+# 安装 improve-codebase-architecture（项目架构分析）
+npx skills add https://github.com/mattpocock/skills --skill improve-codebase-architecture
+
+# 安装 find-skills（技能查找）
+npx skills add https://github.com/vercel-labs/skills --skill find-skills
+```
+
+**说明**：
+- 这两个 Skill 会被所有 Agent 引用，在执行任何任务前先分析项目架构
+- `improve-codebase-architecture` 帮助 Agent 理解项目结构，生成更准确的代码
+- `find-skills` 帮助 Agent 在遇到不熟悉的技术时快速查找合适的 Skill
+
+**增量更新处理**：
+- 如果 Skill 已安装，跳过（输出「✅ [Skill名称] 已安装」）
+- 如果安装失败，记录到报告，继续后续步骤
+
+### Step 0.5.2: 创建目录结构
 
 ```
 .peaks/                     # SDD 工作目录
@@ -190,7 +263,7 @@ ln -s /path/to/template agents/frontend.md
 └── fixes/
 ```
 
-### Step 0.5.1: 初始化 OpenSpec（用于存量项目迭代）
+### Step 0.5.3: 初始化 OpenSpec（用于存量项目迭代）
 
 **重要：OpenSpec 必须初始化，不能跳过！**
 
@@ -288,6 +361,7 @@ cat .claude/settings.json | grep -A 10 '"commands"'
 **项目**: {{PROJECT_NAME}}
 **路径**: {{PROJECT_PATH}}
 **时间**: [当前时间]
+**模式**: [首次初始化 / 增量更新]
 
 ---
 
@@ -302,29 +376,41 @@ cat .claude/settings.json | grep -A 10 '"commands"'
 | 测试框架 | [检测结果，如 Vitest / Playwright / 未检测到] |
 | 项目类型 | [纯前端 / 纯后端 / 混合项目] |
 
-## 2. 生成的 Agent 配置
+## 2. 项目架构分析（improve-codebase-architecture）
 
-已生成到 `.claude/agents/`：
+| 维度 | 分析结果 |
+|------|----------|
+| 目录结构 | [src/, pages/, components/, hooks/, stores/ 等] |
+| 模块划分 | [按功能/按页面/按层] |
+| 依赖关系 | [主要模块间依赖] |
+| 技术债 | [如有] |
+
+## 3. 更新的 Agent 配置
+
+已更新到 `.claude/agents/`：
 
 | Agent | 状态 | 说明 |
 |-------|------|------|
-| peaksfeat | ✅ 启用 | 功能开发流程管理 |
-| peaksbug | ✅ 启用 | Bug 修复流程管理 |
-| product | ✅ 启用 | 产品需求分析 |
-| qa | ✅ 启用 | 测试工程 |
-| frontend | ✅ 启用 / ❌ 不适用 | 前端开发专家 |
-| backend | ✅ 启用 / ❌ 不适用 | 后端开发专家 |
-| design | ✅ 启用 / ❌ 不适用 | UI/UX 设计 |
+| peaksfeat | ✅ 更新 | 功能开发流程管理 |
+| peaksbug | ✅ 更新 | Bug 修复流程管理 |
+| product | ✅ 更新 | 产品需求分析 |
+| qa | ✅ 更新 | 测试工程 |
+| frontend | ✅ 更新 / ❌ 不适用 | 前端开发专家（含 Vue2/Vue3 支持） |
 | ... | ... | ... |
 
-## 3. 已安装的 Skills
+**增量更新说明**：
+- 新增的 Agent：从模板生成并写入
+- 已存在的 Agent：检测到模板更新则重新生成
+- 未变化的 Agent：保留现有配置
 
-| Skill | 来源 | 用途 |
-|-------|------|------|
-| [skill 名称] | [仓库地址] | [简要说明] |
-| ... | ... | ... |
+## 4. 已安装的 Skills
 
-## 4. 已注册的 Commands
+| Skill | 状态 |
+|-------|------|
+| improve-codebase-architecture | ✅ 已安装 / ⏭️ 已跳过 |
+| find-skills | ✅ 已安装 / ⏭️ 已跳过 |
+
+## 5. 已注册的 Commands
 
 | 命令 | 说明 |
 |------|------|

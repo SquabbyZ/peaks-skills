@@ -16,6 +16,8 @@ tools:
   - Glob
 
 skills:
+  - improve-codebase-architecture
+  - find-skills
   - design-taste-frontend
   - frontend-design
 

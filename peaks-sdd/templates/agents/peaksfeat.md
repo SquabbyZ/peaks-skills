@@ -18,6 +18,8 @@ tools:
   - Agent
 
 skills:
+  - improve-codebase-architecture
+  - find-skills
   - systematic-debugging
 
 memory: project

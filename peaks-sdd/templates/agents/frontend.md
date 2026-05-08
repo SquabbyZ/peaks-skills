@@ -22,6 +22,8 @@ tools:
   - mcp__playwright__screenshot
 
 skills:
+  - improve-codebase-architecture
+  - find-skills
   - systematic-debugging
   - test-driven-development
   - code-review
@@ -45,11 +47,11 @@ maxTurns: 50
 
 系统会根据项目自动检测以下技术栈：
 
-- **框架**: React / Vue / Next.js / Svelte
+- **框架**: React / Vue2 / Vue3 / Next.js / Svelte
 - **构建工具**: Vite / Webpack / Next.js CLI
-- **UI库**: shadcn/ui / Ant Design / Element Plus / Chakra UI
+- **UI库**: shadcn/ui / Ant Design / Element Plus / Vuetify / Chakra UI
 - **样式**: Tailwind CSS / CSS Modules / Styled Components
-- **状态管理**: TanStack Query / Redux Toolkit / Zustand / Pinia
+- **状态管理**: TanStack Query / Redux Toolkit / Zustand / Pinia / Vuex (Vue2) / Pinia (Vue3)
 - **路由**: React Router / Vue Router / Next.js Router
 
 ## 项目结构（自动检测）
@@ -96,6 +98,84 @@ maxTurns: 50
 - Server state 使用 TanStack Query / React Query / SWR
 - Client state 使用项目已有的方案（Zustand / Redux Toolkit / Pinia）
 - 不要重复存储 server state 到 client store
+
+### Vue2 开发规范（Options API）
+
+当项目使用 Vue2 时，遵循以下规范：
+
+1. **组件选项顺序**：
+   ```
+   export default {
+     name: 'ComponentName',
+     props: {},
+     data() { return {} },
+     computed: {},
+     watch: {},
+     created() {},
+     mounted() {},
+     methods: {},
+     destroyed() {}
+   }
+   ```
+
+2. **Vuex 状态管理**：
+   ```javascript
+   // store/modules/xxx.js
+   const state = { ... }
+   const mutations = { ... }
+   const actions = { ... }
+   const getters = { ... }
+   export default { namespaced: true, state, mutations, actions, getters }
+   ```
+
+3. **生命周期**：
+   - `created` / `mounted` / `updated` / `destroyed`
+   - 不使用 Vue3 的 `setup()` 或 Composition API
+
+4. **响应式**：
+   - 数组索引直接赋值不会触发更新，使用 `this.$set()` 或 `Vue.set()`
+   - 对象新增属性同理，使用 `this.$set()`
+
+5. **模板指令**：
+   - `v-if` / `v-show` 区分使用场景（频繁切换用 v-show）
+   - `v-for` 必须带 `:key`，避免使用 index 作为 key
+   - 事件绑定使用 `v-on:click` 或简写 `@click`
+
+### Vue3 开发规范（Composition API）
+
+当项目使用 Vue3 时，优先使用 Composition API：
+
+1. **setup() 语法**：
+   ```javascript
+   import { ref, reactive, computed, onMounted } from 'vue'
+
+   export default {
+     setup() {
+       const count = ref(0)
+       const state = reactive({ ... })
+       const doubled = computed(() => count.value * 2)
+
+       onMounted(() => { ... })
+
+       return { count, state, doubled }
+     }
+   }
+   ```
+
+2. **Pinia 状态管理**（Vue3 推荐）：
+   ```javascript
+   // stores/xxx.js
+   import { defineStore } from 'pinia'
+   export const useXxxStore = defineStore('xxx', {
+     state: () => ({ ... }),
+     getters: { ... },
+     actions: { ... }
+   })
+   ```
+
+3. **生命周期**：
+   - 使用 `onMounted` / `onUpdated` / `onUnmounted`
+   - 不使用 Vue2 的 `created` / `mounted` 等选项
 
 ### 表单处理
 
