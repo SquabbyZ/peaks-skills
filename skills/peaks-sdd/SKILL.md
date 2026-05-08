@@ -661,24 +661,39 @@ openspec/
 
 ```json
 // package.json 检测（按优先级）
+// React UI 库
 { "dependencies": { "antd": "^5.x" } } → UI_LIBRARY=antd
 { "dependencies": { "@mui/material": "^5.x" } } → UI_LIBRARY=mui
 { "dependencies": { "@chakra-ui/react": "^3.x" } } → UI_LIBRARY=chakra
 { "dependencies": { "@radix-ui/react-dialog": "^1.x" } } → UI_LIBRARY=radix
 { "dependencies": { "shadcn": "^1.x" } } → UI_LIBRARY=shadcn
 { "dependencies": { "antd": "^4.x" } } → UI_LIBRARY=antd
+
+// Vue UI 库
+{ "dependencies": { "element-plus": "^2.x" } } → UI_LIBRARY=element-plus
+{ "dependencies": { "naive-ui": "^2.x" } } → UI_LIBRARY=naive-ui
+{ "dependencies": { "vuetify": "^3.x" } } → UI_LIBRARY=vuetify
+{ "dependencies": { "quasar": "^2.x" } } → UI_LIBRARY=quasar
+{ "dependencies": { "@ant-design/vue": "^5.x" } } → UI_LIBRARY=ant-design-vue
+{ "dependencies": { "primevue": "^3.x" } } → UI_LIBRARY=primevue
 ```
 
 **UI 库对应模板变量**：
 
-| UI_LIBRARY | 说明 | 模板后缀 |
-|------------|------|---------|
-| antd | Ant Design 5 | _antd |
-| mui | Material UI 5 | _mui |
-| chakra | Chakra UI | _chakra |
-| radix | Radix UI (headless) | _radix |
-| shadcn | shadcn/ui | _shadcn |
-| none | 未检测到 | (无后缀) |
+| UI_LIBRARY | 说明 | 模板后缀 | 框架 |
+|------------|------|---------|------|
+| antd | Ant Design 5 | _antd | React |
+| mui | Material UI 5 | _mui | React |
+| chakra | Chakra UI | _chakra | React |
+| radix | Radix UI (headless) | _radix | React |
+| shadcn | shadcn/ui | _shadcn | React |
+| element-plus | Element Plus | _element | Vue |
+| naive-ui | Naive UI | _naive | Vue |
+| vuetify | Vuetify 3 | _vuetify | Vue |
+| quasar | Quasar | _quasar | Vue |
+| ant-design-vue | Ant Design Vue | _ant-design-vue | Vue |
+| primevue | PrimeVue | _primevue | Vue |
+| none | 未检测到 | (无后缀) | - |
 
 ### 后端检测
 
