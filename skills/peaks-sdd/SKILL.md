@@ -39,9 +39,6 @@ user-invocable: true
 A Spec-Driven Development workflow for **任意 TypeScript 项目**. 自动检测项目技术栈并动态生成对应的 Agent 配置。
 
 ## 核心架构
-
-A Spec-Driven Development workflow for **任意 TypeScript 项目**。自动检测项目技术栈并动态生成对应的 Agent 配置。
-
 ## 核心架构
 
 ### 文件层次关系
@@ -936,6 +933,44 @@ openspec/
 └────────────────────────────────────────────────────┘
 ```
 
+**Checkpoint 6 执行步骤**：
+
+1. **Step 6.1: 验证服务可达**
+   ```bash
+   # 检查所有服务端口
+   curl -s http://localhost:${DEV_PORT}/health || echo "主服务未响应"
+   curl -s http://localhost:${DEV_PORT}/api/health || echo "API 未响应"
+   # 检查数据库连接
+   psql -c "SELECT 1" || echo "数据库连接失败"
+   ```
+
+2. **Step 6.2: 健康检查端点**
+   ```bash
+   # 分环境执行健康检查
+   curl -f https://api.${DOMAIN}/health || echo "生产环境 API 异常"
+   curl -f http://localhost:3000/health || echo "本地环境异常"
+   ```
+
+3. **Step 6.3: 数据库迁移验证**
+   ```bash
+   # 确认迁移完成且无数据丢失
+   npm run db:migrate:status
+   ```
+
+4. **Step 6.4: 关键功能抽查**
+   - 登录/登出流程
+   - 核心 CRUD 操作
+   - 关键第三方集成
+
+5. **Step 6.5: 日志检查**
+   ```bash
+   grep "ERROR" .peaks/deploys/deploy-*.log | tail -20
+   ```
+
+**产出**：
+- `.peaks/deploys/deploy-[环境]-[日期].log`
+- `.peaks/reports/deploy-verification-[日期].md`
+
 ---
 
 ### 选择正确的工作流
@@ -1232,6 +1267,17 @@ peaks-sdd 提供三个快捷命令，覆盖主要开发场景：
 自动分析复现 → 根因分析 → 修复 → 测试 → 验证。
 
 **执行流程**：Phase 1-6（使用 `.claude/agents/peaksbug.md` 中定义的调试工作流）
+
+**peaksbug 8 阶段调试流程**：
+
+| Phase | 阶段 | 输出 | 关键操作 |
+|-------|------|------|---------|
+| 1 | 复现 | `.peaks/bugs/repro-[日期].md` | 捕获 Console/Sources/Network 截图 |
+| 2 | 假设 | `.peaks/bugs/hypothesis-[日期].md` | 列出可能根因 (3-5 个) |
+| 3 | 探测 | `console.log` / `debugger` | 验证假设，缩小范围 |
+| 4 | 定位 | 根因代码位置 | 定位到文件:行号 |
+| 5 | 修复 | 代码变更 | 最小改动原则 |
+| 6 | 测试 | 回归测试报告 | 复现用例 + 新增边界测试 |
 
 ---
 
