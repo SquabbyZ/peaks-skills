@@ -10,6 +10,11 @@ color: green
 
 model: sonnet
 
+mcpServers:
+  - "@bunas/fs-mcp"
+  - "@upstash/context7-mcp@latest"
+  - "@alisaitteke/docker-mcp"
+
 tools:
   - Read
   - Edit
@@ -18,6 +23,12 @@ tools:
   - Glob
   - Grep
   - Agent
+
+hooks:
+  - type-check
+  - min-code-enforce
+  - require-code-review
+  - file-size-check
 
 skills:
   - improve-codebase-architecture

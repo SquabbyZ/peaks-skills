@@ -10,6 +10,10 @@ color: blue
 
 model: sonnet
 
+mcpServers:
+  - chrome-devtools-mcp
+  - "@playwright/mcp"
+
 tools:
   - Read
   - Edit
@@ -22,6 +26,13 @@ tools:
   - mcp__playwright__click
   - mcp__playwright__fill
   - mcp__playwright__screenshot
+
+hooks:
+  - auto-format
+  - type-check
+  - tailwind-enforce
+  - component-library-enforce
+  - file-size-check
 
 skills:
   - improve-codebase-architecture

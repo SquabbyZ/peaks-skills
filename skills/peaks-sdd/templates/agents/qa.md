@@ -10,6 +10,10 @@ color: pink
 
 model: sonnet
 
+mcpServers:
+  - chrome-devtools-mcp
+  - "@playwright/mcp"
+
 tools:
   - Read
   - Write
@@ -17,6 +21,10 @@ tools:
   - Glob
   - Grep
   - Agent
+
+hooks:
+  - test-gate
+  - require-code-review
 
 skills:
   - improve-codebase-architecture
