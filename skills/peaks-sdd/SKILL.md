@@ -39,7 +39,6 @@ user-invocable: true
 A Spec-Driven Development workflow for **任意 TypeScript 项目**. 自动检测项目技术栈并动态生成对应的 Agent 配置。
 
 ## 核心架构
-## 核心架构
 
 ### 文件层次关系
 
