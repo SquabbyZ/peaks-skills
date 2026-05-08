@@ -315,58 +315,43 @@ ls -la .peaks/
 
 ### Step 0.7: 注册 Slash Commands
 
-读取现有的 `.claude/settings.json`，**增量添加** peaks-sdd 的三个 commands：
+VS Code 扫描 `.claude/` 目录下的 `.md` 文件作为 slash commands。需要把 peaks-sdd 的命令文件**复制**到项目 `.claude/` 目录。
+
+**需要复制的 commands**：
+
+| 命令 | 源文件 | 目标 |
+|------|--------|------|
+| `/peaksinit` | `~/.claude/skills/peaks-sdd/peaksinit.md` | `.claude/peaksinit.md` |
+| `/peaksfeat` | `~/.claude/skills/peaks-sdd/peaksfeat.md` | `.claude/peaksfeat.md` |
+| `/peaksbug` | `~/.claude/skills/peaks-sdd/peaksbug.md` | `.claude/peaksbug.md` |
+| `/peaksupdate` | `~/.claude/skills/peaks-sdd/peaksupdate.md` | `.claude/peaksupdate.md` |
+| `/peakscheck` | `~/.claude/skills/peaks-sdd/peakscheck.md` | `.claude/peakscheck.md` |
+
+**复制逻辑**：
 
 ```bash
-cat .claude/settings.json 2>/dev/null || echo '{}'
-```
-
-**需要注册的 commands**：
-
-| 命令 | 来源 | 说明 |
-|------|------|------|
-| `/peaksinit` | peaks-sdd/commands/peaksinit.md | 项目初始化 |
-| `/peaksfeat` | peaks-sdd/commands/peaksfeat.md | 功能开发 |
-| `/peaksbug` | peaks-sdd/commands/peaksbug.md | Bug 修复 |
-| `/peaksupdate` | peaks-sdd/commands/peaksupdate.md | 更新 peaks-sdd |
-| `/peakscheck` | peaks-sdd/commands/peakscheck.md | 检查更新（自动触发） |
-
-**注册逻辑**：
-
-1. 读取现有 `settings.json`
-2. 如果不存在 `commands` 字段，创建它
-3. 对于每个 command：已存在则跳过，不存在则添加
-4. **不覆盖任何已有的 command 配置**
-5. 写回 `.claude/settings.json`
-
-**settings.json 示例结构**：
-
-```json
-{
-  "commands": {
-    "peaksinit": "peaks-sdd/commands/peaksinit.md",
-    "peaksfeat": "peaks-sdd/commands/peaksfeat.md",
-    "peaksbug": "peaks-sdd/commands/peaksbug.md",
-    "peaksupdate": "peaks-sdd/commands/peaksupdate.md",
-    "peakscheck": "peaks-sdd/commands/peakscheck.md"
-  }
-}
+# 复制命令文件到 .claude/ 目录
+cp ~/.claude/skills/peaks-sdd/peaksinit.md .claude/peaksinit.md
+cp ~/.claude/skills/peaks-sdd/peaksfeat.md .claude/peaksfeat.md
+cp ~/.claude/skills/peaks-sdd/peaksbug.md .claude/peaksbug.md
+cp ~/.claude/skills/peaks-sdd/peaksupdate.md .claude/peaksupdate.md
+cp ~/.claude/skills/peaks-sdd/peakscheck.md .claude/peakscheck.md
 ```
 
 **注意**：
-- peaks-sdd 目录使用相对路径（如 `peaks-sdd/commands/peaksfeat.md`）
-- 路径相对于 `.claude/settings.json` 所在目录（即项目根目录）
-- 如果 peaks-sdd 目录不在项目根目录，需要使用绝对路径
+- 使用绝对路径 `~/.claude/skills/peaks-sdd/` 确保全局安装也能找到源文件
+- 如果文件已存在，**跳过**（不覆盖已有配置）
+- 复制后 VS Code 会自动识别这 5 个 slash commands
 
 ---
 
 ### Step 0.8: 验证 Command 注册
 
 ```bash
-cat .claude/settings.json | grep -A 10 '"commands"'
+ls -la .claude/*.md | grep peaks
 ```
 
-确认五个命令都已注册（peaksinit, peaksfeat, peaksbug, peaksupdate, peakscheck）。
+确认五个命令都已复制（peaksinit.md, peaksfeat.md, peaksbug.md, peaksupdate.md, peakscheck.md）。
 
 ### Step 0.9: 生成初始化报告
 
