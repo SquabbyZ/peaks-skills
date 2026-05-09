@@ -76,9 +76,7 @@ skills:
       - project-init
       - prd
       - slash-commands
-      - peaksinit
-      - peaksfeat
-      - peaksbug
+      - peaks-sdd
 
 installation:
   # Method 1: Using npx skills (vercel-labs/skills)

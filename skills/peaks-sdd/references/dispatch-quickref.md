@@ -2,12 +2,11 @@
 
 ## 工作流选择
 
-| 场景 | 工具 | 入口 |
-|------|------|------|
-| 新项目 (0→1) | Spec-It | `/peaksinit` → `/peaksfeat` |
-| 复杂项目 | Spec-It | `/peaksfeat` |
+| 场景 | 工作流 | 入口 |
+|------|--------|------|
+| 新项目 (0→1) | OpenSpec | `/peaks-sdd 初始化` → `/peaks-sdd 添加...` |
 | 存量项目迭代 | OpenSpec | `openspec init` → `/opsx:propose` |
-| Bug 修复 | peaksbug | `/peaksbug` |
+| Bug 修复 | peaksbug | `/peaks-sdd [bug描述]` |
 
 ## Agent 调度矩阵
 
@@ -23,26 +22,57 @@
 | security-reviewer | 始终 | OWASP 安全审查 |
 | code-reviewer-frontend | 有前端变更 | 前端代码审查 |
 | code-reviewer-backend | 有后端变更 | 后端代码审查 |
-| design | 新页面/复杂交互 | UI 设计、设计稿、视觉规范（必须先调 design-taste-frontend） |
+| triage | 始终 | Issue 分类、状态机流转 |
+| peaksfeat | 始终 | 功能开发工作流入口 |
+| peaksbug | 始终 | Bug 修复工作流入口 |
 
-## Skill 调度矩阵
+## Agent 与 Skills 映射
 
-| Skill | 调用 Agent | 用途 |
-|-------|-----------|------|
-| `systematic-debugging` | peaksbug | 根因分析、执行路径追踪 |
-| `test-driven-development` | peaksbug, frontend, backend | 测试驱动开发、回归测试 |
-| `code-review` | peaksfeat, peaksbug | 代码审查方法论 |
-| `security-review` | peaksfeat, peaksbug | 安全漏洞扫描方法论 |
-| `browser` | frontend, peaksbug | Browserbase 浏览器自动化、E2E 测试 |
-| `design-taste-frontend` | design | 设计品味评估（**必须最先调用**） |
-| `frontend-design` | design | 前端设计方法论（design-taste-frontend 之后调用） |
+| Agent | 依赖 Skills |
+|-------|------------|
+| peaksfeat | improve-codebase-architecture, systematic-debugging, test-driven-development, find-skills |
+| peaksbug | systematic-debugging, test-driven-development, code-review |
+| frontend | browser, browser-use, react:components, vue-best-practices, vue, vue-debug-guides, impeccable |
+| backend | - |
+| qa | test-driven-development, browser-use |
+| design | design-taste-frontend, frontend-design |
+
+## OpenSpec 工作流（存量项目迭代）
+
+```
+/opsx:propose ──► /opsx:specs ──► /opsx:design ──► /opsx:tasks ──► /opsx:apply ──► /opsx:archive
+```
+
+| 命令 | 产出 |
+|------|------|
+| `/opsx:propose <idea>` | `openspec/changes/[change-name]/proposal.md` |
+| `/opsx:specs` | `openspec/changes/[change-name]/specs/*.md` |
+| `/opsx:design` | `openspec/changes/[change-name]/design.md` |
+| `/opsx:tasks` | `openspec/changes/[change-name]/tasks.md` |
+| `/opsx:apply` | 执行 tasks.md 中的任务 |
+| `/opsx:archive` | 合并到 openspec/specs/ |
+
+## peaksbug 工作流（Bug 修复）
+
+| Phase | 阶段 | 输出 |
+|-------|------|------|
+| 1 | 复现 | 复现步骤记录 |
+| 2 | 根因分析 | Root cause 分析 |
+| 3 | 修复方案 | 修复代码 |
+| 4 | Code Review | 审查通过 |
+| 5 | 回归测试 | 测试报告 |
+| 6 | 验证 | 验证报告 |
 
 ## 质量门禁
 
 ```
-开发完成 → Code Review → 安全检查 → QA 验证 → 部署
-              ↓ 失败          ↓ 失败
-           打回修复         修复
+开发完成 → Code Review ──┐
+        ↓ 失败           ├─→ QA 验证 → 部署
+     打回修复        安全检查
+        ↓ 失败           ↓ 失败
+     打回修复       打回修复
+
+(Code Review 和 安全检查可并行执行)
 ```
 
 ## 文件命名规范
@@ -50,20 +80,74 @@
 | 类型 | 格式 |
 |------|------|
 | PRD | `prd-[功能名]-[YYYYMMDD].md` |
+| Plan | `plan-[功能名]-[YYYYMMDD].md` |
 | Swagger | `swagger-[功能名]-[YYYYMMDD].json` |
 | 设计稿 | `[功能名]-[YYYYMMDD].png` |
 | 测试用例 | `test-case-[功能名]-[YYYYMMDD].md` |
-| 开发计划 | `plan-[功能名]-[YYYYMMDD].md` |
+| Bug 报告 | `bug-[问题描述]-[YYYYMMDD].md` |
 | 部署脚本 | `deploy-[环境]-[YYYYMMDD].sh` |
+
+## 输出目录结构
+
+```
+.peaks/
+├── prds/              # PRD 文档
+├── plans/             # 开发计划
+├── swagger/           # API 规范
+├── designs/           # 设计稿截图
+├── reports/           # 测试报告
+├── auto-tests/        # 自动化测试
+└── checkpoints/       # 中间检查点
+
+openspec/
+├── specs/             # 系统行为规格（真理来源）
+├── changes/           # 变更提案
+│   └── [change-name]/
+│       ├── proposal.md
+│       ├── specs/
+│       ├── design.md
+│       └── tasks.md
+└── archive/            # 已归档变更
+```
+
+## Context 管理
+
+| Context 占用 | 动作 |
+|-------------|------|
+| < 50% | 正常继续 |
+| 50-70% | 关注，产出中间文件减轻压力 |
+| >= 70% | **强制**：产出检查点 → `/compact` → 继续 |
+| >= 85% | **阻断**：停止 → `/compact` → 用户确认后继续 |
 
 ## 检查点速查
 
 | # | 名称 | 确认内容 |
 |---|------|---------|
-| 0 | 工作流确认 | Spec-It / OpenSpec / peaksbug |
-| 1 | Constitution | 治理原则是否符合预期 |
+| 0 | 需求确认 | 需求清晰可测量、范围明确、验收标准已定义 |
+| 1 | Constitution | 团队约章、治理原则是否符合预期 |
 | 2 | PRD | 需求是否完整无遗漏 |
-| 3 | Plan | 方案是否可行、风险可控 |
-| 4 | Tasks | 任务分配是否合理 |
-| 5 | Implement | 代码满足 PRD、测试通过 |
+| 3 | Design | 设计规范是否完整 |
+| 4 | Implement | 代码满足 PRD |
+| 5 | QA | 测试通过、E2E 验证 |
 | 6 | Deploy | 服务可达、功能正常 |
+
+## 技术栈检测
+
+| 检测项 | 文件/目录 | 说明 |
+|--------|-----------|------|
+| 前端框架 | package.json dependencies.react | React 项目 |
+| 后端框架 | package.json dependencies.@nestjs/* | NestJS 后端 |
+| 全栈框架 | package.json dependencies.next | Next.js |
+| 桌面应用 | src-tauri/ 或 tauri.conf.json | Tauri 项目 |
+| 数据库 | typeorm / prisma / drizzle | PostgreSQL ORM |
+| UI 库 | antd / @mui/material / @chakra-ui/react / radix-ui | UI 组件库 |
+| 测试框架 | @playwright/test / vitest / jest | 测试框架 |
+
+## 触发关键词
+
+| 关键词 | 触发工作流 |
+|--------|-----------|
+| 初始化项目、setup project、init | Phase 0 初始化 |
+| bug、报错、修复、登录按钮没反应 | peaksbug |
+| 添加功能、需求、PRD、技术计划 | OpenSpec 功能开发 |
+| /peaks-sdd | Slash 命令（统一入口） |

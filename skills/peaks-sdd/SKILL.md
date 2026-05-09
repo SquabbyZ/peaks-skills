@@ -2,7 +2,7 @@
 name: peaks-sdd
 description: |
   Spec-Driven Development workflow for TypeScript projects. Use when user mentions 初始化项目, setup project, constitution, PRD, bug, 报错, 修复, or needs to develop features or fix bugs.
-  Triggers: /peaksinit, /peaksfeat, /peaksbug slash commands; or keywords: 初始化, 新项目, 功能开发, bug修复, 需求分析
+  Triggers: /peaks-sdd slash command; or keywords: 初始化, 新项目, 功能开发, bug修复, 需求分析
 
 user-invocable: true
 model: sonnet
@@ -728,7 +728,7 @@ openspec/
 - `PROJECT_PATH` → 根目录
 - `PACKAGES` → 子包列表（如 `["frontend", "api", "shared"]`）
 - 生成 Agent 时，需要确认针对哪个包开发
-- 优先在子包内独立运行 peaksinit
+- 优先在子包内独立运行 `/peaks-sdd 初始化`
 
 ---
 
@@ -1128,20 +1128,20 @@ openspec init
 
 ---
 
-## Slash Commands（用户入口）
+## /peaks-sdd 命令（用户入口）
 
-peaks-sdd 提供三个快捷命令，覆盖主要开发场景：
+peaks-sdd 提供统一的 `/peaks-sdd` 命令入口，通过自然语言描述自动选择工作流：
 
 | 命令 | 说明 | 输入 |
 |------|------|------|
-| `/peaksinit` | 初始化项目 | 无（扫描当前项目） |
-| `/peaksfeat` | 功能开发 | 自然语言需求或 PRD |
-| `/peaksbug` | Bug 修复 | bug 现象描述 |
+| `/peaks-sdd 初始化` | 初始化项目 | 无（扫描当前项目） |
+| `/peaks-sdd 添加[功能]` | 功能开发 | 自然语言需求或 PRD |
+| `/peaks-sdd [bug描述]` | Bug 修复 | bug 现象描述 |
 
-### /peaksinit - 项目初始化
+### /peaks-sdd 初始化 - 项目初始化
 
 ```
-/peaksinit
+/peaks-sdd 初始化
 ```
 
 扫描当前项目，检测技术栈，自动生成：
@@ -1152,10 +1152,10 @@ peaks-sdd 提供三个快捷命令，覆盖主要开发场景：
 
 ---
 
-### /peaksfeat - 功能开发
+### /peaks-sdd 添加[功能] - 功能开发
 
 ```
-/peaksfeat 添加用户登录功能，支持邮箱+密码
+/peaks-sdd 添加用户登录功能，支持邮箱+密码
 ```
 
 或者直接粘贴 PRD 内容，自动进入完整开发流程。
@@ -1164,10 +1164,10 @@ peaks-sdd 提供三个快捷命令，覆盖主要开发场景：
 
 ---
 
-### /peaksbug - Bug 修复
+### /peaks-sdd [bug描述] - Bug 修复
 
 ```
-/peaksbug 登录按钮点击没反应
+/peaks-sdd 登录按钮点击没反应
 ```
 
 自动分析复现 → 根因分析 → 修复 → 测试 → 验证。
@@ -1193,9 +1193,9 @@ peaks-sdd 提供三个快捷命令，覆盖主要开发场景：
 
 | Gotcha | 触发条件 | 应对方式 |
 |--------|---------|---------|
-| **命令未注册** | peaksinit 未执行时调用 /peaksfeat | Checkpoint 0 检测命令可用性，未注册则引导用户先说"初始化我的项目" |
+| **命令未注册** | peaks-sdd 未初始化时调用功能开发 | Checkpoint 0 检测命令可用性，未注册则引导用户先说"初始化我的项目" |
 | **命令注册路径错误** | 项目在子目录中，命令路径相对错误 | 使用绝对路径或相对于 `.claude/settings.json` 的路径 |
-| **命令覆盖** | 多次执行 peaksinit 覆盖已有命令 | Step 0.7 增量添加逻辑：已存在则跳过 |
+| **命令覆盖** | 多次执行初始化覆盖已有命令 | Step 0.7 增量添加逻辑：已存在则跳过 |
 
 ### 技术栈检测相关
 
@@ -1209,7 +1209,7 @@ peaks-sdd 提供三个快捷命令，覆盖主要开发场景：
 
 | Gotcha | 触发条件 | 应对方式 |
 |--------|---------|---------|
-| **跨会话丢失上下文** | claude-mem 未正确初始化 | peaksinit Step 0.7 验证 claude-mem 已注册 |
+| **跨会话丢失上下文** | claude-mem 未正确初始化 | 初始化 Step 0.7 验证 claude-mem 已注册 |
 | **CLAUDE.md 膨胀** | 多轮迭代后 CLAUDE.md 超过 200 行 | 定期归档到 .peaks/，保持主文件精简 |
 
 ---
@@ -1223,7 +1223,7 @@ peaks-sdd 提供三个快捷命令，覆盖主要开发场景：
 | 初始化项目、初始化我的项目、setup project | Phase 0 初始化 |
 | bug、报错、修复、登录按钮没反应、接口返回 500 | peaksbug 调试 |
 | 添加功能、需求、PRD、技术计划、实现计划 | OpenSpec 功能开发 |
-| /peaksinit、/peaksfeat、/peaksbug | Slash 命令 |
+| /peaks-sdd | Slash 命令（统一入口） |
 
 ### OpenSpec - 存量项目迭代
 

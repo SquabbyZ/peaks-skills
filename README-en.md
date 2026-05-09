@@ -156,20 +156,18 @@ Use the peaks-hook-form skill to generate a form:
 - 🔧 **Checkpoint Gates**: Each Phase must pass checkpoint confirmation before proceeding
 - 🤖 **Dynamic Agent Generation**: Auto-select and configure Agents based on detected tech stack
 - 💾 **Cross-Session Memory**: Context persistence via claude-mem MCP
-- 🛠️ **Slash Commands**: `/peaksinit`, `/peaksfeat`, `/peaksbug`, `/peaksupdate`, `/peakscheck`
+- 🛠️ **Slash Command**: `/peaks-sdd` (unified entry point)
 - 🔔 **Auto Update Check**: Check for new versions when using any command, prompt user to update
-- 🏗️ **Incremental Update**: Running `/peaksinit` on an already-initialized project performs incremental Agent template updates
+- 🏗️ **Incremental Update**: Running `/peaks-sdd init` on an already-initialized project performs incremental Agent template updates
 - 🌐 **Full Vue Support**: Vue2 (Options API + Vuex) and Vue3 (Composition API + Pinia) development guidelines and code review
 
 **Workflows**:
 
 | Command | Description | Use Case |
 |---------|-------------|----------|
-| `/peaksinit` | Project init/incremental update | New project or update Agent config |
-| `/peaksfeat` | Feature development | Greenfield projects, complex multi-team projects |
-| `/peaksbug` | Bug fixing | Reproduce → Root cause → Fix → Regression test |
-| `/peaksupdate` | Update peaks-sdd | Update to latest version and sync Agent templates |
-| `/peakscheck` | Check for updates | Auto-triggered (parallel, non-blocking) |
+| `/peaks-sdd init` | Project init/incremental update | New project or update Agent config |
+| `/peaks-sdd add [feature]` | Feature development | Greenfield projects, complex multi-team projects |
+| `/peaks-sdd [bug description]` | Bug fixing | Reproduce → Root cause → Fix → Regression test |
 
 ### Install via skills.sh (Vercel agent-skills compatible)
 
@@ -208,10 +206,9 @@ After installation, use natural language in Claude Code AI conversations:
 • "Generate a form with username and email" → peaks-hook-form
 • "Generate API hooks from swagger" → peaks-api-create
 • "Create a Prompt editor" → peaks-react-prompt-editor
-• "Initialize my project" / "peaksinit" → peaks-sdd
-• "Develop new feature" / "peaksfeat" → peaks-sdd
-• "Fix this bug" / "peaksbug" → peaks-sdd
-• "Update peaks-sdd" / "peaksupdate" → peaks-sdd
+• "Initialize my project" / "peaks-sdd init" → peaks-sdd
+• "Develop new feature" / "peaks-sdd add..." → peaks-sdd
+• "Fix this bug" / "peaks-sdd ..." → peaks-sdd
 ```
 
 ## 📚 Documentation
@@ -295,7 +292,7 @@ You can create custom skills based on existing skill templates:
 Multiple skills can be used together:
 
 ```
-1. Use peaks-sdd (/peaksinit) to initialize project
+1. Use peaks-sdd (/peaks-sdd init) to initialize project
    ↓
 2. Use peaks-react-template to create project structure
    ↓
@@ -307,11 +304,9 @@ Multiple skills can be used together:
    ↓
 6. Use peaks-react-prompt-editor to build AI workflow editor
    ↓
-7. Use peaks-sdd (/peaksfeat) to develop new features
+7. Use peaks-sdd (/peaks-sdd add...) to develop new features
    ↓
-8. Use peaks-sdd (/peaksbug) to fix bugs
-   ↓
-9. Use peaks-sdd (/peaksupdate) to keep peaks-sdd up-to-date
+8. Use peaks-sdd (/peaks-sdd ...) to fix bugs
 ```
 
 ### Integration with Existing Projects

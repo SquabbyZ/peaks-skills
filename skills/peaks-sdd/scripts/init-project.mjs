@@ -258,6 +258,58 @@ function generateAgentConfigs(techStack, templatesDir, agentsDir) {
   return agents;
 }
 
+// 创建 .peaks 目录结构
+function createPeaksDirectory(projectPath) {
+  const peaksDir = join(projectPath, '.peaks');
+  const subdirs = ['prds', 'plans', 'swagger', 'designs', 'reports', 'auto-tests', 'checkpoints', 'bugs'];
+
+  console.log('\n📁 创建 .peaks 目录结构:');
+
+  for (const subdir of subdirs) {
+    const dirPath = join(peaksDir, subdir);
+    if (!existsSync(dirPath)) {
+      mkdirSync(dirPath, { recursive: true });
+      console.log(`  ✅ .peaks/${subdir}/`);
+    } else {
+      console.log(`  ⚠️  .peaks/${subdir}/ 已存在`);
+    }
+  }
+
+  // 创建 README.md
+  const readmePath = join(peaksDir, 'README.md');
+  if (!existsSync(readmePath)) {
+    const readmeContent = `# .peaks
+
+peaks-sdd 工作流产出物目录
+
+## 目录说明
+
+| 目录 | 用途 |
+|------|------|
+| \`prds/\` | PRD 文档（需求分析） |
+| \`plans/\` | 开发计划（任务拆分） |
+| \`swagger/\` | API 规范（后端接口定义） |
+| \`designs/\` | 设计稿截图 |
+| \`reports/\` | 测试报告、修复报告 |
+| \`auto-tests/\` | 自动化测试脚本 |
+| \`checkpoints/\` | 中间检查点归档 |
+| \`bugs/\` | Bug 报告和修复记录 |
+
+## 命名规范
+
+| 类型 | 格式 |
+|------|------|
+| PRD | \`prd-[功能名]-[YYYYMMDD].md\` |
+| Plan | \`plan-[功能名]-[YYYYMMDD].md\` |
+| Swagger | \`swagger-[功能名]-[YYYYMMDD].json\` |
+| Bug 报告 | \`bug-[问题描述]-[YYYYMMDD].md\` |
+| 自动测试 | \`auto-test-[功能名]-[YYYYMMDD].md\` |
+`;
+    writeFileSync(readmePath, readmeContent, 'utf-8');
+    console.log('  ✅ .peaks/README.md');
+  }
+}
+
 // 安装 Impeccable design skill
 async function installImpeccableSkill(projectPath) {
   const impeccableUrl = 'https://github.com/pbakaus/impeccable';
@@ -329,5 +381,8 @@ if (techStack.frontend) {
   installImpeccableSkill(projectPath);
 }
 
+// 创建 .peaks 目录结构
+createPeaksDirectory(projectPath);
+
 console.log('\n✅ 初始化完成！');
-console.log('   接下来运行: /peaksfeat 开始功能开发');
+console.log('   接下来运行: /peaks-sdd 添加[功能] 开始功能开发');

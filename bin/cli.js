@@ -166,7 +166,7 @@ function installSkill(skillName, targetDir = '.') {
     console.log('\n✅ Installation successful!');
     console.log('\n' + '═'.repeat(60));
     console.log(`📍 Installed to: ${targetPath}`);
-    console.log('\n💡 Usage: Restart your AI conversation, then use /peaksinit, /peaksfeat or /peaksbug\n');
+    console.log('\n💡 Usage: Restart your AI conversation, then use /peaks-sdd\n');
 
   } catch (error) {
     console.error('\n❌ Error during installation:', error.message);

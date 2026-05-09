@@ -195,20 +195,18 @@ const [data, setData] = useState<TaskNode[]>([
 - 🔧 **Checkpoint 门禁**：每个 Phase 完成后必须经过检查点确认，防止失控
 - 🤖 **动态 Agent 生成**：根据检测到的技术栈自动选择和配置 Agent
 - 💾 **跨会话 Memory**：通过 claude-mem MCP 实现上下文持久化
-- 🛠️ **Slash Commands**：`/peaksinit`、`/peaksfeat`、`/peaksbug`、`/peaksupdate`、`/peakscheck`
+- 🛠️ **Slash Command**：`/peaks-sdd`（统一入口）
 - 🔔 **自动更新检查**：使用任一命令时自动检查新版本，提示用户更新
-- 🏗️ **增量更新**：已初始化项目再次运行 `/peaksinit` 时自动增量更新 Agent 模板
+- 🏗️ **增量更新**：已初始化项目再次运行 `/peaks-sdd 初始化` 时自动增量更新 Agent 模板
 - 🌐 **Vue 全面支持**：Vue2（Options API + Vuex）和 Vue3（Composition API + Pinia）开发规范和代码审查
 
 **工作流程**：
 
 | 命令 | 说明 | 适用场景 |
 |------|------|---------|
-| `/peaksinit` | 项目初始化/增量更新 | 新项目或现有项目配置/更新 Agent |
-| `/peaksfeat` | 功能开发 | 0→1 新项目，复杂项目多团队协作 |
-| `/peaksbug` | Bug 修复 | 问题复现 → 根因分析 → 修复 → 回归测试 |
-| `/peaksupdate` | 更新 peaks-sdd | 更新到最新版本并同步 Agent 模板 |
-| `/peakscheck` | 检查更新 | 自动检查（并行触发，不阻塞主命令） |
+| `/peaks-sdd 初始化` | 项目初始化/增量更新 | 新项目或现有项目配置/更新 Agent |
+| `/peaks-sdd 添加[功能]` | 功能开发 | 0→1 新项目，复杂项目多团队协作 |
+| `/peaks-sdd [bug描述]` | Bug 修复 | 问题复现 → 根因分析 → 修复 → 回归测试 |
 
 **技术栈检测**：
 
@@ -267,10 +265,9 @@ npx peaks-skills list
 • "生成一个表单，包含用户名和邮箱" → peaks-hook-form
 • "根据 swagger 生成 API hooks" → peaks-api-create
 • "创建一个 Prompt 编辑器" → peaks-react-prompt-editor
-• "初始化我的项目" / "peaksinit" → peaks-sdd
-• "开发新功能" / "peaksfeat" → peaks-sdd
-• "修复这个 bug" / "peaksbug" → peaks-sdd
-• "更新 peaks-sdd" / "peaksupdate" → peaks-sdd
+• "初始化我的项目" / "peaks-sdd 初始化" → peaks-sdd
+• "开发新功能" / "peaks-sdd 添加..." → peaks-sdd
+• "修复这个 bug" / "peaks-sdd ..." → peaks-sdd
 ```
 
 ## 📚 文档
@@ -363,7 +360,7 @@ npx peaks-skills list
 多个技能可以组合使用：
 
 ```
-1. 使用 peaks-sdd (/peaksinit) 初始化项目
+1. 使用 peaks-sdd (/peaks-sdd 初始化) 初始化项目
    ↓
 2. 使用 peaks-react-template 创建项目结构
    ↓
@@ -375,11 +372,9 @@ npx peaks-skills list
    ↓
 6. 使用 peaks-react-prompt-editor 构建 AI 工作流编辑器
    ↓
-7. 使用 peaks-sdd (/peaksfeat) 开发新功能
+7. 使用 peaks-sdd (/peaks-sdd 添加...) 开发新功能
    ↓
-8. 使用 peaks-sdd (/peaksbug) 修复 bug
-   ↓
-9. 使用 peaks-sdd (/peaksupdate) 保持 peaks-sdd 最新
+8. 使用 peaks-sdd (/peaks-sdd ...) 修复 bug
 ```
 
 ### 与现有项目集成

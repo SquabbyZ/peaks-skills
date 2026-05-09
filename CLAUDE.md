@@ -43,19 +43,19 @@ npx peaks-skills init              # Initialize skills directory
 │   ├── references/                # Documentation
 │   └── assets/                    # Static assets
 └── peaks-sdd/                    # Spec-Driven Development skill
-    ├── commands/                  # Slash command implementations
-    └── templates/                # Project templates
+    ├── templates/                # Agent templates and workflows
+    └── scripts/                  # Project initialization scripts
 ```
 
 ## peaks-sdd Workflow
 
-The peaks-sdd skill provides slash commands for project development:
+The peaks-sdd skill provides a unified `/peaks-sdd` command for project development:
 
-| Command | Purpose |
-|---------|---------|
-| `/peaksinit` | Scan tech stack, generate .claude/agents/ configs |
-| `/peaksfeat` | Full workflow: Constitution → PRD → Design → Develop → Review → QA → Deploy |
-| `/peaksbug` | Bug workflow: Reproduce → Root cause → Fix → Test → Verify |
+| Input Example | Purpose |
+|--------------|---------|
+| `/peaks-sdd 初始化我的项目` | Scan tech stack, generate .claude/agents/ configs |
+| `/peaks-sdd 添加用户注册功能` | Full workflow: Constitution → PRD → Design → Develop → Review → QA → Deploy |
+| `/peaks-sdd 登录按钮点击没反应` | Bug workflow: Reproduce → Root cause → Fix → Test → Verify |
 
 Working directory structure created by peaks-sdd:
 ```

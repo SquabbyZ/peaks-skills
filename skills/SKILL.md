@@ -60,9 +60,9 @@ Generate API hooks from Swagger:
 
 ### peaks-sdd
 Spec-Driven Development workflow:
-- `/peaksinit` - Initialize project, detect tech stack
-- `/peaksfeat` - Full feature development workflow
-- `/peaksbug` - Bug fix workflow with systematic debugging
+- `/peaks-sdd 初始化` - Initialize project, detect tech stack
+- `/peaks-sdd 添加[功能]` - Full feature development workflow
+- `/peaks-sdd [bug描述]` - Bug fix workflow with systematic debugging
 
 ## Requirements
 

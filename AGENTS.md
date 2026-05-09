@@ -16,7 +16,7 @@ AI-driven frontend development skills for React/Next.js projects.
 | **peaks-hook-form** | "generate form", "React Hook Form" |
 | **peaks-api-create** | "swagger", "API hooks", "OpenAPI" |
 | **peaks-react-prompt-editor** | "prompt editor", "AI workflow" |
-| **peaks-sdd** | "/peaksinit", "/peaksfeat", "/peaksbug", "spec-driven" |
+| **peaks-sdd** | "/peaks-sdd", "spec-driven", "初始化", "功能开发", "bug修复" |
 
 ## Directory Structure
 
@@ -46,9 +46,9 @@ peaks-*/                  # Native peaks-skills format (for peaks-skills CLI)
 ## Quick Reference
 
 ### peaks-sdd Commands
-- `/peaksinit` - Initialize project, detect tech stack, generate agent configs
-- `/peaksfeat` - Full feature workflow: Constitution → PRD → Design → Develop → Review → QA → Deploy
-- `/peaksbug` - Bug fix workflow: Reproduce → Root cause → Fix → Test → Verify
+- `/peaks-sdd 初始化我的项目` - Initialize project, detect tech stack, generate agent configs
+- `/peaks-sdd 添加[功能描述]` - Full feature workflow: Constitution → PRD → Design → Develop → Review → QA → Deploy
+- `/peaks-sdd [bug描述]` - Bug fix workflow: Reproduce → Root cause → Fix → Test → Verify
 
 ### Tech Stack Detection
 peaks-sdd auto-detects from package.json:
