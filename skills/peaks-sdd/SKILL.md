@@ -57,13 +57,9 @@ hooks:
 /peaks-sdd 添加用户注册功能
 ```
 
-A Spec-Driven Development workflow for **任意 TypeScript 项目**. 自动检测项目技术栈并动态生成对应的 Agent 配置。
-
 ## 核心架构
 
 A Spec-Driven Development workflow for **任意 TypeScript 项目**。自动检测项目技术栈并动态生成对应的 Agent 配置。
-
-## 核心架构
 
 ### 文件层次关系
 
@@ -1069,6 +1065,32 @@ openspec init
 # 7. 归档
 # 用户：/opsx:archive
 # → 合并到 openspec/specs/，清理 changes/ 目录
+```
+
+**OpenSpec 检查点模板**：
+
+| 检查点 | 触发时机 | 确认内容 |
+|--------|---------|---------|
+| **Spec-Checkpoint 1** | `/opsx:propose` 后 | 提案目标清晰、范围明确、价值论证充分 |
+| **Spec-Checkpoint 2** | `/opsx:specs` 后 | 规格完整、行为可测、无歧义 |
+| **Spec-Checkpoint 3** | `/opsx:design` 后 | 技术方案可行、风险可控、依赖明确 |
+| **Spec-Checkpoint 4** | `/opsx:apply` 后 | 代码通过 CR、测试覆盖达标、安全无漏洞 |
+| **Spec-Checkpoint 5** | `/opsx:archive` 前 | 规格已更新、文档已同步、产出物完整 |
+
+**OpenSpec 检查点示例**：
+```
+┌─ Spec-Checkpoint 1: 提案确认 ───────────────────────┐
+│                                                    │
+│  产出：openspec/changes/[change-name]/proposal.md  │
+│                                                    │
+│  请确认：                                          │
+│  - [ ] 目标清晰可测量                             │
+│  - [ ] 范围无蔓延                                 │
+│  - [ ] 价值 > 成本                                │
+│                                                    │
+│  ✅ 确认 → 进入规格编写                            │
+│  ❌ 有问题 → 修改 proposal.md 后重新确认            │
+└────────────────────────────────────────────────────┘
 ```
 
 ---
