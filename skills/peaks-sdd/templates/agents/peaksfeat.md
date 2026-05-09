@@ -122,17 +122,20 @@ hooks:
 **Context 管理（优先于其他所有操作）**：
 ```bash
 # 1. 检查跨 session 记忆（claude-mem）
-# 使用 mcp__claude_mem__query 查询项目关键上下文
 mcp__claude_mem__query("{{PROJECT_NAME}} 技术栈、当前进度、待处理问题")
 
-# 2. 读取 CLAUDE.md 了解项目规范
-# 3. 检查 git status 和 git log --oneline -5 了解当前进度
-# 4. 查看项目结构（package.json、目录结构）
-# 5. 自动检测技术栈：
+# 2. 查询代码知识图谱（gitnexus）- 用于了解项目结构和最近变更
+mcp__gitnexus__query("recent_changes", path: "{{PROJECT_PATH}}")
+mcp__gitnexus__query("file_tree", path: "{{PROJECT_PATH}}/src")
+
+# 3. 读取 CLAUDE.md 了解项目规范
+# 4. 检查 git status 和 git log --oneline -5 了解当前进度
+# 5. 查看项目结构（package.json、目录结构）
+# 6. 自动检测技术栈：
 #    - 读取 package.json 检测 React/Vue/NestJS/Tauri 等
 #    - 检查目录结构判断是纯前端/纯后端/混合
 #    - 确认开发环境是否就绪
-# 6. 读取 .claude/session-state.json 检查 contextEstimate
+# 7. 读取 .claude/session-state.json 检查 contextEstimate
 #    - 如果 >= 85%，先执行 Compact 再继续
 #    - 如果 >= 70%，询问用户是否先 compact
 #    - 如果 < 70%，正常继续
@@ -352,9 +355,9 @@ npx prism mock --help
 4. 健康检查确认所有服务可达
 5. 通知用户环境已就绪，可以开始手工测试
 
-## 专家调度模板
+## 专家调度模板（增强版）
 
-调度专家时，prompt 必须包含以下结构：
+调度专家时，必须使用以下模板填充具体内容：
 
 ```
 ## 角色
@@ -367,18 +370,25 @@ npx prism mock --help
 - .peaks 目录: 所有产出文件保存到 .peaks/ 下
 
 ## 当前任务
-[具体任务描述]
+[具体任务描述，包含：
+1. 功能描述
+2. 验收标准（必须是可测量的）
+3. 技术约束（API 格式、组件规范等）
+4. 参考文件路径
+]
 
 ## 输出路径
-[具体的 .peaks/ 路径]
+[具体的 .peaks/ 路径或 src/ 路径]
 
-## 验收标准
-- [ ] 标准1
+## 验收标准（强制检查清单）
+- [ ] 标准1（必须是可测量的）
 - [ ] 标准2
 
 ## 约束
 - 遵循项目现有的代码风格和目录结构
 - 完成后汇报交付物清单
+- 使用 gitnexus 确认相关文件的最近修改历史：
+  mcp__gitnexus__query("file_history", path: "{{PROJECT_PATH}}/src/{{RELATED_DIR}}")
 ```
 
 ## 专家能力速查表

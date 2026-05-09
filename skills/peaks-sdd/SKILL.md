@@ -965,20 +965,27 @@ openspec/
 收到任务
     ↓
 ┌─ Checkpoint 0: 确认工作流 ──────────────────────┐
-│  问题：这个项目是新的还是已有的？                   │
 │                                                    │
-│  [ ] 新项目 (0→1) 或 复杂项目                     │
-│      → Spec-It (peaks-sdd) → Phase 1-5           │
+│  [ ] 已有项目代码 (>1个月历史)                   │
+│      → 存量项目 → OpenSpec                       │
+│         /opsx:propose → /opsx:specs → /opsx:apply │
 │                                                    │
-│  [ ] 存量项目功能迭代 (1→n)                       │
-│      → OpenSpec → /opsx:propose → /opsx:archive  │
+│  [ ] 新项目 (0→1) 或 复杂项目                    │
+│      → Spec-It (peaks-sdd)                       │
+│         Phase 1-5: Constitution → PRD → Plan     │
 │                                                    │
 │  [ ] Bug 修复                                     │
-│      → peaksbug → systematic-debugging → 修复   │
+│      → peaksbug                                  │
+│         systematic-debugging → 修复 → 回归测试   │
 └────────────────────────────────────────────────────┘
     ↓
 用户确认工作流后执行
 ```
+
+**快速决策规则**：
+- 有 `.git/` 且最近 30 天有 commit → **OpenSpec**
+- 无 git 或空白项目 → **Spec-It**
+- 报错/崩溃/行为异常 → **peaksbug**
 
 ### Spec-It 工作流 (新项目)
 
