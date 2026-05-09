@@ -14,6 +14,11 @@ tools:
   - Edit
   - Bash
   - Glob
+  - mcp__frontend-design__design-to-code
+  - mcp__frontend-design__component-search
+  - mcp__frontend-design__style-guide
+  - mcp__claude-md-management__read
+  - mcp__claude-md-management__write
 
 skills:
   - improve-codebase-architecture

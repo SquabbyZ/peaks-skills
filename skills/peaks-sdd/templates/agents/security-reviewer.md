@@ -13,6 +13,8 @@ tools:
   - Grep
   - Glob
   - Edit
+  - mcp__code-review__security-scan
+  - mcp__code-review__review
 
 skills:
   - improve-codebase-architecture

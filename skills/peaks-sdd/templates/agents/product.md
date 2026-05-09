@@ -15,6 +15,9 @@ tools:
   - Bash
   - Glob
   - Grep
+  - mcp__claude-md-management__read
+  - mcp__claude-md-management__write
+  - mcp__claude-md-management__update
 
 skills:
   - improve-codebase-architecture

@@ -20,6 +20,14 @@ tools:
   - mcp__playwright__click
   - mcp__playwright__fill
   - mcp__playwright__screenshot
+  - mcp__typescript-lsp__document
+  - mcp__typescript-lsp__hover
+  - mcp__typescript-lsp__definition
+  - mcp__typescript-lsp__references
+  - mcp__typescript-lsp__rename
+  - mcp__typescript-lsp__completion
+  - mcp__frontend-design__design-to-code
+  - mcp__frontend-design__component-search
 
 skills:
   - improve-codebase-architecture
@@ -97,16 +105,45 @@ hooks:
 
 ### 组件开发
 
-1. 使用项目已有的 UI 库（shadcn/ui / Ant Design 等）
+1. 使用项目已有的 UI 库（{{UI_LIBRARY}}）
 2. 遵循项目已有的样式方案（Tailwind / CSS Modules 等）
 3. 组件文件使用 PascalCase 命名
 4. 组件放在 `src/components/` 或对应功能目录
 
-### 状态管理
+### React 开发规范
 
-- Server state 使用 TanStack Query / React Query / SWR
-- Client state 使用项目已有的方案（Zustand / Redux Toolkit / Pinia）
-- 不要重复存储 server state 到 client store
+当项目使用 React 时，遵循以下规范：
+
+1. **Hooks 规范**：
+   - 优先使用函数组件 + Hooks
+   - 自定义 Hooks 放在 `hooks/` 目录，命名以 `use` 开头
+   - 遵循 Hooks 规则：不可在循环、条件或嵌套函数中调用 Hooks
+
+2. **TypeScript 类型**：
+   ```typescript
+   // 组件类型定义
+   interface Props {
+     title: string;
+     count?: number;
+   }
+   const MyComponent: React.FC<Props> = ({ title, count = 0 }) => {
+     // ...
+   }
+   ```
+
+3. **状态管理**：
+   - Server state 使用 TanStack Query / React Query / SWR
+   - Client state 使用 Zustand / Redux Toolkit
+   - 不要重复存储 server state 到 client store
+
+4. **性能优化**：
+   - 使用 `React.memo` 避免不必要的重渲染
+   - 使用 `useMemo` 和 `useCallback` 缓存计算结果和回调
+   - 大列表使用虚拟滚动（react-virtual 或 react-window）
+
+5. **样式方案**：
+   - 使用 CSS Modules 或 Tailwind CSS
+   - 避免使用内联样式（动态样式除外）
 
 ### Vue2 开发规范（Options API）
 

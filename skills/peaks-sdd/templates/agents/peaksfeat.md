@@ -16,6 +16,12 @@ tools:
   - Glob
   - Grep
   - Agent
+  - mcp__superpowers__dispatch
+  - mcp__superpowers__brainstorm
+  - mcp__superpowers__execute
+  - mcp__claude-md-management__read
+  - mcp__claude-md-management__write
+  - mcp__claude-md-management__update
 
 skills:
   - improve-codebase-architecture

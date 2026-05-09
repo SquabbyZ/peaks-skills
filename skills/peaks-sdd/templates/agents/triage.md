@@ -15,6 +15,8 @@ tools:
   - Bash
   - Glob
   - Grep
+  - mcp__superpowers__dispatch
+  - mcp__superpowers__brainstorm
 
 skills:
   - improve-codebase-architecture

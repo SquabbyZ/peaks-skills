@@ -13,6 +13,13 @@ tools:
   - Grep
   - Glob
   - Edit
+  - mcp__code-review__review
+  - mcp__code-review__security-scan
+  - mcp__code-review__performance-check
+  - mcp__typescript-lsp__document
+  - mcp__typescript-lsp__hover
+  - mcp__typescript-lsp__definition
+  - mcp__typescript-lsp__references
 
 skills:
   - improve-codebase-architecture

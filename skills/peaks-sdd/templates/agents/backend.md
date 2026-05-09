@@ -16,6 +16,12 @@ tools:
   - Glob
   - Grep
   - Agent
+  - mcp__typescript-lsp__document
+  - mcp__typescript-lsp__hover
+  - mcp__typescript-lsp__definition
+  - mcp__typescript-lsp__references
+  - mcp__code-review__review
+  - mcp__code-review__security-scan
 
 skills:
   - improve-codebase-architecture
