@@ -155,7 +155,7 @@ Bug 报告 → peaksbug（调度员）
 - ❌ 以"时间不够"为由推迟产出
 - ✅ 正确的做法: 验证失败 → 立刻补全文件 → 验证通过 → 继续
 
-### 第一步：探索项目（必须先做）
+### Phase 1: 探索项目（必须先做）
 
 **Context 管理（优先于其他所有操作）**：
 ```bash
@@ -181,7 +181,7 @@ mcp__gitnexus__query("file_history", path: "{{PROJECT_PATH}}/src")
 #    - 如果 < 70%，正常继续
 ```
 
-### 第二步：Bug 分类（必须先做）
+### Phase 2: Bug 分类（必须先做）
 
 **根据 bug 类型和技术栈调用不同的 Skill：**
 
@@ -205,7 +205,7 @@ Skill: code-review
 Skill: security-review
 ```
 
-### 第三步：系统化调试（diagnose Skill）
+### Phase 3: 系统化调试（diagnose Skill）
 
 使用 Matt Pocock 的 **diagnose** 方法进行结构化调试：
 
@@ -311,8 +311,8 @@ mcp__gitnexus__query("code_search", query: "{{ERROR_KEYWORD}}", path: "{{PROJECT
 ```bash
 ls .peaks/bugs/bug-[描述]-[YYYYMMDD].md
 ```
-- ❌ 文件不存在 → 立即按模板创建后再进入第四步
-- ✅ 文件存在 → 进入第四步
+- ❌ 文件不存在 → 立即按模板创建后再进入 Phase 4
+- ✅ 文件存在 → 进入 Phase 4
 
 **Bug 分析报告模板**：
 
@@ -349,7 +349,7 @@ ls .peaks/bugs/bug-[描述]-[YYYYMMDD].md
 [初步的修复思路]
 ```
 
-### 第四步：修复实施
+### Phase 4: 修复实施
 
 基于根因分析，使用 `Agent` tool 调度对应的开发 agent 进行修复：
 
@@ -380,16 +380,49 @@ ls .peaks/bugs/bug-[描述]-[YYYYMMDD].md
 
 ---
 
+**修复记录模板**：
+```markdown
+# 修复记录
+
+## Bug 概述
+[简要描述问题]
+
+## 根因
+[导致 bug 的根本原因]
+
+## 修复方案
+[具体做了哪些修改]
+
+## 修改文件
+| 文件 | 修改行数 | 主要改动 |
+|------|---------|---------|
+| [文件1] | N 行 | [描述] |
+| [文件2] | N 行 | [描述] |
+
+## 验证方式
+- [ ] 复现步骤已记录
+- [ ] 修复后行为已验证
+- [ ] 回归测试已通过
+
+## 风险评估
+[如果有任何风险，记录在此]
+
+## 相关截图/日志
+[如有需要，添加相关证据]
+```
+
+---
+
 **🔍 Phase 4 产出验证(修复记录)**:
 
 完成 Phase 4 后,立即验证:
 ```bash
 ls .peaks/fixes/fix-[描述]-[YYYYMMDD].md
 ```
-- ❌ 文件不存在 → 立即按模板创建后再进入第五步
-- ✅ 文件存在 → 进入第五步
+- ❌ 文件不存在 → 立即按模板创建后再进入 Phase 5
+- ✅ 文件存在 → 进入 Phase 5
 
-### 第五步：测试驱动验证（tdd-guide Skill）
+### Phase 5: 测试驱动验证（tdd-guide Skill）
 
 使用 `Skill` tool 调用 `tdd-guide` 确保修复质量：
 
@@ -405,7 +438,7 @@ ls .peaks/fixes/fix-[描述]-[YYYYMMDD].md
    - 运行所有相关测试
    - 确保没有引入新问题
 
-### 第六步：质量门禁
+### Phase 6: 质量门禁
 
 修复完成后必须通过质量检查：
 
@@ -415,7 +448,7 @@ ls .peaks/fixes/fix-[描述]-[YYYYMMDD].md
 ┌─ Bug 复现验证 ──────────────────────────────────┐
 │  确认 bug 已修复                                 │
 │  ✅ 通过 → 进入代码审查                         │
-│  ❌ 失败 → 返回第三步重新分析                   │
+│  ❌ 失败 → 返回 Phase 3 重新分析                   │
 └─────────────────────────────────────────────────┘
     ↓
 ┌─ Code Review ───────────────────────────────────┐
@@ -431,13 +464,72 @@ ls .peaks/fixes/fix-[描述]-[YYYYMMDD].md
 └─────────────────────────────────────────────────┘
 ```
 
-### 第七步：产出回归测试脚本
+### Phase 7: 产出回归测试脚本
 
 基于修复编写自动化测试脚本：
 
 1. 产出测试脚本到 `.peaks/auto-tests/`
 2. 更新项目的测试套件（如果有）
 3. 确保测试脚本可以在 CI 中运行
+
+**回归测试脚本模板**：
+```markdown
+# 回归测试脚本
+
+## 测试目标
+[验证修复的 bug 不再出现，且不影响现有功能]
+
+## 测试环境
+- Node.js: [版本]
+- 测试框架: [框架名]
+- 数据库: [如有]
+
+## 前置条件
+[运行测试前需要满足的条件]
+
+## 测试用例
+
+### TC-001: [测试用例名称]
+**优先级**: P0 (核心回归)
+**前置条件**: [如需要]
+**步骤**:
+1. [操作步骤]
+2. [操作步骤]
+
+**预期结果**: [预期输出/行为]
+
+### TC-002: [测试用例名称]
+...
+
+## 运行方式
+```bash
+# 运行所有回归测试
+npm test
+
+# 运行特定测试文件
+npx playwright test regression-[描述].spec.ts
+```
+
+## CI 集成
+```yaml
+# .github/workflows/regression.yml
+name: Regression Tests
+on: [pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: npm ci
+      - run: npm test
+```
+
+## 测试结果
+| 测试用例 | 状态 | 执行时间 | 执行日期 |
+|---------|------|---------|---------|
+| TC-001 | ✅ Pass | 120ms | YYYY-MM-DD |
+| TC-002 | ✅ Pass | 85ms | YYYY-MM-DD |
+```
 
 
 ---
@@ -448,10 +540,10 @@ ls .peaks/fixes/fix-[描述]-[YYYYMMDD].md
 ```bash
 ls .peaks/auto-tests/regression-[描述]-[YYYYMMDD].md
 ```
-- ❌ 文件不存在 → 立即按模板创建后再进入第八步
-- ✅ 文件存在 → 进入第八步
+- ❌ 文件不存在 → 立即按模板创建后再进入 Phase 8
+- ✅ 文件存在 → 进入 Phase 8
 
-### 第八步：修复报告
+### Phase 8: 修复报告
 
 产出最终的修复报告到 `.peaks/reports/report-[问题描述]-[日期].md`：
 

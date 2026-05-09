@@ -359,11 +359,11 @@ mcp__bunas__fs_mcp__read_file(path: "/path/to/project/package.json")
 
 #### 其他文件
 
-| 文件                                       | 处理方式                                     |
+| 文件/目录                                  | 处理方式                                     |
 | ------------------------------------------ | -------------------------------------------- |
 | `.claude/hookify.context-monitor.local.md` | 如不存在则生成（已存在则跳过）               |
 | `.claude/session-state.json`               | 如不存在则生成（已存在则跳过）               |
-| `.peaks/` 目录                             | 创建标准子目录（plans/, prds/, reports/ 等），已存在则跳过 |
+| `.peaks/` 目录                             | 创建标准子目录（plans/, prds/, swagger/, reports/, auto-tests/, checkpoints/, bugs/），已存在则跳过 |
 | `.gitnexus/` 目录                          | gitnexus 数据目录（项目根目录），已存在则跳过 |
 | `.claude-mem/` 目录                        | claude-mem 数据目录（项目根目录），已存在则跳过 |
 | `.context7/` 目录                           | context7 缓存目录（项目根目录），已存在则跳过 |
@@ -1046,10 +1046,27 @@ openspec/
 ┌─ Bug 修复？ ───────────────────────────────────────┐
 │  ✅ 是 → 使用 peaksbug                              │
 │         systematic-debugging → 修复 → 回归测试   │
-│  ❌ 否 → 使用 OpenSpec                             │
+│  ❌ 否 → 检查项目状态                              │
 └────────────────────────────────────────────────────┘
     ↓
-OpenSpec 工作流：
+┌─ 存量项目？ ───────────────────────────────────────┐
+│         检查 .claude/ 或 openspec/ 是否存在        │
+│  ✅ 是 → 使用 claude-mem 检索项目记忆              │
+│         → 使用 gitnexus 理解现有代码结构            │
+│         → 使用 OpenSpec（存量项目迭代）             │
+│  ❌ 否 → 新项目开发（0→1）                         │
+│         初始化 → Constitution → PRD → Design       │
+└────────────────────────────────────────────────────┘
+```
+
+**存量项目判断**：如果 `.claude/agents/` 或 `openspec/` 目录已存在，判定为存量项目。
+
+**存量项目功能开发前准备**：
+1. 调用 `mcp__claude_mem__query` 检索项目记忆，获取最近一次开发的上下文和技术栈状态
+2. 调用 `mcp__gitnexus__query` 理解现有代码结构，确定影响范围
+
+**OpenSpec 工作流**：
+```
 /opsx:propose → /opsx:specs → /opsx:design → /opsx:tasks → /opsx:apply → /opsx:archive
 ```
 
