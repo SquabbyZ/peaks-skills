@@ -1219,9 +1219,27 @@ peaks-sdd 提供三个快捷命令，覆盖主要开发场景：
 | 路径 | 用途 |
 |------|------|
 | `references/dispatch-quickref.md` | Agent 调度速查表、质量门禁、文件命名规范 |
-| `templates/agents/*.md` | **初始化时使用** - 模板,根据技术栈生成 `.claude/agents/` |
+| `templates/agents/*.md` | **初始化时使用** - 14个模板，根据技术栈生成 `.claude/agents/` |
 | `.claude/agents/*.md` | **实际运行时使用** - 初始化后生成的 agents |
-| `scripts/` | **执行脚本** - 质量门禁和自动化工具 |
+| `scripts/` | **执行脚本** - 8个脚本，质量门禁和自动化工具 |
+
+### templates/agents/ 目录说明
+
+| 模板文件 | 生成目标 | 触发条件 |
+|----------|---------|---------|
+| `frontend.md` | `.claude/agents/frontend.md` | 检测到 React/Vue/Next |
+| `backend.md` | `.claude/agents/backend.md` | 检测到 NestJS/Express |
+| `peaksbug.md` | `.claude/agents/peaksbug.md` | Bug 修复场景 |
+| `peaksfeat.md` | `.claude/agents/peaksfeat.md` | 功能开发场景 |
+| `product.md` | `.claude/agents/product.md` | 始终生成 |
+| `qa.md` | `.claude/agents/qa.md` | 始终生成 |
+| `devops.md` | `.claude/agents/devops.md` | 始终生成 |
+| `security-reviewer.md` | `.claude/agents/security-reviewer.md` | 始终生成 |
+| `code-reviewer-frontend.md` | `.claude/agents/code-reviewer-frontend.md` | 始终生成 |
+| `code-reviewer-backend.md` | `.claude/agents/code-reviewer-backend.md` | 始终生成 |
+| `tauri.md` | `.claude/agents/tauri.md` | 检测到 Tauri |
+| `postgres.md` | `.claude/agents/postgres.md` | 检测到 PostgreSQL |
+| `triage.md` | `.claude/agents/triage.md` | 始终生成 |
 
 ### scripts/ 脚本说明
 
