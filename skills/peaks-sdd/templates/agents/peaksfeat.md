@@ -221,8 +221,8 @@ mcp__gitnexus__query("file_tree", path: "{{PROJECT_PATH}}/src")
 #    - 检查目录结构判断是纯前端/纯后端/混合
 #    - 确认开发环境是否就绪
 # 7. 读取 .claude/session-state.json 检查 contextEstimate
-#    - 如果 >= 85%，先执行 Compact 再继续
-#    - 如果 >= 70%，询问用户是否先 compact
+#    - 如果 >= 90%，先执行 Compact 再继续
+#    - 如果 >= 75%，询问用户是否先 compact
 #    - 如果 < 70%，正常继续
 ```
 
@@ -471,8 +471,8 @@ npx prism mock --help
 
 ## Context 守门（调度时强制检查）
 - 调度前读取 .claude/session-state.json 检查 contextEstimate
-- >= 85%：不调度新 Agent，先执行 /compact
-- >= 70%：警告，产出检查点后再调度
+- >= 90%：不调度新 Agent，先执行 /compact
+- >= 75%：警告，产出检查点后再调度
 - < 70%：正常调度
 
 ## 约束
@@ -577,9 +577,9 @@ npx prism mock --help
 
 每个阶段完成后检查 contextEstimate：
 - < 50%：正常继续下一阶段
-- 50-70%：将当前产出写入 .peaks/ 文件，减轻 context 压力
-- >= 70%：**强制**写入产出文件 → 执行 `/compact` → 确认恢复后继续
-- >= 85%：**阻断**，必须 `/compact` 后才能继续
+- 50-75%：将当前产出写入 .peaks/ 文件，减轻 context 压力
+- >= 75%：**强制**写入产出文件 → 执行 `/compact` → 确认恢复后继续
+- >= 90%：**阻断**，必须 `/compact` 后才能继续
 
 ### /loop 长任务自治
 
@@ -623,7 +623,7 @@ peaksfeat 调度（主 session）
 1. 读取 .claude/session-state.json 检查 contextEstimate
 2. 根据阈值和当前阶段类型执行对应动作：
 
-| 阶段类型 | context >= 70% | context >= 85% |
+| 阶段类型 | context >= 75% | context >= 90% |
 |---------|----------------|---------------|
 | **全自动阶段**（开发/CR/安全/测试） | 自动 compact + 继续 | 自动 compact + 继续 |
 | **半自动阶段**（PRD/设计/Constitution） | 警告 + 等待确认 | 阻断 + 等待确认 |
@@ -653,7 +653,7 @@ peaksfeat 调度（主 session）
 ```
 /loop 开发用户模块
 → 迭代开始检查 contextEstimate
-→ 如果 >= 70%：自动 compact + 继续（无需等待）
+→ 如果 >= 75%：自动 compact + 继续（无需等待）
 → 完成模块开发 → 产出检查点 → 检查 context → 继续或自动 compact
 ```
 
