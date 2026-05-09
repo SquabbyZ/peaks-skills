@@ -35,6 +35,7 @@ skills:
   - vue-best-practices
   - vue
   - vue-debug-guides
+  - impeccable
 
 memory: project
 

@@ -495,3 +495,74 @@ peaksfeat 调度（主 session）
 ```
 
 **关键**：loop 迭代之间不共享 context，通过 .peaks/ 文件传递状态。
+
+## OpenSpec 集成（存量项目迭代）
+
+对于**存量项目**的功能迭代，使用 OpenSpec 工作流替代部分 Spec-It 步骤：
+
+### OpenSpec 工作流脚本
+
+使用 `openspec.mjs` 脚本调用 OpenSpec：
+
+```bash
+# 初始化 OpenSpec 项目（首次使用时）
+node .claude/skills/peaks-sdd/scripts/openspec.mjs init
+
+# 创建变更提案
+node .claude/skills/peaks-sdd/scripts/openspec.mjs propose "<变更描述>"
+
+# 编写规格文档
+node .claude/skills/peaks-sdd/scripts/openspec.mjs specs
+
+# 技术设计
+node .claude/skills/peaks-sdd/scripts/openspec.mjs design
+
+# 任务拆分
+node .claude/skills/peaks-sdd/scripts/openspec.mjs tasks
+
+# 实施任务
+node .claude/skills/peaks-sdd/scripts/openspec.mjs apply
+
+# 归档变更
+node .claude/skills/peaks-sdd/scripts/openspec.mjs archive
+
+# 快速填充所有 artifacts
+node .claude/skills/peaks-sdd/scripts/openspec.mjs ff
+```
+
+### OpenSpec vs Spec-It 选择
+
+| 项目类型 | 工作流 | 说明 |
+|---------|--------|------|
+| 新项目 (0→1) | Spec-It（12 步） | 完整流程：Constitution → PRD → Plan → Implement |
+| 存量项目迭代 (1→n) | OpenSpec | 轻量流程：propose → specs → design → apply → archive |
+
+### OpenSpec 目录结构
+
+```
+openspec/
+├── specs/              # 系统当前行为（真理来源）
+│   └── **/*.md
+├── changes/           # 变更提案
+│   ├── [change-name]/
+│   │   ├── proposal.md
+│   │   ├── specs/
+│   │   ├── design.md
+│   │   └── tasks.md
+│   └── archive/
+└── .openspec/
+```
+
+### 使用时机
+
+在 **Checkpoint 0** 判断后：
+
+- **存量项目** → 使用 OpenSpec
+  1. `openspec.mjs propose "<需求>"` 创建提案
+  2. `openspec.mjs specs` 编写规格
+  3. `openspec.mjs design` 技术设计
+  4. `openspec.mjs tasks` 任务拆分
+  5. `openspec.mjs apply` 实施
+  6. `openspec.mjs archive` 归档
+
+- **新项目** → 使用 Spec-It（原有 12 步）
