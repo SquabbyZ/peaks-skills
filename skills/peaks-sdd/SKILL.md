@@ -918,8 +918,10 @@ openspec/
 | 网络超时 | MCP 启动或 npx 下载超时 | 增加超时等待（30s）；仍失败则降级或跳过 |
 | 权限不足 | 写入 `.claude/` 或 `.peaks/` 失败 | 提示用户检查目录权限，建议 `chmod -R u+w .claude/` |
 | 磁盘空间不足 | 写入文件时报 ENOSPC | 提示用户清理磁盘空间后重试 |
-
-### 决策树
+| npm 安装成功但 symlink 失败 | symlink 返回非零退出码 | 记录警告，使用 --force 或手动创建链接 |
+| 同时检测到多个技术栈 | package.json 同时有 react 和 @nestjs/core | 生成 frontend + backend 两个 Agent |
+| OpenSpec 目录已存在 | openspec/ 目录已存在 | 增量更新，不覆盖已有内容 |
+| Agent 模板生成失败 | 模板渲染报错 | 使用最小 Agent 配置，保证基本功能可用 |
 
 ```
 收到任务
@@ -1182,6 +1184,15 @@ peaks-sdd 提供三个快捷命令，覆盖主要开发场景：
 ---
 
 ## 触发关键词
+
+### peaks-sdd 核心触发词
+
+| 关键词 | 触发工作流 |
+|--------|-----------|
+| 初始化项目、初始化我的项目、setup project | Phase 0 初始化 |
+| bug、报错、修复、登录按钮没反应、接口返回 500 | peaksbug 调试 |
+| 添加功能、需求、PRD、技术计划、实现计划 | OpenSpec 功能开发 |
+| /peaksinit、/peaksfeat、/peaksbug | Slash 命令 |
 
 ### OpenSpec - 存量项目迭代
 
