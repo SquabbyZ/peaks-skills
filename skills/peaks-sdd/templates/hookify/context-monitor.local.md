@@ -2,34 +2,44 @@
 name: context-monitor
 enabled: true
 event: PreToolUse
-action: warn
+action: conditional
 ---
 
 ## Context 使用率检查与自动 Compact 策略
 
 在每次工具调用前，检查 .claude/session-state.json 中的 contextEstimate 值。
 
-### 检查规则
+### 阶段自动化级别
 
-| contextEstimate | 动作 |
-|-----------------|------|
-| >= 85% | 🚨 **阻断**：阻止工具调用，强制提示用户先执行 /compact |
-| >= 70% | ⚠️ **警告**：允许继续但输出醒目警告，建议先 /compact |
-| < 70% | ✅ 正常：放行 |
+| 阶段类型 | 示例 | context >= 70% | context >= 85% |
+|---------|------|---------------|---------------|
+| **半自动** | Constitution、PRD、设计 | 警告 + 产出检查点 + 等待确认 | 阻断 + 等待确认 |
+| **全自动** | 开发、Code Review、安全检测、测试 | 自动 compact + 继续 | 自动 compact + 继续 |
+
+### 全自动阶段检测
+
+通过检查当前执行的任务类型判断：
+
+```
+正在执行的任务包含以下关键词？
+- "开发"、"前端"、"后端"、"模块"
+- "Code Review"、"CR"、"审查"
+- "安全检查"、"security"
+- "测试"、"QA"、"验证"
+→ 全自动阶段
+```
 
 ### 阻断逻辑（>= 85%）
 
 当 contextEstimate >= 85 时：
-1. 输出红色警告：`🚨 Context 已达 ${contextEstimate}%，请先执行 /compact 再继续`
-2. 建议：将当前阶段的产出写入 .peaks/ 文件，然后 /compact
-3. 用户手动 /compact 后 contextEstimate 会重置，hook 自动放行
+1. **全自动阶段**：自动执行 `/compact`，完成后自动继续
+2. **半自动阶段**：输出红色警告，阻断操作，强制提示用户手动执行 `/compact`
 
 ### 警告逻辑（>= 70%）
 
 当 contextEstimate >= 70 时：
-1. 输出黄色警告：`⚠️ Context 已达 ${contextEstimate}%，建议尽快 /compact`
-2. 允许当前工具调用继续执行
-3. 提醒用户：长任务考虑产出中间文件到 .peaks/ 减轻 context 压力
+1. **全自动阶段**：自动产出检查点到 `.peaks/checkpoints/`，自动执行 `/compact`，继续执行
+2. **半自动阶段**：输出黄色警告，允许继续但建议用户手动 compact
 
 ### Context 增量估算参考
 
@@ -38,6 +48,8 @@ action: warn
 ```json
 {
   "contextEstimate": 45,
+  "currentPhase": "PRD 分析",
+  "automationLevel": "semi",
   "phasesCompleted": ["探索", "PRD"],
   "lastUpdated": "2026-05-06T21:00:00"
 }
@@ -55,25 +67,22 @@ Context 增量估算参考：
 - 自动化测试执行: +5%
 - 运维部署: +3%
 
-### 自动 Compact 触发
+### 自动 Compact 执行流程
 
-**当 contextEstimate >= 70% 时，优先建议自动 compact**：
-
-1. **触发条件**：contextEstimate 连续 3 次检查都 >= 70%
-2. **自动动作**：
-   - 输出 `/compact` 指令（醒目格式）
-   - 建议产出检查点文件到 `.peaks/checkpoints/`
-3. **恢复流程**：
-   - 用户执行 `/compact` 后 context 重置
-   - 继续工作时 hook 自动放行
+**全自动阶段触发自动 compact 时**：
+1. 产出检查点到 `.peaks/checkpoints/checkpoint-[模块]-[时间戳].md`
+2. 输出当前进度摘要
+3. 执行 `compact` 命令（hook 内部调用或通过输出指令触发）
+4. context 重置后自动继续执行
 
 ### 与 /loop 配合
 
 当使用 /loop 长任务自治时：
 1. loop 唤醒时自动触发此 hook 检查
-2. context 过高时 loop 自动暂停，等待 /compact
-3. /compact 后手动恢复 loop（ScheduleWakeup 重新调度）
-4. **loop 迭代强制检查**：每次 loop 开始和结束都必须检查 contextEstimate
+2. **全自动阶段**：context 过高时 loop 自动 compact 后继续
+3. **半自动阶段**：context 过高时 loop 暂停，等待用户手动 compact
+4. /compact 后手动恢复 loop（ScheduleWakeup 重新调度）
+5. **loop 迭代强制检查**：每次 loop 开始和结束都必须检查 contextEstimate
 
 ### 检查点文件模板
 
@@ -81,6 +90,10 @@ Context 增量估算参考：
 
 ```markdown
 # 检查点 - [模块名] - [时间戳]
+
+## 阶段信息
+- 阶段类型: [全自动/半自动]
+- 当前任务: [描述]
 
 ## 已完成
 - [ ] 任务 1

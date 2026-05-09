@@ -155,10 +155,26 @@ paths:
 | >= 70% | **强制**：产出当前阶段文件 → 执行 `/compact` → 继续 |
 | >= 85% | **阻断**：停止当前工作 → `/compact` → 用户确认后继续 |
 
+**按阶段区分自动化级别**：
+
+| 阶段类型 | 示例 | context >= 70% | context >= 85% |
+|---------|------|---------------|---------------|
+| **半自动** | Constitution、PRD、设计 | 警告 + 产出检查点 + 等待确认 | 阻断 + 等待确认 |
+| **全自动** | 开发、Code Review、安全检测、测试 | 自动 compact + 继续 | 自动 compact + 继续 |
+
 **自动管理机制**（通过 hook 实现）：
 - PreToolUse hook 在每次工具调用前检查 contextEstimate
 - >= 70%：输出警告但允许继续（用户可选择先 compact）
 - >= 85%：阻断工具调用，强制先 compact
+- **全自动阶段**：hook 自动执行 `/compact` 并继续
+
+**全自动阶段检测**：
+- peaksfeat Step 9（前端/后端开发）
+- peaksfeat Step 10（自动化测试）
+- peaksfeat Step 11（报告生成）
+- Code Review（前端/后端）
+- Security Review
+- QA 验证
 
 **与 /loop 配合**：
 - 长任务使用 `/loop` 动态唤醒，每次唤醒检查 context 状态
