@@ -1494,3 +1494,30 @@ peaks-sdd 提供三个快捷命令，覆盖主要开发场景：
 | `references/dispatch-quickref.md` | Agent 调度速查表、质量门禁、文件命名规范 |
 | `templates/agents/*.md` | **初始化时使用** - 模板,根据技术栈生成 `.claude/agents/` |
 | `.claude/agents/*.md` | **实际运行时使用** - 初始化后生成的 agents |
+| `scripts/` | **执行脚本** - 质量门禁和自动化工具 |
+
+### scripts/ 脚本说明
+
+| 脚本 | 用途 | 调用时机 |
+|------|------|---------|
+| `init-project.mjs` | 项目初始化脚本 | Phase 0.1-0.6（初始化阶段自动调用） |
+| `openspec.mjs` | OpenSpec 工作流执行器 | 存量项目迭代时使用 |
+| `auto-format.mjs` | 代码格式化 | 开发阶段 PostToolUse hook |
+| `type-check.mjs` | TypeScript 类型检查 | 开发阶段 PostToolUse hook |
+| `min-code-enforce.mjs` | 最小代码强制检查 | Code Review 前置 |
+| `component-library-enforce.mjs` | 组件库规范检查 | 前端开发完成后 |
+| `tailwind-enforce.mjs` | Tailwind CSS 规范检查 | 前端开发完成后 |
+| `file-size-check.mjs` | 文件大小检查 | 防止超大文件 |
+
+**调用示例**：
+```bash
+# 在开发阶段自动调用
+node scripts/type-check.mjs
+node scripts/auto-format.mjs
+
+# 在 Code Review 前强制检查
+node scripts/min-code-enforce.mjs --path src/
+
+# OpenSpec 工作流
+node scripts/openspec.mjs propose "添加用户注册功能"
+```
