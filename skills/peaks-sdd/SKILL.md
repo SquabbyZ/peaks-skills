@@ -1136,8 +1136,10 @@ openspec/
 
 **快速决策规则**：
 - 有 `.git/` 且最近 30 天有 commit → **OpenSpec**
-- 无 git 或空白项目 → **Spec-It**
+- 无 git 或空白项目 → **OpenSpec**（初始化后使用）
 - 报错/崩溃/行为异常 → **peaksbug**
+
+**注意**：peaks-sdd 主要使用 OpenSpec 工作流进行存量项目迭代，通过 `/opsx:` 命令交互。Spec-It 仅在新项目（0→1）或复杂项目时使用 Checkpoint 0 判断后切换。
 
 ### Spec-It 工作流 (新项目)
 
