@@ -759,6 +759,28 @@ openspec/
 { "dependencies": { "@prisma/client": "^5.x" } } → HAS_DATABASE=postgresql
 ```
 
+### Monorepo 检测
+
+```json
+// pnpm workspaces
+{ "packages": ["*"] } in pnpm-workspace.yaml → IS_MONOREPO=true, PACKAGES=[各子包]
+
+// Lerna
+{ "packages": ["packages/*"] } in lerna.json → IS_MONOREPO=true, PACKAGES=[各子包]
+
+// Turborepo
+{ "pipeline": {} } in turbo.json → IS_MONOREPO=true, PACKAGES=[各子包]
+
+// package.json workspaces
+{ "workspaces": ["packages/*"] } in root package.json → IS_MONOREPO=true, PACKAGES=[各子包]
+```
+
+**Monorepo 特殊处理**：
+- `PROJECT_PATH` → 根目录
+- `PACKAGES` → 子包列表（如 `["frontend", "api", "shared"]`）
+- 生成 Agent 时，需要确认针对哪个包开发
+- 优先在子包内独立运行 peaksinit
+
 ---
 
 ## Agent 模板说明

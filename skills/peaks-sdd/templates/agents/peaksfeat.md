@@ -503,16 +503,44 @@ peaksfeat 调度（主 session）
   ├─ Step 10-12: 正常执行（测试、报告、部署）
 ```
 
-**loop prompt 模板**：
+**loop prompt 模板（增强版）**：
 ```
-当前任务：[具体模块开发任务]
-参考文件：.peaks/prds/prd-xxx.md, .peaks/swagger/swagger-xxx.json
-产出路径：[具体 src/ 路径]
-完成标准：[可验证的目标]
-完成后：将进度写入 .peaks/plans/plan-xxx.md 的 checklist
+# /loop - [模块名] 开发迭代
+
+## 当前任务
+[模块名] 开发：实现 [功能描述]
+
+## 参考文件（必须读取）
+- .peaks/prds/prd-[功能名].md（需求规格）
+- .peaks/swagger/swagger-[功能名].json（如有 API）
+- .peaks/plans/plan-[功能名].md（开发计划）
+
+## 技术栈
+- 框架：{{FRONTEND_FRAMEWORK}} / {{BACKEND_FRAMEWORK}}
+- UI 库：{{UI_LIBRARY}}
+- 代码风格：遵循项目现有规范
+
+## 产出要求
+1. 代码产出到：`src/[模块路径]/`
+2. 完成后更新：`.peaks/plans/plan-[功能名].md` 的 checklist
+3. 必须执行质量门禁：Code Review → 测试
+
+## Context 守门
+- 每次迭代后检查 contextEstimate
+- >= 70% 先写入 .peaks/ 再继续
+- >= 85% 强制 /compact
+
+## 验证标准
+- [ ] 单元测试通过
+- [ ] 类型检查通过（tsc --noEmit）
+- [ ] E2E 测试通过（如有）
 ```
 
-**关键**：loop 迭代之间不共享 context，通过 .peaks/ 文件传递状态。
+**loop 迭代规则**：
+1. 每个 loop 只做一个模块的完整开发（PRD → Code → Review → Test）
+2. loop 之间通过 `.peaks/plans/` 传递状态，不依赖 context
+3. 失败时从 `.peaks/plans/plan-xxx.md` 读取上下文恢复
+4. 复杂模块拆分为多个小 loop，每个专注一个子任务
 
 ## OpenSpec 集成（存量项目迭代）
 
