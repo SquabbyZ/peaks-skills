@@ -958,6 +958,33 @@ openspec/
 
 ## SDD 工作流
 
+### Checkpoint 0: 需求确认（peaksfeat 起点）
+
+```
+┌─ Checkpoint 0: 需求确认 ─────────────────────────┐
+│                                                    │
+│  输入：用户需求（自然语言或 PRD）                   │
+│                                                    │
+│  请确认：                                          │
+│  - [ ] 需求清晰可测量                             │
+│  - [ ] 范围明确无蔓延                             │
+│  - [ ] 验收标准已定义                             │
+│                                                    │
+│  ✅ 确认 → 进入 Constitution → PRD → Design        │
+│  ❌ 有问题 → 补充信息后重新确认                    │
+└────────────────────────────────────────────────────┘
+```
+
+### peaksfeat 工作流（Phase 1-5）
+
+| Phase | 阶段 | 输入 | 输出 |
+|-------|------|------|------|
+| Phase 1 | Constitution | 需求确认 | 团队约章 |
+| Phase 2 | PRD | Constitution | 产品需求文档 |
+| Phase 3 | Design | PRD + 设计稿 | 设计规范 |
+| Phase 4 | Develop | Design + Swagger | 实现代码 |
+| Phase 5 | QA | 代码 + 测试用例 | 测试报告 |
+
 ### ⚠️ 关键检查点（防止自主失控）
 
 > **OpenSpec 工作流使用 `/opsx:` 命令，Checkpoint 简化为关键节点确认。**
