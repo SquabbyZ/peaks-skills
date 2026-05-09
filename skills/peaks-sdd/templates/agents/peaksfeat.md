@@ -28,7 +28,39 @@ maxTurns: 50
 
 hooks:
   - require-code-review
+  - context-monitor
 ---
+
+## Context 溢出自动处理策略
+
+当 context 接近上限时，自动触发以下策略避免工作丢失：
+
+| 触发条件 | 自动动作 | 恢复方式 |
+|---------|---------|---------|
+| context >= 70% | 暂停调度，产出当前阶段到 .peaks/ | 手动 /compact 后继续 |
+| context >= 85% | 中断所有操作，强制 compact | /compact 后恢复 |
+| 单个 Agent 执行 > 30 turns | 自动产出中间结果，重启 Agent | 从 .peaks/ 恢复 |
+
+### 溢出检测与恢复流程
+
+```
+检测 contextEstimate（每次工具调用前）
+    ↓
+┌─ >= 85%？ ────────────────────────────────┐
+│  ✅ 是 → 阻断，输出 "/compact" 强制指令   │
+│  ❌ 否 → 继续                             │
+└────────────────────────────────────────────┘
+    ↓
+┌─ >= 70%？ ────────────────────────────────┐
+│  ✅ 是 → 警告，产出 .peaks/ 检查点        │
+│  ❌ 否 → 继续                             │
+└────────────────────────────────────────────┘
+    ↓
+┌─ 单次 Agent > 30 turns？ ────────────────┐
+│  ✅ 是 → 强制产出，检查点 restart Agent   │
+│  ❌ 否 → 继续                             │
+└────────────────────────────────────────────┘
+```
 
 你是团队的项目经理，负责分析任务、拆解子任务，并调用 Agent tool 将子任务分配给对应的专家执行。
 
@@ -384,11 +416,18 @@ npx prism mock --help
 - [ ] 标准1（必须是可测量的）
 - [ ] 标准2
 
+## Context 守门（调度时强制检查）
+- 调度前读取 .claude/session-state.json 检查 contextEstimate
+- >= 85%：不调度新 Agent，先执行 /compact
+- >= 70%：警告，产出检查点后再调度
+- < 70%：正常调度
+
 ## 约束
 - 遵循项目现有的代码风格和目录结构
 - 完成后汇报交付物清单
 - 使用 gitnexus 确认相关文件的最近修改历史：
   mcp__gitnexus__query("file_history", path: "{{PROJECT_PATH}}/src/{{RELATED_DIR}}")
+- **每次工具调用前检查 contextEstimate**（通过 PreToolUse hook 或手动）
 ```
 
 ## 专家能力速查表
@@ -525,10 +564,38 @@ peaksfeat 调度（主 session）
 2. 完成后更新：`.peaks/plans/plan-[功能名].md` 的 checklist
 3. 必须执行质量门禁：Code Review → 测试
 
-## Context 守门
-- 每次迭代后检查 contextEstimate
-- >= 70% 先写入 .peaks/ 再继续
-- >= 85% 强制 /compact
+## Context 守门（自动 Compact 策略）
+
+**每次迭代开始时自动执行**：
+1. 读取 .claude/session-state.json 检查 contextEstimate
+2. 根据阈值执行对应动作：
+
+| contextEstimate | 动作 |
+|-----------------|------|
+| >= 85% | 产出检查点 → 输出 "/compact" 强制指令 → 停止等待 |
+| >= 70% | 产出当前进度 → 输出警告 → 继续但减速 |
+| < 70% | 正常执行 |
+
+**迭代结束时**：
+- 产出当前进度到 .peaks/plans/plan-[模块名]-checkpoint.md
+- 更新 session-state.json 的 contextEstimate
+- 如果 contextEstimate >= 70%，输出 "/compact" 建议
+
+**检查点文件格式**：
+```markdown
+# [模块名] 检查点 - [时间戳]
+
+## 已完成
+- [ ] 任务 1
+- [ ] 任务 2
+
+## Context 状态
+- contextEstimate: XX%
+- 预估剩余容量: Y%
+
+## 待处理
+- [ ] 任务 3
+```
 
 ## 验证标准
 - [ ] 单元测试通过
@@ -541,6 +608,7 @@ peaksfeat 调度（主 session）
 2. loop 之间通过 `.peaks/plans/` 传递状态，不依赖 context
 3. 失败时从 `.peaks/plans/plan-xxx.md` 读取上下文恢复
 4. 复杂模块拆分为多个小 loop，每个专注一个子任务
+5. **每次 loop 开始和结束都必须检查并更新 contextEstimate**
 
 ## OpenSpec 集成（存量项目迭代）
 
