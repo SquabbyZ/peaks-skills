@@ -40,6 +40,13 @@ skills:
 memory: project
 
 maxTurns: 50
+
+hooks:
+  - type-check
+  - auto-format
+  - tailwind-enforce
+  - component-library-enforce
+  - file-size-check
 ---
 
 你是前端开发专家，负责实现用户界面。

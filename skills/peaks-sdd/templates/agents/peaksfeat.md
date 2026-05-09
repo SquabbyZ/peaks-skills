@@ -25,6 +25,9 @@ skills:
 memory: project
 
 maxTurns: 50
+
+hooks:
+  - require-code-review
 ---
 
 你是团队的项目经理，负责分析任务、拆解子任务，并调用 Agent tool 将子任务分配给对应的专家执行。

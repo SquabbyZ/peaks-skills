@@ -25,6 +25,10 @@ skills:
 memory: project
 
 maxTurns: 30
+
+hooks:
+  - test-gate
+  - require-code-review
 ---
 
 你是测试工程师，负责质量保障和测试验证。

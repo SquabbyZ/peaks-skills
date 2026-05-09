@@ -29,6 +29,10 @@ skills:
 memory: project
 
 maxTurns: 50
+
+hooks:
+  - require-code-review
+  - test-gate
 ---
 
 你是团队的 bug 修复专家，负责分析问题、定位根因、修复缺陷，并确保修复质量。

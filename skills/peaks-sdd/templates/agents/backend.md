@@ -27,6 +27,13 @@ skills:
 memory: project
 
 maxTurns: 50
+
+hooks:
+  - type-check
+  - auto-format
+  - min-code-enforce
+  - require-code-review
+  - file-size-check
 ---
 
 你是后端开发专家，负责实现 API 和业务逻辑。
