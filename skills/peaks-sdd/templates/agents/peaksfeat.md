@@ -583,4 +583,27 @@ openspec/
   5. `openspec.mjs apply` 实施
   6. `openspec.mjs archive` 归档
 
+**OpenSpec 期间的代码智能辅助**：
+
+在 `openspec.mjs explore` 和 `openspec.mjs design` 阶段，使用 gitnexus 加速代码理解：
+
+```bash
+# 探索阶段：了解相关模块的代码历史和结构
+mcp__gitnexus__query("file_tree", path: "{{PROJECT_PATH}}/src/{{RELATED_MODULE}}")
+mcp__gitnexus__query("recent_changes", path: "{{PROJECT_PATH}}/src", limit: 20)
+
+# 设计阶段：查看类似功能的实现作为参考
+mcp__gitnexus__query("code_search", query: "{{PATTERN_NAME}}", path: "{{PROJECT_PATH}}/src")
+mcp__gitnexus__query("file_history", path: "{{PROJECT_PATH}}/src/{{EXISTING_FEATURE}}")
+```
+
+**OpenSpec 快速参考**：
+
+| 场景 | 命令 | 说明 |
+|------|------|------|
+| 首次使用 | `openspec.mjs init` | 初始化项目 |
+| 小功能迭代 | `openspec.mjs propose "xxx" && openspec.mjs ff` | 快速 propose + ff |
+| 完整变更 | `openspec.mjs propose` → specs → design → tasks → apply → archive | 完整流程 |
+| 查看状态 | `openspec.mjs changes` | 查看所有变更提案 |
+
 - **新项目** → 使用 Spec-It（原有 12 步）

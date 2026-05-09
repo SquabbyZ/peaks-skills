@@ -854,6 +854,9 @@ openspec/
 | context window 不足 | session-state.json 显示 contextEstimate >= 85% | 先 Compact，再继续 |
 | 用户中断流程 | 用户明确表示停止 | 暂停，保存当前进度到 `.peaks/state.json` |
 | @bunas/fs-mcp 不可用 | MCP 工具调用失败 | 降级为 Bash/Read 工具手动扫描项目 |
+| claude-mem MCP 不可用 | `mcp__claude_mem__query` 调用失败 | 降级为直接读取 CLAUDE.md，跳过跨 session 记忆查询 |
+| gitnexus MCP 不可用 | `mcp__gitnexus__query` 调用失败 | 降级为 Bash git 命令（git log/diff），继续流程 |
+| OpenSpec 命令失败 | `openspec.mjs` 返回非零退出码 | 输出错误信息，使用 Bash 直接调用 `npx @fission-ai/openspec` 或跳过该步骤 |
 | settings.json 不存在 | `.claude/settings.json` 不存在 | 跳过 MCP 配置步骤，提示用户可稍后手动配置 |
 | 模板变量替换失败 | 检测到未定义的变量 | 使用空字符串作为默认值，继续处理 |
 | npm/npx 安装失败 | `npx skills add` 或 `npx @fission-ai/openspec` 超时/报错 | 重试 1 次；仍失败则跳过该 skill，记录警告继续 |
