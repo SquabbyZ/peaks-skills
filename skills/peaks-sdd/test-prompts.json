@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "prompt": "初始化我的项目",
+    "expected": "扫描技术栈，生成 .claude/agents/ 配置（frontend/backend/product/qa 等），创建 .peaks/ 目录结构，配置 MCP servers（gitnexus、claude-mem、context7 等），安装 required skills",
+    "scenario": "新项目首次使用 peaks-sdd"
+  },
+  {
+    "id": 2,
+    "prompt": "登录按钮点击没反应",
+    "expected": "进入 peaksbug 工作流，8 阶段调试：复现 → 根因分析 → 假设验证 → 修复 → 测试 → 验证。产出 bug 分析报告到 .peaks/bugs/",
+    "scenario": "Bug 修复场景"
+  },
+  {
+    "id": 3,
+    "prompt": "给已有项目添加用户注册功能",
+    "expected": "判断是存量项目 → 使用 OpenSpec workflow：openspec.mjs propose → specs → design → tasks → apply → archive。查询 claude-mem 获取上次项目上下文，使用 gitnexus 理解现有代码结构。12步完整 Spec-It 流程",
+    "scenario": "存量项目功能开发（OpenSpec 集成）"
+  }
+]
