@@ -23,6 +23,8 @@ import { fileURLToPath } from 'url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // OpenSpec 命令映射
+// 注意: OpenSpec CLI 使用嵌套命令结构: openspec <resource> <action>
+// 例如: openspec new change <name>, openspec archive <change-name>
 const OPENSPEC_COMMANDS = {
   // 初始化 OpenSpec 项目
   init: {
@@ -31,82 +33,102 @@ const OPENSPEC_COMMANDS = {
     args: ['-y', '@fission-ai/openspec@latest', 'init']
   },
 
-  // 创建变更提案
+  // 创建变更提案: openspec new change <name>
+  new: {
+    desc: '创建新变更提案',
+    cmd: 'npx',
+    args: ['-y', '@fission-ai/openspec@latest', 'new', 'change'],
+    usage: 'node openspec.mjs new "变更名称"'
+  },
+
+  // propose 是 new change 的别名（兼容旧用法）
   propose: {
-    desc: '创建变更提案',
+    desc: '创建新变更提案 (new change 的别名)',
     cmd: 'npx',
-    args: ['-y', '@fission-ai/openspec@latest', 'propose'],
-    usage: 'node openspec.mjs propose "<变更描述>"'
+    args: ['-y', '@fission-ai/openspec@latest', 'new', 'change'],
+    usage: 'node openspec.mjs propose "变更名称"'
   },
 
-  // 编写规格
-  specs: {
-    desc: '编写或更新规格文档',
+  // 查看变更列表: openspec list (已废弃，用 openspec list)
+  changes: {
+    desc: '查看所有变更提案',
     cmd: 'npx',
-    args: ['-y', '@fission-ai/openspec@latest', 'specs']
+    args: ['-y', '@fission-ai/openspec@latest', 'list']
   },
 
-  // 技术设计
-  design: {
-    desc: '进行技术设计评审',
+  // 显示变更详情: openspec show <change-name>
+  show: {
+    desc: '显示变更详情',
     cmd: 'npx',
-    args: ['-y', '@fission-ai/openspec@latest', 'design']
+    args: ['-y', '@fission-ai/openspec@latest', 'show'],
+    usage: 'node openspec.mjs show "变更名称"'
   },
 
-  // 任务拆分
-  tasks: {
-    desc: '拆分和分配任务',
+  // 验证变更: openspec validate <change-name>
+  validate: {
+    desc: '验证变更提案',
     cmd: 'npx',
-    args: ['-y', '@fission-ai/openspec@latest', 'tasks']
+    args: ['-y', '@fission-ai/openspec@latest', 'validate'],
+    usage: 'node openspec.mjs validate "变更名称"'
   },
 
-  // 实施任务
-  apply: {
-    desc: '实施任务',
-    cmd: 'npx',
-    args: ['-y', '@fission-ai/openspec@latest', 'apply']
-  },
-
-  // 快速填充（填充所有 artifacts）
-  ff: {
-    desc: '快速填充所有 artifacts',
-    cmd: 'npx',
-    args: ['-y', '@fission-ai/openspec@latest', 'ff']
-  },
-
-  // 同步变更到 specs
-  sync: {
-    desc: '同步变更到规格文档',
-    cmd: 'npx',
-    args: ['-y', '@fission-ai/openspec@latest', 'sync']
-  },
-
-  // 归档并合并到 specs
+  // 归档变更: openspec archive <change-name>
   archive: {
     desc: '归档变更并合并到规格文档',
     cmd: 'npx',
-    args: ['-y', '@fission-ai/openspec@latest', 'archive']
+    args: ['-y', '@fission-ai/openspec@latest', 'archive'],
+    usage: 'node openspec.mjs archive "变更名称"'
   },
 
-  // 验证实施结果
-  verify: {
-    desc: '验证实施结果',
+  // 查看规格列表: openspec list --specs
+  specs: {
+    desc: '查看所有规格文档',
     cmd: 'npx',
-    args: ['-y', '@fission-ai/openspec@latest', 'verify']
+    args: ['-y', '@fission-ai/openspec@latest', 'list', '--specs']
   },
 
-  // 查看所有变更
-  changes: {
-    desc: '列出所有变更提案',
+  // spec 命令: openspec spec
+  spec: {
+    desc: '管理和查看规格文档',
     cmd: 'npx',
-    args: ['-y', '@fission-ai/openspec@latest', 'changes']
+    args: ['-y', '@fission-ai/openspec@latest', 'spec']
   },
 
-  // 探索代码库
-  explore: {
-    desc: '探索代码库结构',
+  // view 命令: 交互式仪表盘
+  view: {
+    desc: '显示交互式仪表盘',
     cmd: 'npx',
-    args: ['-y', '@fission-ai/openspec@latest', 'explore']
+    args: ['-y', '@fission-ai/openspec@latest', 'view']
+  },
+
+  // status 命令: 查看状态
+  status: {
+    desc: '显示变更完成状态',
+    cmd: 'npx',
+    args: ['-y', '@fission-ai/openspec@latest', 'status'],
+    usage: 'node openspec.mjs status "变更名称"'
+  },
+
+  // instructions 命令: 输出创建 artifact 的指导
+  instructions: {
+    desc: '输出 artifact 创建指导',
+    cmd: 'npx',
+    args: ['-y', '@fission-ai/openspec@latest', 'instructions'],
+    usage: 'node openspec.mjs instructions "artifact名称"'
+  },
+
+  // schema 命令: 查看可用 schema
+  schemas: {
+    desc: '列出可用工作流 schema',
+    cmd: 'npx',
+    args: ['-y', '@fission-ai/openspec@latest', 'schemas']
+  },
+
+  // update 命令: 更新 OpenSpec 指令文件
+  update: {
+    desc: '更新 OpenSpec 指令文件',
+    cmd: 'npx',
+    args: ['-y', '@fission-ai/openspec@latest', 'update']
   }
 };
 

@@ -5,7 +5,7 @@
 | 场景 | 工作流 | 入口 |
 |------|--------|------|
 | 新项目 (0→1) | OpenSpec | `/peaks-sdd 初始化` → `/peaks-sdd 添加...` |
-| 存量项目迭代 | OpenSpec | `openspec init` → `/opsx:propose` |
+| 存量项目迭代 | OpenSpec | `openspec init` → `openspec new change <name>` |
 | Bug 修复 | peaksbug | `/peaks-sdd [bug描述]` |
 
 ## Agent 调度矩阵
@@ -40,17 +40,16 @@
 ## OpenSpec 工作流（存量项目迭代）
 
 ```
-/opsx:propose ──► /opsx:specs ──► /opsx:design ──► /opsx:tasks ──► /opsx:apply ──► /opsx:archive
+openspec new change <name> ──► openspec spec ──► 编写 design ──► openspec apply ──► openspec archive <name>
 ```
 
 | 命令 | 产出 |
 |------|------|
-| `/opsx:propose <idea>` | `openspec/changes/[change-name]/proposal.md` |
-| `/opsx:specs` | `openspec/changes/[change-name]/specs/*.md` |
-| `/opsx:design` | `openspec/changes/[change-name]/design.md` |
-| `/opsx:tasks` | `openspec/changes/[change-name]/tasks.md` |
-| `/opsx:apply` | 执行 tasks.md 中的任务 |
-| `/opsx:archive` | 合并到 openspec/specs/ |
+| `openspec new change <name>` | `openspec/changes/[change-name]/` 目录及 proposal.md |
+| `openspec list` | 查看所有变更 |
+| `openspec show <change-name>` | 显示变更详情 |
+| `openspec status <change-name>` | 显示变更完成状态 |
+| `openspec archive <change-name>` | 合并到 openspec/specs/ |
 
 ## peaksbug 工作流（Bug 修复）
 

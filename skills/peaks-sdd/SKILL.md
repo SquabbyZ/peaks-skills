@@ -738,7 +738,7 @@ openspec/
 
 | 场景 | 工具 | 说明 |
 |------|------|------|
-| 功能开发/需求迭代 | OpenSpec | 轻量级工作流：propose → apply → archive |
+| 功能开发/需求迭代 | OpenSpec | 轻量级工作流：`openspec new change` → `apply` → `archive` |
 | Bug 修复 | peaksbug | 系统化调试 → 修复 → 回归测试 |
 | Issue 管理 | triage | 状态机流转 → Agent Brief |
 
@@ -1095,26 +1095,32 @@ openspec init
 # 2. 创建变更提案
 # 用户：/opsx:propose 给登录页添加"记住我"功能
 # → 产出：openspec/changes/add-remember-me/proposal.md
+openspec new change add-remember-me
 
 # 3. 编写规格
 # 用户：/opsx:specs
 # → 产出：openspec/changes/add-remember-me/specs/login.md
+openspec spec
 
 # 4. 技术设计
 # 用户：/opsx:design
 # → 产出：openspec/changes/add-remember-me/design.md
+# (直接在 specs/ 目录下创建设计文档)
 
 # 5. 任务拆分
 # 用户：/opsx:tasks
 # → 产出：openspec/changes/add-remember-me/tasks.md
+# (通过 openspec instructions tasks 获取任务指南)
 
 # 6. 实施
 # 用户：/opsx:apply
 # → 执行 tasks.md 中的各个任务
+openspec apply
 
 # 7. 归档
 # 用户：/opsx:archive
 # → 合并到 openspec/specs/，清理 changes/ 目录
+openspec archive add-remember-me
 ```
 
 **OpenSpec 检查点模板**：
@@ -1312,5 +1318,8 @@ node scripts/auto-format.mjs
 node scripts/min-code-enforce.mjs --path src/
 
 # OpenSpec 工作流
-node scripts/openspec.mjs propose "添加用户注册功能"
+# 创建新变更
+node scripts/openspec.mjs new "添加用户注册功能"
+# 归档变更
+node scripts/openspec.mjs archive "添加用户注册功能"
 ```
