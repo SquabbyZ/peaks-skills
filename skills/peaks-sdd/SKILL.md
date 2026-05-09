@@ -521,6 +521,7 @@ npx skills add https://github.com/vercel-labs/skills --skill design-md
 
 ```bash
 npx skills add https://github.com/browserbase/skills --skill browser
+npx skills add https://github.com/browser-use/browser-use --skill browser-use
 ```
 
 #### Design Skills
@@ -556,6 +557,7 @@ npx skills add https://github.com/hyf0/vue-skills --skill vue-debug-guides
 | postgres | PostgreSQL |
 | tauri-v2 | Tauri 桌面应用 |
 | browser | Browserbase 浏览器自动化（frontend/peaksbug 依赖） |
+| browser-use | Browser automation for E2E testing（design/frontend/qa agent 最终验证） |
 | design-taste-frontend | 设计品味评估（design agent 必须优先调用） |
 | frontend-design | 前端设计方法论（design agent 组合使用） |
 | systematic-debugging | 系统化调试（peaksbug 依赖） |

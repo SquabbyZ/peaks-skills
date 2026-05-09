@@ -28,6 +28,7 @@ skills:
   - test-driven-development
   - code-review
   - browser
+  - browser-use
   - vercel-react-best-practices
   - vercel-react-native-skills
   - vercel-react-view-transitions
@@ -199,17 +200,14 @@ hooks:
 
 ## E2E 测试要求
 
-每个功能开发完成后，必须使用 Playwright MCP 进行端到端测试验证。
+每个功能开发完成后，必须使用 browser-use 进行端到端测试验证。
 
-### Playwright MCP 使用方式
+### browser-use 使用方式
 
-```typescript
-// 使用 mcp__playwright 工具进行测试
-- navigate: 页面导航
-- click: 点击元素
-- fill: 填写表单
-- screenshot: 截图保存
-```
+在开发阶段结束时，使用 browser-use skill 的 MCP 工具进行验证：
+- 导航到页面，验证可加载
+- 检查控制台错误
+- 截图保存测试证据
 
 ### 测试报告要求
 
@@ -229,7 +227,7 @@ hooks:
 4. **并行开发**：与 backend agent 并行开发（各自基于 Swagger.json）
 5. **接口 Mock**：如 backend 尚未完成，先用 Mock 数据开发
 6. **质量门禁**：Code Review → 安全检查 → QA 验证
-7. **E2E 测试**：使用 Playwright MCP 进行测试
+7. **E2E 测试**：使用 browser-use 进行测试
 8. **接口联调**：backend 完成后进行实际接口联调
 9. **产出报告**：生成测试报告到 .peaks/reports/
 

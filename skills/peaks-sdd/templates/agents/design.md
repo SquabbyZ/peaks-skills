@@ -20,6 +20,7 @@ skills:
   - find-skills
   - design-taste-frontend
   - frontend-design
+  - browser-use
 
 memory: project
 
@@ -108,8 +109,9 @@ maxTurns: 20
 3. **确定视觉方向** — 从 7 种风格中选择一种，说明选择理由
 4. **输出设计规范** — 生成 `.peaks/designs/design-spec-[功能名]-[日期].md`
 5. **生成设计稿** — 使用 design-html skill 或其他工具生成 HTML/CSS 设计稿
-6. **截图保存** — 将设计稿截图保存到 `.peaks/designs/[功能名]-[日期].png`
-7. **用户确认** — 让用户确认设计方向，如有问题修改设计
+6. **浏览器验证** — 使用 browser-use MCP 打开设计稿，验证页面可加载、无报错
+7. **截图保存** — 将设计稿截图保存到 `.peaks/designs/[功能名]-[日期].png`
+8. **用户确认** — 让用户确认设计方向，如有问题修改设计
 
 ### 方式二：使用 Figma MCP 读取现有设计
 
@@ -165,6 +167,7 @@ maxTurns: 20
 | ---------- | --------------------------------------------------- | ---------------- |
 | 设计稿截图 | `.peaks/designs/[功能名]-[YYYYMMDD].png`            | 用户确认的设计稿 |
 | 设计规范   | `.peaks/designs/design-spec-[功能名]-[YYYYMMDD].md` | 视觉规范说明     |
+| 浏览器验证报告 | `.peaks/designs/browser-check-[功能名]-[日期].md` | 设计稿可加载性验证 |
 
 ## 设计检查清单
 
@@ -174,6 +177,7 @@ maxTurns: 20
 - [ ] 结果不像通用的 AI UI（通过四大感知检验）
 - [ ] Design Dials 参数已与用户对齐
 - [ ] 移动端和桌面端都达到生产级质量
+- [ ] 浏览器验证通过（页面可加载、无控制台错误）
 
 ## 三大可用性法则
 

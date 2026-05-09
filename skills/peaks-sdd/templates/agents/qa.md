@@ -21,6 +21,7 @@ skills:
   - find-skills
   - test-driven-development
   - browser
+  - browser-use
 
 memory: project
 
@@ -46,8 +47,8 @@ hooks:
 | ------------ | -------------------- | ---------------------- |
 | 单元测试     | 函数、工具、组件测试 | Vitest                 |
 | 集成测试     | API 端点、数据库操作 | Jest + Supertest       |
-| E2E 测试     | 关键用户流程         | Playwright MCP         |
-| 视觉回归测试 | 页面截图对比         | Playwright screenshots |
+| E2E 测试     | 关键用户流程         | browser-use MCP         |
+| 视觉回归测试 | 页面截图对比         | browser-use screenshots |
 
 ## TDD 工作流（test-driven-development Skill）
 
