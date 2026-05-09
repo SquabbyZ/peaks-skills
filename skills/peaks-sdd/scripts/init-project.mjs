@@ -42,38 +42,31 @@ function detectTechStack(projectPath) {
     const deps = { ...pkg.dependencies, ...pkg.devDependencies };
     techStack.projectName = pkg.name || 'unknown-project';
 
-    // 前端框架检测
     if (deps.react) techStack.frontend = 'react';
     else if (deps.vue) techStack.frontend = 'vue';
     else if (deps.next) techStack.frontend = 'next';
 
-    // 后端框架检测
     if (deps['@nestjs/core']) techStack.backend = 'nestjs';
     else if (deps.express) techStack.backend = 'express';
     else if (deps.fastify) techStack.backend = 'fastify';
 
-    // UI库检测
     if (deps.antd) techStack.ui = 'antd';
     else if (deps['@mui/material']) techStack.ui = 'mui';
     else if (deps['@chakra-ui/react']) techStack.ui = 'chakra';
     else if (deps['@radix-ui/react-dialog'] || deps['@radix-ui/react-accordion']) techStack.ui = 'radix';
 
-    // 数据库检测
     if (deps.typeorm || deps.prisma || deps.drizzle) techStack.database = 'postgresql';
     else if (deps.mongoose) techStack.database = 'mongodb';
 
-    // 测试框架检测
     if (deps['@playwright/test']) techStack.test = 'playwright';
     else if (deps.vitest) techStack.test = 'vitest';
     else if (deps.jest) techStack.test = 'jest';
 
-    // Tauri检测
     if (existsSync(join(projectPath, 'src-tauri')) ||
         existsSync(join(projectPath, 'tauri.conf.json'))) {
       techStack.hasTauri = true;
     }
 
-    // 开发端口
     if (pkg.devDependencies?.vite) techStack.devPort = 5173;
     else if (pkg.devDependencies?.webpack) techStack.devPort = 8080;
   }
@@ -83,111 +76,106 @@ function detectTechStack(projectPath) {
 
 // 根据技术栈过滤 skills
 function filterSkills(skills, techStack) {
-  const frameworkExcludes = {
-    // 排除 Vue 相关的，如果检测到 React/Next
-    vue: ['vue-best-practices', 'vue', 'vue-debug-guides'],
-    // 排除 React 相关的，如果检测到 Vue
-    react: ['react:components'],
-    // 排除 NestJS 相关的，如果检测到 Express
-    express: ['nestjs-patterns'],
-    // 排除特定框架的 skill
-  };
-
   const excludeSkills = new Set();
 
-  // 如果是 React/Next，排除 Vue skills
   if (techStack.frontend === 'react' || techStack.frontend === 'next') {
-    frameworkExcludes.vue.forEach(s => excludeSkills.add(s));
+    excludeSkills.add('vue-best-practices');
+    excludeSkills.add('vue');
+    excludeSkills.add('vue-debug-guides');
   }
 
-  // 如果是 Vue，排除 React skills
   if (techStack.frontend === 'vue') {
-    frameworkExcludes.react.forEach(s => excludeSkills.add(s));
-    // Vue 项目保留 Vue skills
+    excludeSkills.add('react:components');
+    excludeSkills.add('vercel-react-best-practices');
+    excludeSkills.add('vercel-react-native-skills');
+    excludeSkills.add('vercel-react-view-transitions');
   }
 
-  // 如果是 Express，排除 NestJS skills
-  if (techStack.backend === 'express' || techStack.backend === 'fastify') {
-    frameworkExcludes.express.forEach(s => excludeSkills.add(s));
+  if (techStack.backend !== 'nestjs' && techStack.backend) {
+    excludeSkills.add('nestjs-patterns');
   }
 
-  // 如果检测到 Ant Design，排除其他 UI 库的 skills
-  if (techStack.ui !== 'antd') {
-    ['antd-best-practices'].forEach(s => excludeSkills.add(s));
-  }
-
-  // 如果检测到的是非 antd UI，保留 antd 相关 skill
-  if (techStack.ui && techStack.ui !== 'antd') {
-    excludeSkills.add('antd-best-practices');
-  }
-
-  // 过滤掉不相关框架的 skills
   return skills.filter(skill => !excludeSkills.has(skill));
 }
 
-// 解析 frontmatter
-function parseFrontmatter(content) {
-  const match = content.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
-  if (!match) return { frontmatter: {}, body: content };
+// 提取 skills 部分的开始位置
+function findSkillsSection(content) {
+  const lines = content.split('\n');
+  let inFrontmatter = false;
+  let skillsStart = -1;
+  let skillsEnd = -1;
+  let braceCount = 0;
 
-  const frontmatterLines = match[1].split('\n');
-  const body = match[2];
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const trimmed = line.trim();
 
-  const frontmatter = {};
-  let currentKey = null;
-  let currentValue = [];
+    if (trimmed === '---' && !inFrontmatter) {
+      inFrontmatter = true;
+      continue;
+    }
 
-  for (const line of frontmatterLines) {
-    // YYYY: value 格式（顶部级别键）
-    const simpleMatch = line.match(/^(\w+):\s*(.*)$/);
-    if (simpleMatch && !line.startsWith(' ') && !line.startsWith('\t')) {
-      if (currentKey) {
-        frontmatter[currentKey] = currentValue.join('\n').trim();
+    if (trimmed === '---' && inFrontmatter) {
+      inFrontmatter = false;
+      continue;
+    }
+
+    if (!inFrontmatter) continue;
+
+    // 找到 skills: 行
+    if (trimmed === 'skills:' || trimmed.startsWith('skills:')) {
+      skillsStart = i;
+      // 继续找到 skills 列表的结束（下一个非列表项、非缩进行）
+      for (let j = i + 1; j < lines.length; j++) {
+        const nextLine = lines[j];
+        const nextTrimmed = nextLine.trim();
+
+        // 如果是空行继续
+        if (!nextTrimmed) continue;
+
+        // 如果是另一个顶层键（如 memory:）结束
+        if (nextTrimmed.match(/^\w+:\s*$/)) {
+          skillsEnd = j;
+          break;
+        }
+
+        // 如果是另一个 section 的开始（如 memory: 前面有缩进）
+        if (nextLine.match(/^[a-z]/) && !nextTrimmed.startsWith('-')) {
+          skillsEnd = j;
+          break;
+        }
+
+        // 如果遇到 memory: 结束
+        if (nextTrimmed === 'memory:') {
+          skillsEnd = j;
+          break;
+        }
       }
-      currentKey = simpleMatch[1];
-      currentValue = simpleMatch[2] ? [simpleMatch[2]] : [];
-    }
-    // 列表项 - xxx
-    else if (line.match(/^\s+-\s+.+$/)) {
-      const value = line.replace(/^\s+-\s+/, '');
-      currentValue.push(value);
-    }
-    // 多行描述 | 后面的内容
-    else if (line.match(/^\s+\|.+$/)) {
-      const value = line.replace(/^\s+\|/, '');
-      currentValue.push(value);
+      break;
     }
   }
 
-  if (currentKey) {
-    frontmatter[currentKey] = currentValue.join('\n').trim();
-  }
-
-  return { frontmatter, body };
+  return { start: skillsStart, end: skillsEnd };
 }
 
-// 格式化 frontmatter 为 YAML 字符串
-function formatFrontmatter(frontmatter) {
-  const lines = [];
-
-  for (const [key, value] of Object.entries(frontmatter)) {
-    if (Array.isArray(value)) {
-      lines.push(`${key}:`);
-      for (const item of value) {
-        lines.push(`  - ${item}`);
-      }
-    } else if (typeof value === 'string' && value.includes('\n')) {
-      // 多行字符串
-      lines.push(`${key}: |`);
-      for (const line of value.split('\n')) {
-        lines.push(`  ${line}`);
-      }
-    } else {
-      lines.push(`${key}: ${value}`);
-    }
+// 替换 skills 部分
+function replaceSkillsSection(content, newSkills) {
+  const { start, end } = findSkillsSection(content);
+  if (start === -1 || end === -1) {
+    return content; // 没找到 skills 部分，保持原样
   }
 
-  return lines.join('\n');
+  const lines = content.split('\n');
+  const before = lines.slice(0, start);
+  const after = lines.slice(end);
+
+  // 构建新的 skills 部分
+  const newSkillsLines = ['skills:'];
+  for (const skill of newSkills) {
+    newSkillsLines.push(`  - ${skill}`);
+  }
+
+  return [...before, ...newSkillsLines, ...after].join('\n');
 }
 
 // 生成 Agent 文件
@@ -197,22 +185,39 @@ function generateAgentFile(agentName, techStack, templatePath, destPath) {
     return false;
   }
 
-  const content = readFileSync(templatePath, 'utf-8');
-  const { frontmatter, body } = parseFrontmatter(content);
+  let content = readFileSync(templatePath, 'utf-8');
 
-  // 动态过滤 skills
-  if (frontmatter.skills) {
-    const currentSkills = Array.isArray(frontmatter.skills)
-      ? frontmatter.skills
-      : frontmatter.skills.split('\n').filter(s => s.trim());
+  // 提取 frontmatter 和 body
+  const match = content.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
+  if (!match) {
+    console.log(`  ⚠️  模板格式错误: ${agentName}.md`);
+    return false;
+  }
 
-    frontmatter.skills = filterSkills(currentSkills, techStack);
+  let frontmatter = match[1];
+  const body = match[2];
+
+  // 提取当前 skills
+  const skillsMatch = frontmatter.match(/^skills:$\n([\s\S]*?)^memory:/m);
+  if (skillsMatch) {
+    const currentSkills = skillsMatch[1]
+      .split('\n')
+      .filter(line => line.trim().startsWith('-'))
+      .map(line => line.trim().substring(2).trim());
+
+    const filteredSkills = filterSkills(currentSkills, techStack);
+
+    // 替换 skills 部分
+    frontmatter = frontmatter.replace(/^skills:$\n[\s\S]*?^memory:/m, (match) => {
+      const skillsLines = filteredSkills.map(s => `  - ${s}`).join('\n');
+      return `skills:\n${skillsLines}\nmemory:`;
+    });
   }
 
   // 组合最终内容
-  const finalContent = `---\n${formatFrontmatter(frontmatter)}\n---\n${body}`;
+  content = `---\n${frontmatter}\n---\n${body}`;
 
-  writeFileSync(destPath, finalContent, 'utf-8');
+  writeFileSync(destPath, content, 'utf-8');
   return true;
 }
 
@@ -220,11 +225,9 @@ function generateAgentFile(agentName, techStack, templatePath, destPath) {
 function generateAgentConfigs(techStack, templatesDir, agentsDir) {
   const agents = [];
 
-  // 始终生成的 Agent
   const baseAgents = ['peaksfeat', 'product', 'qa', 'devops', 'security-reviewer',
               'code-reviewer-frontend', 'code-reviewer-backend', 'triage'];
 
-  // 技术栈相关 Agent
   const stackAgents = [];
   if (techStack.frontend) {
     stackAgents.push('frontend');
