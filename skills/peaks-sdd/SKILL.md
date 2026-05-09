@@ -1,7 +1,28 @@
 ---
 name: peaks-sdd
-description: Spec-Driven Development workflow. Use when user mentions 初始化项目, setup project, constitution, PRD, bug, 报错, 修复, or needs to develop features or fix bugs.
+description: |
+  Spec-Driven Development workflow for TypeScript projects. Use when user mentions 初始化项目, setup project, constitution, PRD, bug, 报错, 修复, or needs to develop features or fix bugs.
+  Triggers: /peaksinit, /peaksfeat, /peaksbug slash commands; or keywords: 初始化, 新项目, 功能开发, bug修复, 需求分析
+
 user-invocable: true
+model: sonnet
+tools:
+  - Read
+  - Write
+  - Edit
+  - Bash
+  - Glob
+  - Grep
+  - Agent
+skills:
+  - improve-codebase-architecture
+  - systematic-debugging
+  - test-driven-development
+  - find-skills
+maxTurns: 100
+memory: project
+hooks:
+  - require-code-review
 ---
 
 # Peaks SDD (Spec-Driven Development)

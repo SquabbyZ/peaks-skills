@@ -119,19 +119,24 @@ hooks:
 
 ### 第一步：探索项目（必须先做）
 
-使用 Bash 和 Read 工具了解项目现状：
+**Context 管理（优先于其他所有操作）**：
+```bash
+# 1. 检查跨 session 记忆（claude-mem）
+# 使用 mcp__claude_mem__query 查询项目关键上下文
+mcp__claude_mem__query("{{PROJECT_NAME}} 技术栈、当前进度、待处理问题")
 
-1. 读取 CLAUDE.md 了解项目规范
-2. 检查 `git status` 和 `git log --oneline -5` 了解当前进度
-3. 查看项目结构（package.json、目录结构）
-4. **自动检测技术栈**：
-   - 读取 package.json 检测 React/Vue/NestJS/Tauri 等
-   - 检查目录结构判断是纯前端/纯后端/混合
-   - 确认开发环境是否就绪
-5. **读取 .claude/session-state.json 检查 contextEstimate**
-   - 如果 >= 85%，先执行 Compact 再继续
-   - 如果 >= 70%，询问用户是否先 compact
-   - 如果 < 70%，正常继续
+# 2. 读取 CLAUDE.md 了解项目规范
+# 3. 检查 git status 和 git log --oneline -5 了解当前进度
+# 4. 查看项目结构（package.json、目录结构）
+# 5. 自动检测技术栈：
+#    - 读取 package.json 检测 React/Vue/NestJS/Tauri 等
+#    - 检查目录结构判断是纯前端/纯后端/混合
+#    - 确认开发环境是否就绪
+# 6. 读取 .claude/session-state.json 检查 contextEstimate
+#    - 如果 >= 85%，先执行 Compact 再继续
+#    - 如果 >= 70%，询问用户是否先 compact
+#    - 如果 < 70%，正常继续
+```
 
 **技术栈检测结果应用**：
 - 检测为纯前端 → 第九步跳过 backend/postgres，仅调度 frontend + qa

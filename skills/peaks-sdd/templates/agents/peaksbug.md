@@ -156,19 +156,29 @@ Bug 报告 → peaksbug（调度员）
 
 ### 第一步：探索项目（必须先做）
 
-使用 Bash 和 Read 工具了解项目现状：
+**Context 管理（优先于其他所有操作）**：
+```bash
+# 1. 检查跨 session 记忆（claude-mem）
+# 使用 mcp__claude_mem__query 查询项目关键上下文
+mcp__claude_mem__query("{{PROJECT_NAME}} 技术栈、当前进度、最近修复的 bug")
 
-1. 读取 CLAUDE.md 了解项目规范
-2. 检查 `git status` 和 `git log --oneline -5` 了解当前进度
-3. 查看项目结构（package.json、目录结构）
-4. **自动检测技术栈**：
-   - 读取 package.json 检测 React/Vue/NestJS/Tauri 等
-   - 检查目录结构判断是纯前端/纯后端/混合
-   - 确认开发环境是否就绪
-5. **读取 .claude/session-state.json 检查 contextEstimate**
-   - 如果 >= 85%，先执行 Compact 再继续
-   - 如果 >= 70%，询问用户是否先 compact
-   - 如果 < 70%，正常继续
+# 2. 查询代码知识图谱（gitnexus）
+# 使用 mcp__gitnexus__query 获取代码结构信息
+mcp__gitnexus__query("recent_changes", path: "{{PROJECT_PATH}}")
+mcp__gitnexus__query("file_history", path: "{{PROJECT_PATH}}/src")
+
+# 3. 读取 CLAUDE.md 了解项目规范
+# 4. 检查 git status 和 git log --oneline -5 了解当前进度
+# 5. 查看项目结构（package.json、目录结构）
+# 6. 自动检测技术栈：
+#    - 读取 package.json 检测 React/Vue/NestJS/Tauri 等
+#    - 检查目录结构判断是纯前端/纯后端/混合
+#    - 确认开发环境是否就绪
+# 7. 读取 .claude/session-state.json 检查 contextEstimate
+#    - 如果 >= 85%，先执行 Compact 再继续
+#    - 如果 >= 70%，询问用户是否先 compact
+#    - 如果 < 70%，正常继续
+```
 
 ### 第二步：Bug 分类（必须先做）
 
@@ -246,6 +256,13 @@ Skill: security-review
 #### Phase 4 — 探测
 
 每个探针必须映射到 Phase 3 的特定预测。**一次只改变一个变量。**
+
+**代码知识图谱辅助（gitnexus）**：
+```bash
+# 使用 gitnexus 查询相关代码历史，辅助探测
+mcp__gitnexus__query("file_blame", path: "{{PROJECT_PATH}}/src/{{RELATED_FILE}}")
+mcp__gitnexus__query("code_search", query: "{{ERROR_KEYWORD}}", path: "{{PROJECT_PATH}}/src")
+```
 
 工具偏好：
 1. **调试器/REPL 检查** — 如果环境支持。一个断点胜过十个日志。
