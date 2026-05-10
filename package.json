@@ -1,6 +1,6 @@
 {
   "name": "peaks-skills",
-  "version": "1.0.14",
+  "version": "1.0.15",
   "description": "AI-driven frontend development skills collection for Claude Code and AI coding assistants",
   "type": "module",
   "bin": {
