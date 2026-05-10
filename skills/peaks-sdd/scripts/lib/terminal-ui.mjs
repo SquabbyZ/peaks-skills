@@ -144,3 +144,35 @@ export const status = {
   skip: (text) => `\x1b[36m➖ ${text}\x1b[0m`,
   info: (text) => `\x1b[34mℹ ${text}\x1b[0m`,
 };
+
+/**
+ * 颜色名称到 ANSI 256 色码映射
+ */
+const COLOR_BG_MAP = {
+  violet:   '\x1b[48;5;135m',
+  red:      '\x1b[48;5;196m',
+  blue:     '\x1b[48;5;33m',
+  pink:     '\x1b[48;5;213m',
+  cyan:     '\x1b[48;5;51m',
+  green:    '\x1b[48;5;46m',
+  orange:   '\x1b[48;5;208m',
+  indigo:   '\x1b[48;5;99m',
+  teal:     '\x1b[48;5;37m',
+  emerald:  '\x1b[48;5;35m',
+  amber:    '\x1b[48;5;214m',
+  purple:   '\x1b[48;5;141m',
+  slate:    '\x1b[48;5;245m',
+  yellow:   '\x1b[48;5;226m',
+};
+
+/**
+ * 生成带背景色的 Agent 标签
+ * @param {string} agentName - agent 文件名（如 "frontend.md"）
+ * @param {string|null} color - 颜色名称（如 "cyan"）
+ * @returns {string} 带背景色的 ANSI 字符串
+ */
+export function agentBadge(agentName, color = null) {
+  const bg = color ? (COLOR_BG_MAP[color] || '\x1b[48;5;245m') : '\x1b[48;5;245m';
+  const label = agentName.replace('.md', '');
+  return `${bg}\x1b[1m\x1b[38;5;255m ${label} \x1b[0m`;
+}

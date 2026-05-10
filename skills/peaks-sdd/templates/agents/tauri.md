@@ -7,6 +7,7 @@ when_to_use: |
   Tauri、Rust、桌面、窗口、托盘、IPC、系统集成、桌面应用、tauri
 
 model: sonnet
+color: orange
 
 tools:
   - Read

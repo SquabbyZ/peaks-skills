@@ -8,6 +8,7 @@ when_to_use: |
   项目初始化、任务调度、多 Agent 协调、跨模块开发、集成测试
 
 model: sonnet
+color: purple
 
 tools:
   - Read

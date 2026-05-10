@@ -341,7 +341,7 @@ mcp__bunas__fs_mcp__read_file(path: "/path/to/project/package.json")
 
 | 条件                    | 生成 Agent                                                                                       | 说明       |
 | ----------------------- | ------------------------------------------------------------------------------------------------ | ---------- |
-| 检测到 React/Vue        | frontend                                                                                         | 前端专家   |
+| 检测到 React/Vue        | frontend, design                                                                                 | 前端专家 + 设计专家 |
 | 检测到 NestJS           | backend                                                                                          | 后端专家   |
 | 检测到 Tauri            | tauri                                                                                            | Tauri 专家 |
 | 检测到 PostgreSQL/MySQL | postgres                                                                                         | 数据库专家 |
@@ -769,6 +769,7 @@ openspec/
 | security-reviewer       | 安全审查，OWASP Top 10 | - |
 | code-reviewer-frontend | 前端代码审查 | - |
 | code-reviewer-backend  | 后端代码审查 | - |
+| design _(前端项目)_    | UI/UX 设计，视觉设计 + 交互设计 | design-taste-frontend, frontend-design |
 
 ### 技术栈相关 Agent（按需生成）
 
@@ -1289,6 +1290,7 @@ peaks-sdd 提供统一的 `/peaks-sdd` 命令入口，**用户输入任何内容
 | 模板文件 | 生成目标 | 触发条件 |
 |----------|---------|---------|
 | `frontend.md` | `.claude/agents/frontend.md` | 检测到 React/Vue/Next |
+| `design.md` | `.claude/agents/design.md` | 检测到 React/Vue/Next |
 | `backend.md` | `.claude/agents/backend.md` | 检测到 NestJS/Express |
 | `peaksbug.md` | `.claude/agents/peaksbug.md` | Bug 修复场景 |
 | `peaksfeat.md` | `.claude/agents/peaksfeat.md` | 功能开发场景 |

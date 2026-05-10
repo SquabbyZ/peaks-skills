@@ -6,7 +6,7 @@
 
 import { readFileSync, existsSync, mkdirSync, writeFileSync, readdirSync, statSync } from 'fs';
 import { join } from 'path';
-import { status } from './terminal-ui.mjs';
+import { status, agentBadge } from './terminal-ui.mjs';
 
 /**
  * 根据技术栈过滤 skills
@@ -351,6 +351,61 @@ function getAgentDescription(templatePath) {
 }
 
 /**
+ * 从模板中提取 when_to_use（简短角色描述）
+ * @param {string} templatePath - 模板路径
+ * @returns {string} 角色描述
+ */
+function getAgentRole(templatePath) {
+  try {
+    const content = readFileSync(templatePath, 'utf-8');
+    const match = content.match(/^when_to_use:\s*\|\s*\n([^\n]+)/m);
+    if (match) {
+      return match[1].trim();
+    }
+  } catch (e) {}
+  return '';
+}
+
+/**
+ * 从模板中提取 color
+ * @param {string} templatePath - 模板路径
+ * @returns {string|null} 颜色名称
+ */
+function getAgentColor(templatePath) {
+  try {
+    const content = readFileSync(templatePath, 'utf-8');
+    const match = content.match(/^color:\s*(\w+)/m);
+    if (match) return match[1].trim();
+  } catch (e) {}
+  return null;
+}
+
+/**
+ * 颜色名称到 ANSI 256 色码的映射
+ * @param {string} colorName - 颜色名称
+ * @returns {number} ANSI 色码
+ */
+function getColorAnsi(colorName) {
+  const map = {
+    violet: 135,   // 紫色
+    red: 196,      // 红色
+    blue: 33,      // 蓝色
+    pink: 213,     // 粉色
+    cyan: 51,      // 青色
+    green: 46,     // 绿色
+    orange: 208,   // 橙色
+    indigo: 99,    // 靛蓝
+    teal: 37,      // 蓝绿
+    emerald: 35,   // 翠绿
+    amber: 214,    // 琥珀
+    purple: 141,   // 紫色
+    slate: 245,    // 灰色
+    yellow: 226,   // 黄色
+  };
+  return map[colorName] || 245;
+}
+
+/**
  * 生成 QA 子 Agent 配置
  * @param {object} techStack - 技术栈信息
  * @param {string} templatesDir - 模板目录
@@ -406,7 +461,9 @@ function generateQaSubAgents(techStack, templatesDir, agentsDir) {
     if (existsSync(templatePath)) {
       const success = generateAgentFile(agent, techStack, templatePath, destPath);
       if (success) {
-        console.log(`  ${status.success(`${agent}.md`)} \x1b[90m- QA 子 Agent\x1b[0m`);
+        const qaRole = getAgentRole(templatePath);
+        const qaRoleTag = qaRole ? ` \x1b[33m${qaRole}\x1b[0m` : ' \x1b[90mQA 子 Agent\x1b[0m';
+        console.log(`  ${agentBadge(`${agent}.md`, getAgentColor(templatePath))}${qaRoleTag}`);
         generated.push(`qa/${agent}`);
       }
     } else {
@@ -620,7 +677,10 @@ export function generateDispatcherConfig(techStack, scanResult, templatesDir, ag
 
   const destPath = join(agentsDir, 'dispatcher.md');
   writeFileSync(destPath, `---\n${frontmatter}\n---\n${body}`, 'utf-8');
-  console.log(`  ${status.success('dispatcher.md')} \x1b[90m- 调度 Agent\x1b[0m`);
+  const dispatcherColor = getAgentColor(dispatcherTemplatePath);
+  const dispatcherRole = getAgentRole(dispatcherTemplatePath);
+  const dispatcherRoleTag = dispatcherRole ? ` \x1b[33m${dispatcherRole}\x1b[0m` : ' \x1b[90m调度 Agent\x1b[0m';
+  console.log(`  ${agentBadge('dispatcher.md', dispatcherColor)}${dispatcherRoleTag}`);
   return true;
 }
 
@@ -755,7 +815,7 @@ export function generateAgentConfigs(techStack, templatesDir, agentsDir, project
 
   const stackAgents = [];
   if (techStack.frontend) {
-    stackAgents.push('frontend');
+    stackAgents.push('frontend', 'design');
   }
   if (techStack.backend) stackAgents.push('backend');
   if (techStack.hasTauri) stackAgents.push('tauri');
@@ -781,7 +841,11 @@ export function generateAgentConfigs(techStack, templatesDir, agentsDir, project
       const success = generateAgentFile(agent, techStack, templatePath, destPath);
       if (success) {
         const desc = getAgentDescription(templatePath);
-        console.log(`  ${status.success(`${agent}.md`)} \x1b[90m- ${desc}\x1b[0m`);
+        const role = getAgentRole(templatePath);
+        const color = getAgentColor(templatePath);
+        const badge = agentBadge(`${agent}.md`, color);
+        const roleTag = role ? ` \x1b[33m${role}\x1b[0m` : '';
+        console.log(`  ${badge}${roleTag}`);
         agents.push(agent);
       }
     } else {

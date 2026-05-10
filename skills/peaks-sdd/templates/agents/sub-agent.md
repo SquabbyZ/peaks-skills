@@ -8,6 +8,7 @@ when_to_use: |
   功能开发、bug修复、模块迭代、自测
 
 model: sonnet
+color: slate
 
 background: true
 
