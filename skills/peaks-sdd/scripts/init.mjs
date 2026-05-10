@@ -82,8 +82,8 @@ async function main() {
   console.log(`\x1b[1m\x1b[36m║\x1b[0m  \x1b[90m耗时: ${elapsed}s\x1b[0m\x1b[36m                            ║\x1b[0m`);
   console.log('\x1b[1m\x1b[36m╚══════════════════════════════════════════════╝\x1b[0m');
   console.log('\n\x1b[90m   接下来运行:\x1b[0m');
-  console.log('\x1b[90m   • \x1b[37m/peaks-sdd 添加[功能]\x1b[0m  开始功能开发');
-  console.log('\x1b[90m   • \x1b[37m/peaks-sdd 修复[bug]\x1b[0m   修复 Bug');
+  console.log('\x1b[90m   • \x1b[37m/peaks-sdd 加个用户注册功能\x1b[0m  功能开发');
+  console.log('\x1b[90m   • \x1b[37m/peaks-sdd 登录按钮点击没反应\x1b[0m  Bug 修复');
   console.log('\x1b[90m   • \x1b[37m/peaks-sdd 初始化\x1b[0m     重新初始化项目');
   console.log('');
 }
