@@ -10,7 +10,7 @@ import { extname, basename } from 'path';
 // 阈值配置
 const THRESHOLDS = {
   softWarn: 400,   // 超过此行数发出警告
-  hardLimit: 800   // 超过此行数必须拆分
+  hardLimit: 500   // 超过此行数必须拆分
 };
 
 // 支持的文件类型

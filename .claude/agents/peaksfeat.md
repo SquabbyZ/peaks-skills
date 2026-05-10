@@ -27,7 +27,6 @@ skills:
   - improve-codebase-architecture
   - find-skills
   - systematic-debugging
-
 memory: project
 
 maxTurns: 50
@@ -206,11 +205,11 @@ hooks:
 **Context 管理（优先于其他所有操作）**：
 ```bash
 # 1. 检查跨 session 记忆（claude-mem）
-mcp__claude_mem__query("{{PROJECT_NAME}} 技术栈、当前进度、待处理问题")
+mcp__claude_mem__query("peaks-skills 技术栈、当前进度、待处理问题")
 
 # 2. 查询代码知识图谱（gitnexus）- 用于了解项目结构和最近变更
-mcp__gitnexus__query("recent_changes", path: "{{PROJECT_PATH}}")
-mcp__gitnexus__query("file_tree", path: "{{PROJECT_PATH}}/src")
+mcp__gitnexus__query("recent_changes", path: "C:\Users\smallMark\Desktop\peaks-skills")
+mcp__gitnexus__query("file_tree", path: "C:\Users\smallMark\Desktop\peaks-skills/src")
 
 # 3. 读取 CLAUDE.md 了解项目规范
 # 4. 检查 git status 和 git log --oneline -5 了解当前进度
@@ -525,8 +524,8 @@ qa-coordinator 接入
 你是 [专家角色]，负责 [职责范围]。
 
 ## 背景信息
-- 项目: {{PROJECT_NAME}}
-- 技术栈: {{TECH_STACK}}
+- 项目: peaks-skills
+- 技术栈: Unknown
 - 项目规范: [从 CLAUDE.md 提取的关键规范]
 - .peaks 目录: 所有产出文件保存到 .peaks/ 下
 
@@ -555,7 +554,7 @@ qa-coordinator 接入
 - 遵循项目现有的代码风格和目录结构
 - 完成后汇报交付物清单
 - 使用 gitnexus 确认相关文件的最近修改历史：
-  mcp__gitnexus__query("file_history", path: "{{PROJECT_PATH}}/src/{{RELATED_DIR}}")
+  mcp__gitnexus__query("file_history", path: "C:\Users\smallMark\Desktop\peaks-skills/src/{{RELATED_DIR}}")
 - **每次工具调用前检查 contextEstimate**（通过 PreToolUse hook 或手动）
 ```
 
@@ -684,8 +683,8 @@ peaksfeat 调度（主 session）
 - .peaks/plans/plan-[功能名].md（开发计划）
 
 ## 技术栈
-- 框架：{{FRONTEND_FRAMEWORK}} / {{BACKEND_FRAMEWORK}}
-- UI 库：{{UI_LIBRARY}}
+- 框架：react / nestjs
+- UI 库：antd
 - 代码风格：遵循项目现有规范
 
 ## 产出要求
@@ -821,12 +820,12 @@ openspec/
 
 ```bash
 # 探索阶段：了解相关模块的代码历史和结构
-mcp__gitnexus__query("file_tree", path: "{{PROJECT_PATH}}/src/{{RELATED_MODULE}}")
-mcp__gitnexus__query("recent_changes", path: "{{PROJECT_PATH}}/src", limit: 20)
+mcp__gitnexus__query("file_tree", path: "C:\Users\smallMark\Desktop\peaks-skills/src/{{RELATED_MODULE}}")
+mcp__gitnexus__query("recent_changes", path: "C:\Users\smallMark\Desktop\peaks-skills/src", limit: 20)
 
 # 设计阶段：查看类似功能的实现作为参考
-mcp__gitnexus__query("code_search", query: "{{PATTERN_NAME}}", path: "{{PROJECT_PATH}}/src")
-mcp__gitnexus__query("file_history", path: "{{PROJECT_PATH}}/src/{{EXISTING_FEATURE}}")
+mcp__gitnexus__query("code_search", query: "{{PATTERN_NAME}}", path: "C:\Users\smallMark\Desktop\peaks-skills/src")
+mcp__gitnexus__query("file_history", path: "C:\Users\smallMark\Desktop\peaks-skills/src/{{EXISTING_FEATURE}}")
 ```
 
 **OpenSpec 快速参考**：

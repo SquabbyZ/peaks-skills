@@ -1,0 +1,74 @@
+{
+  "mcpServers": {
+    "gitnexus": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "gitnexus@latest",
+        "mcp",
+        "--repo",
+        "c:/Users/smallMark/Desktop/peaks-skills"
+      ]
+    },
+    "claude-mem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@the.dot/mem"
+      ]
+    },
+    "context7": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@upstash/context7-mcp@latest"
+      ]
+    },
+    "fs": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@bunas/fs-mcp"
+      ]
+    },
+    "claude-md-management": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "claude-md-management@claude-plugins-official"
+      ]
+    },
+    "code-review": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "code-review@claude-plugins-official"
+      ]
+    },
+    "typescript-lsp": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "typescript-lsp@claude-plugins-official"
+      ]
+    },
+    "superpowers": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "superpowers@claude-plugins-official"
+      ]
+    },
+    "frontend-design": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "frontend-design@claude-plugins-official"
+      ]
+    }
+  },
+  "permissions": {
+    "allow": [],
+    "deny": []
+  }
+}

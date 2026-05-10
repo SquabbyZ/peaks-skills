@@ -41,18 +41,21 @@ async function main() {
 
   printAnimatedTitle('🔍 扫描项目');
   const techStack = detectTechStack(projectPath);
-  printTechStack(techStack);
+  printTechStack(techStack, projectPath);
 
   printAnimatedTitle('🧩 生成 Agents');
   if (skillDir) {
     const templatesDir = join(skillDir, 'templates', 'agents');
     const agentsDir = join(projectPath, '.claude', 'agents');
 
-    if (!existsSync(agentsDir)) {
-      mkdirSync(agentsDir, { recursive: true });
+    // 清空 agents 目录重新生成
+    if (existsSync(agentsDir)) {
+      const { rmSync } = await import('fs');
+      rmSync(agentsDir, { recursive: true });
     }
+    mkdirSync(agentsDir, { recursive: true });
 
-    const generatedAgents = generateAgentConfigs(techStack, templatesDir, agentsDir);
+    const generatedAgents = generateAgentConfigs(techStack, templatesDir, agentsDir, projectPath);
     console.log(`\n\x1b[90m   共生成 ${generatedAgents.length} 个 Agent\x1b[0m`);
   } else {
     console.log(`\n   ${status.warning('未找到 peaks-sdd skill 目录，跳过 Agent 生成')}`);

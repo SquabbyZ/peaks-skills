@@ -4,7 +4,7 @@
  * 根据技术栈动态生成 Agent 配置文件
  */
 
-import { readFileSync, existsSync, mkdirSync, writeFileSync } from 'fs';
+import { readFileSync, existsSync, mkdirSync, writeFileSync, readdirSync, statSync } from 'fs';
 import { join } from 'path';
 import { status } from './terminal-ui.mjs';
 
@@ -125,8 +125,8 @@ export function generateAgentFile(agentName, techStack, templatePath, destPath) 
 
   let content = readFileSync(templatePath, 'utf-8');
 
-  // 提取 frontmatter 和 body
-  const match = content.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
+  // 提取 frontmatter 和 body（兼容 Windows 和 Unix 换行）
+  const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/);
   if (!match) {
     console.log(`  \x1b[33m⚠️  模板格式错误: ${agentName}.md\x1b[0m`);
     return false;
@@ -134,6 +134,10 @@ export function generateAgentFile(agentName, techStack, templatePath, destPath) 
 
   let frontmatter = match[1];
   let body = match[2];
+
+  // 标准化换行符（兼容 Windows 和 Unix）
+  frontmatter = frontmatter.replace(/\r\n/g, '\n');
+  body = body.replace(/\r\n/g, '\n');
 
   // 定义模板变量映射
   const variables = {
@@ -366,6 +370,12 @@ function generateQaSubAgents(techStack, templatesDir, agentsDir) {
 
   const generated = [];
   const qaTemplateDir = join(templatesDir, 'qa');
+  const qaAgentsDir = join(agentsDir, 'qa');
+
+  // 创建 qa/ 子目录
+  if (!existsSync(qaAgentsDir)) {
+    mkdirSync(qaAgentsDir, { recursive: true });
+  }
 
   // 动态过滤 QA 子 agents
   const enabledQaSubAgents = [];
@@ -391,13 +401,13 @@ function generateQaSubAgents(techStack, templatesDir, agentsDir) {
 
   for (const agent of enabledQaSubAgents) {
     const templatePath = join(qaTemplateDir, `${agent}.md`);
-    const destPath = join(agentsDir, `${agent}.md`);
+    const destPath = join(qaAgentsDir, `${agent}.md`);
 
     if (existsSync(templatePath)) {
       const success = generateAgentFile(agent, techStack, templatePath, destPath);
       if (success) {
         console.log(`  ${status.success(`${agent}.md`)} \x1b[90m- QA 子 Agent\x1b[0m`);
-        generated.push(agent);
+        generated.push(`qa/${agent}`);
       }
     } else {
       console.log(`  ${status.warning(`QA 模板不存在: ${agent}.md`)}`);
@@ -408,17 +418,338 @@ function generateQaSubAgents(techStack, templatesDir, agentsDir) {
 }
 
 /**
- * 生成 Agent 配置
+ * 扫描项目模块结构
  * @param {object} techStack - 技术栈信息
+ * @param {string} projectPath - 项目路径
+ * @returns {object} 模块扫描结果
+ */
+export function scanProjectModules(techStack, projectPath) {
+  const modules = [];
+  const sharedFiles = [];
+  const packages = [];
+
+  // 检测 packages/ 目录（多包项目）
+  const packagesDir = join(projectPath, 'packages');
+  if (existsSync(packagesDir)) {
+    const entries = readdirSync(packagesDir);
+    for (const entry of entries) {
+      const pkgPath = join(packagesDir, entry);
+      if (statSync(pkgPath).isDirectory()) {
+        packages.push({
+          name: entry,
+          path: pkgPath,
+          modules: scanModulesInPath(pkgPath, techStack, entry)
+        });
+      }
+    }
+  }
+
+  // 检测单包项目的 src/ 目录
+  const srcDir = join(projectPath, 'src');
+  if (existsSync(srcDir)) {
+    const srcModules = scanModulesInPath(projectPath, techStack, '');
+    if (srcModules.length > 0) {
+      modules.push(...srcModules);
+    }
+  }
+
+  return {
+    projectType: packages.length > 0 ? 'multi-package' : 'single-package',
+    projectPath,
+    packages,
+    modules,
+    sharedFiles
+  };
+}
+
+/**
+ * 扫描指定路径下的模块
+ * @param {string} basePath - 基础路径
+ * @param {object} techStack - 技术栈信息
+ * @param {string} pkgName - 包名称（用于判断是否 Tauri）
+ * @returns {Array} 模块列表
+ */
+function scanModulesInPath(basePath, techStack, pkgName = '') {
+  const modules = [];
+
+  // Tauri 不拆分，整个作为一个模块
+  if (pkgName === 'client' && techStack.hasTauri) {
+    modules.push({
+      name: 'main',
+      path: basePath,
+      type: 'tauri'
+    });
+    return modules;
+  }
+
+  const isFrontend = techStack.frontend || techStack.frontendFramework;
+  const isBackend = techStack.backend || (pkgName === 'server');
+
+  // 前端：以页面为模块
+  if (isFrontend) {
+    const pagesDir = join(basePath, 'pages');
+    const appDir = join(basePath, 'app');
+
+    const possiblePaths = [
+      { path: appDir, type: 'app-router' },
+      { path: pagesDir, type: 'pages' }
+    ];
+
+    for (const { path, type } of possiblePaths) {
+      if (existsSync(path)) {
+        const entries = readdirSync(path);
+        for (const entry of entries) {
+          const entryPath = join(path, entry);
+          if (statSync(entryPath).isDirectory()) {
+            modules.push({
+              name: entry,
+              path: entryPath,
+              type,
+              techStack: detectModuleTechStack(entryPath, techStack)
+            });
+          }
+        }
+      }
+    }
+  }
+
+  // 后端：以 src 下的目录为模块
+  if (isBackend) {
+    const srcDir = join(basePath, 'src');
+    if (existsSync(srcDir)) {
+      const entries = readdirSync(srcDir);
+      for (const entry of entries) {
+        const entryPath = join(srcDir, entry);
+        if (statSync(entryPath).isDirectory()) {
+          modules.push({
+            name: entry,
+            path: entryPath,
+            type: 'backend-module',
+            techStack: detectModuleTechStack(entryPath, techStack)
+          });
+        }
+      }
+    }
+  }
+
+  return modules;
+}
+
+/**
+ * 检测模块的技术栈
+ * @param {string} modulePath - 模块路径
+ * @param {object} projectTechStack - 项目技术栈
+ * @returns {object} 模块技术栈
+ */
+function detectModuleTechStack(modulePath, projectTechStack) {
+  // 检测模块特定的技术栈（可能与项目整体不同）
+  const pkgJsonPath = join(modulePath, 'package.json');
+  if (existsSync(pkgJsonPath)) {
+    const pkg = JSON.parse(readFileSync(pkgJsonPath, 'utf-8'));
+    const deps = { ...pkg.dependencies, ...pkg.devDependencies };
+
+    return {
+      frontend: deps.react ? 'react' : (deps.vue ? 'vue' : projectTechStack.frontend),
+      backend: deps['@nestjs/core'] ? 'nestjs' : projectTechStack.backend,
+      ui: projectTechStack.ui
+    };
+  }
+
+  return {
+    frontend: projectTechStack.frontend,
+    backend: projectTechStack.backend,
+    ui: projectTechStack.ui
+  };
+}
+
+/**
+ * 生成调度 Agent 配置
+ * @param {object} techStack - 技术栈信息
+ * @param {object} scanResult - 模块扫描结果
+ * @param {string} templatesDir - 模板目录
+ * @param {string} agentsDir - agent 输出目录
+ * @returns {boolean} 是否成功
+ */
+export function generateDispatcherConfig(techStack, scanResult, templatesDir, agentsDir) {
+  const dispatcherTemplatePath = join(templatesDir, 'dispatcher.md');
+  if (!existsSync(dispatcherTemplatePath)) {
+    console.log(`  \x1b[33m⚠️  调度 Agent 模板不存在\x1b[0m`);
+    return false;
+  }
+
+  let content = readFileSync(dispatcherTemplatePath, 'utf-8');
+
+  // 提取 frontmatter 和 body（兼容 Windows 和 Unix 换行）
+  const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/);
+  if (!match) {
+    console.log(`  \x1b[33m⚠️  调度 Agent 模板格式错误\x1b[0m`);
+    return false;
+  }
+
+  let frontmatter = match[1];
+  let body = match[2];
+
+  // 标准化换行符（兼容 Windows 和 Unix）
+  frontmatter = frontmatter.replace(/\r\n/g, '\n');
+  body = body.replace(/\r\n/g, '\n');
+
+  // 注入项目结构信息
+  const projectInfo = {
+    '{{PROJECT_NAME}}': techStack.projectName || 'unknown-project',
+    '{{PROJECT_PATH}}': techStack.projectPath || process.cwd(),
+    '{{PROJECT_TYPE}}': scanResult.projectType,
+    '{{PACKAGE_COUNT}}': String(scanResult.packages.length),
+    '{{MODULE_COUNT}}': String(scanResult.modules.length),
+    '{{TECH_STACK}}': buildTechStackDesc(techStack)
+  };
+
+  // 替换变量
+  for (const [key, value] of Object.entries(projectInfo)) {
+    frontmatter = frontmatter.replace(new RegExp(key.replace(/[{}]/g, '\\$&'), 'g'), value);
+    body = body.replace(new RegExp(key.replace(/[{}]/g, '\\$&'), 'g'), value);
+  }
+
+  // 根据项目类型调整 body
+  if (scanResult.projectType === 'single-package') {
+    body = body.replace(/\$2\$ 多包项目配置[\s\S]*?\$2\$ 单包项目简化版/, '$2$ 单包项目简化配置');
+  }
+
+  // 生成模块注册表
+  const moduleRegistry = generateModuleRegistry(scanResult);
+  body = body.replace('{{MODULE_REGISTRY}}', moduleRegistry);
+
+  const destPath = join(agentsDir, 'dispatcher.md');
+  writeFileSync(destPath, `---\n${frontmatter}\n---\n${body}`, 'utf-8');
+  console.log(`  ${status.success('dispatcher.md')} \x1b[90m- 调度 Agent\x1b[0m`);
+  return true;
+}
+
+/**
+ * 生成模块注册表
+ * @param {object} scanResult - 扫描结果
+ * @returns {string} 模块注册表 markdown
+ */
+function generateModuleRegistry(scanResult) {
+  let registry = '## 模块注册表\n\n';
+  registry += `项目类型: **${scanResult.projectType}**\n\n`;
+
+  if (scanResult.packages.length > 0) {
+    registry += '### 包列表\n\n';
+    for (const pkg of scanResult.packages) {
+      registry += `- **${pkg.name}**: ${pkg.modules.length} 个模块\n`;
+    }
+  }
+
+  if (scanResult.modules.length > 0) {
+    registry += '\n### 模块列表\n\n';
+    for (const mod of scanResult.modules) {
+      registry += `- **${mod.name}** (${mod.type}): ${mod.path}\n`;
+    }
+  }
+
+  registry += '\n### 调度规则\n\n';
+  registry += '- 独立模块并行执行\n';
+  registry += '- 有依赖模块串行执行\n';
+  registry += '- 共享文件修改需通过交接协议\n';
+
+  return registry;
+}
+
+/**
+ * 生成子 Agent 配置
+ * @param {object} techStack - 技术栈信息
+ * @param {object} scanResult - 模块扫描结果
  * @param {string} templatesDir - 模板目录
  * @param {string} agentsDir - agent 输出目录
  * @returns {Array} 生成的 agent 列表
  */
-export function generateAgentConfigs(techStack, templatesDir, agentsDir) {
+export function generateSubAgentConfigs(techStack, scanResult, templatesDir, agentsDir) {
+  const subAgentTemplatePath = join(templatesDir, 'sub-agent.md');
+  if (!existsSync(subAgentTemplatePath)) {
+    console.log(`  \x1b[33m⚠️  子 Agent 模板不存在\x1b[0m`);
+    return [];
+  }
+
+  const generated = [];
+
+  // 为每个包生成 Agent Pool
+  for (const pkg of scanResult.packages) {
+    const pkgAgentsDir = join(agentsDir, pkg.name);
+    if (!existsSync(pkgAgentsDir)) {
+      mkdirSync(pkgAgentsDir, { recursive: true });
+    }
+
+    for (const mod of pkg.modules) {
+      const agentName = `${pkg.name}-${mod.name}-agent`;
+      const success = generateSubAgentFile(agentName, techStack, mod, subAgentTemplatePath, pkgAgentsDir);
+      if (success) {
+        generated.push(agentName);
+      }
+    }
+  }
+
+  // 为单包项目的模块生成 Agent
+  for (const mod of scanResult.modules) {
+    const agentName = `${mod.name}-agent`;
+    const success = generateSubAgentFile(agentName, techStack, mod, subAgentTemplatePath, agentsDir);
+    if (success) {
+      generated.push(agentName);
+    }
+  }
+
+  return generated;
+}
+
+/**
+ * 生成单个子 Agent 文件
+ * @param {string} agentName - agent 名称
+ * @param {object} techStack - 技术栈信息
+ * @param {object} module - 模块信息
+ * @param {string} templatePath - 模板路径
+ * @param {string} destDir - 目标目录
+ * @returns {boolean} 是否成功
+ */
+function generateSubAgentFile(agentName, techStack, module, templatePath, destDir) {
+  let content = readFileSync(templatePath, 'utf-8');
+
+  const match = content.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
+  if (!match) return false;
+
+  let frontmatter = match[1];
+  let body = match[2];
+
+  const variables = {
+    '{{MODULE_NAME}}': module.name,
+    '{{MODULE_PATH}}': module.path,
+    '{{MODULE_TYPE}}': module.type,
+    '{{TECH_STACK}}': buildTechStackDesc(techStack),
+    '{{AGENT_NAME}}': agentName
+  };
+
+  for (const [key, value] of Object.entries(variables)) {
+    frontmatter = frontmatter.replace(new RegExp(key.replace(/[{}]/g, '\\$&'), 'g'), value);
+    body = body.replace(new RegExp(key.replace(/[{}]/g, '\\$&'), 'g'), value);
+  }
+
+  const destPath = join(destDir, `${agentName}.md`);
+  writeFileSync(destPath, `---\n${frontmatter}\n---\n${body}`, 'utf-8');
+  console.log(`  ${status.success(`${agentName}.md`)} \x1b[90m- ${module.type}\x1b[0m`);
+  return true;
+}
+
+/**
+ * 生成 Agent 配置
+ * @param {object} techStack - 技术栈信息
+ * @param {string} templatesDir - 模板目录
+ * @param {string} agentsDir - agent 输出目录
+ * @param {string} projectPath - 项目路径
+ * @returns {Array} 生成的 agent 列表
+ */
+export function generateAgentConfigs(techStack, templatesDir, agentsDir, projectPath) {
   const agents = [];
 
   const baseAgents = [
-    'peaksfeat', 'product', 'qa', 'devops', 'security-reviewer',
+    'peaksfeat', 'peaksbug', 'product', 'qa', 'devops', 'security-reviewer',
     'code-reviewer-frontend', 'code-reviewer-backend', 'triage'
   ];
 
@@ -457,6 +788,21 @@ export function generateAgentConfigs(techStack, templatesDir, agentsDir) {
       console.log(`  ${status.warning(`模板不存在: ${agent}.md`)}`);
     }
   }
+
+  // 生成调度 Agent 和子 Agent 配置
+  console.log(`\n\x1b[1m\x1b[36m🚀\x1b[0m \x1b[1m调度 Agent 配置\x1b[0m`);
+  console.log('\x1b[90m' + '─'.repeat(50) + '\x1b[0m');
+
+  const scanResult = scanProjectModules(techStack, projectPath);
+  const dispatcherSuccess = generateDispatcherConfig(techStack, scanResult, templatesDir, agentsDir);
+  if (dispatcherSuccess) {
+    agents.push('dispatcher');
+  }
+
+  const subAgents = generateSubAgentConfigs(techStack, scanResult, templatesDir, agentsDir);
+  agents.push(...subAgents);
+
+  console.log(`\n\x1b[90m   共生成 ${subAgents.length} 个子 Agent\x1b[0m`);
 
   return agents;
 }

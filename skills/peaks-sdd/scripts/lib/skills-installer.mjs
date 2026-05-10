@@ -109,9 +109,39 @@ export async function installSkills(skillList) {
   const skipped = results.filter(r => r.skipped).length;
   const failed = results.filter(r => !r.success).length;
 
+  // 按来源分组显示
+  const superpowers = results.filter(r => r.name && ['brainstorming', 'dispatching-parallel-agents', 'executing-plans', 'finishing-a-development-branch', 'receiving-code-review', 'requesting-code-review', 'subagent-driven-development', 'systematic-debugging', 'test-driven-development', 'using-git-worktrees', 'using-superpowers', 'verification-before-completion', 'writing-plans', 'writing-skills'].includes(r.name));
+  const vercel = results.filter(r => r.name && r.name.startsWith('vercel-'));
+  const other = results.filter(r => !superpowers.includes(r) && !vercel.includes(r));
+
   console.log('\x1b[90m' + '─'.repeat(50) + '\x1b[0m');
   console.log(`\n\x1b[1m📊 Skills 安装结果:\x1b[0m`);
-  console.log(`   ${status.success(`成功: ${succeeded}`)}`);
+
+  if (superpowers.length > 0) {
+    console.log(`\n   \x1b[1m🔗 Superpowers:\x1b[0m`);
+    superpowers.forEach(r => {
+      const icon = r.success ? (r.skipped ? '➖' : '✅') : '❌';
+      console.log(`      ${icon} ${r.name}`);
+    });
+  }
+
+  if (vercel.length > 0) {
+    console.log(`\n   \x1b[1m🔗 Vercel Skills:\x1b[0m`);
+    vercel.forEach(r => {
+      const icon = r.success ? (r.skipped ? '➖' : '✅') : '❌';
+      console.log(`      ${icon} ${r.name}`);
+    });
+  }
+
+  if (other.length > 0) {
+    console.log(`\n   \x1b[1m🔗 其他 Skills:\x1b[0m`);
+    other.forEach(r => {
+      const icon = r.success ? (r.skipped ? '➖' : '✅') : '❌';
+      console.log(`      ${icon} ${r.name}`);
+    });
+  }
+
+  console.log(`\n   ${status.success(`成功: ${succeeded}`)}`);
   console.log(`   ${status.skip(`跳过: ${skipped}`)}`);
   console.log(`   ${status.error(`失败: ${failed}`)}`);
 

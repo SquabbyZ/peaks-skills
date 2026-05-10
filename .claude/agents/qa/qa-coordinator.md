@@ -24,7 +24,6 @@ skills:
   - webapp-testing
   - e2e-testing-patterns
   - testing-strategies
-
 memory: project
 
 maxTurns: 100
