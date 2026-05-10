@@ -9,6 +9,8 @@ when_to_use: |
 
 model: sonnet
 
+background: true
+
 tools:
   - Read
   - Edit
@@ -16,7 +18,8 @@ tools:
   - Bash
   - Glob
   - Grep
-  - Agent
+  - TodoWrite
+  - TaskOutput
   - mcp__playwright__navigate
   - mcp__playwright__click
   - mcp__playwright__fill
