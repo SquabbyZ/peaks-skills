@@ -203,7 +203,7 @@ export function detectTechStack(projectPath) {
             techStack.packageDetails[pkgName] = {
               frontend: detectPackageFrontend(subPkg, join(projectPath, 'packages', pkgName)),
               backend: detectPackageBackend(subPkg),
-              ui: detectPackageUI(subPkg),
+              ui: detectPackageUI(subPkg, join(projectPath, 'packages', pkgName)),
               database: detectPackageDatabase(subPkg),
               buildTool: detectPackageBuildTool(subPkg, join(projectPath, 'packages', pkgName))
             };
@@ -298,6 +298,10 @@ export function detectTechStack(projectPath) {
     else if (allDeps['primevue']) techStack.ui = 'primevue';
     else if (allDeps['vuetify']) techStack.ui = 'vuetify';
     else if (allDeps['element-plus']) techStack.ui = 'element-plus';
+    // 本地 shadcn/ui 组件库检测（无 npm 依赖，组件以本地文件存在）
+    if (!techStack.ui && detectLocalShadcn(projectPath)) {
+      techStack.ui = 'shadcn';
+    }
 
     // ========== 检测数据库 ==========
     if (allDeps.prisma) techStack.database = 'postgresql';
@@ -345,8 +349,10 @@ function detectPackageBackend(pkg) {
 
 /**
  * 检测子包的 UI 库
+ * @param {object} pkg - package.json 内容
+ * @param {string} [pkgPath] - 包目录路径（用于检测本地 shadcn/ui）
  */
-function detectPackageUI(pkg) {
+function detectPackageUI(pkg, pkgPath) {
   const deps = { ...pkg.dependencies, ...pkg.devDependencies };
   if (deps.antd || deps['@ant-design/react']) return { framework: 'antd', version: deps.antd || deps['@ant-design/react'] };
   if (deps['@mui/material']) return { framework: 'mui', version: deps['@mui/material'] };
@@ -355,7 +361,53 @@ function detectPackageUI(pkg) {
   if (deps['primevue']) return { framework: 'primevue', version: deps['primevue'] };
   if (deps.vuetify) return { framework: 'vuetify', version: deps.vuetify };
   if (deps['element-plus']) return { framework: 'element-plus', version: deps['element-plus'] };
+  // 本地 shadcn/ui 组件库检测
+  if (pkgPath && detectLocalShadcn(pkgPath)) return { framework: 'shadcn', version: 'local' };
   return { framework: null, version: null };
+}
+
+/**
+ * 通过文件系统检测本地 shadcn/ui 组件库
+ * shadcn/ui 组件通常以本地文件形式存在于 src/components/ui/ 目录下
+ * @param {string} projectPath - 项目路径
+ * @returns {boolean} 是否检测到本地 shadcn/ui
+ */
+function detectLocalShadcn(projectPath) {
+  // shadcn/ui 的典型组件文件名（检测到 3 个以上即判定）
+  const SHADCN_SIGNATURES = [
+    'button.tsx', 'button.jsx', 'button.ts', 'button.js',
+    'dialog.tsx', 'dialog.jsx', 'dialog.ts', 'dialog.js',
+    'input.tsx', 'input.jsx', 'input.ts', 'input.js',
+    'label.tsx', 'label.jsx',
+    'select.tsx', 'select.jsx',
+    'card.tsx', 'card.jsx',
+    'badge.tsx', 'badge.jsx',
+    'tabs.tsx', 'tabs.jsx',
+    'dropdown-menu.tsx', 'dropdown-menu.jsx',
+    'sheet.tsx', 'sheet.jsx',
+    'avatar.tsx', 'avatar.jsx',
+    'tooltip.tsx', 'tooltip.jsx',
+  ];
+
+  const SHADCN_THRESHOLD = 3; // 至少匹配 3 个文件才判定为 shadcn/ui
+
+  // 常见的 shadcn/ui 组件目录路径
+  const searchDirs = [
+    join(projectPath, 'src', 'components', 'ui'),
+    join(projectPath, 'src', 'components', 'ui', 'components'),
+    join(projectPath, 'components', 'ui'),
+  ];
+
+  for (const dir of searchDirs) {
+    if (!existsSync(dir)) continue;
+    try {
+      const files = readdirSync(dir);
+      const matchCount = files.filter(f => SHADCN_SIGNATURES.includes(f.toLowerCase())).length;
+      if (matchCount >= SHADCN_THRESHOLD) return true;
+    } catch (e) { /* ignore */ }
+  }
+
+  return false;
 }
 
 /**
