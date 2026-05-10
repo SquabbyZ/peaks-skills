@@ -76,6 +76,7 @@ downloads/
 eggs/
 .eggs/
 lib/
+!skills/peaks-sdd/scripts/lib/
 lib64/
 parts/
 sdist/
