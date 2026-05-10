@@ -5,7 +5,6 @@ description: |
   Trigger: /peaks-sdd <any natural language description> — routes to init, feature dev, or bug fix based on user intent.
 
 user-invocable: true
-model: sonnet
 tools:
   - Read
   - Write
@@ -14,11 +13,6 @@ tools:
   - Glob
   - Grep
   - Agent
-skills:
-  - improve-codebase-architecture
-  - systematic-debugging
-  - test-driven-development
-  - find-skills
 maxTurns: 100
 memory: project
 hooks:
@@ -492,100 +486,31 @@ find .peaks -type d
 4. **自动替换 `{{PROJECT_PATH}}`** 为实际项目根目录路径
 4. **不覆盖任何已有的 MCP 配置**
 
-### Step 0.8: 安装 Skills（使用 skills CLI + symlink）
+### Step 0.8: Skills 按需安装（避免 429）
 
-使用 `npx skills add` 命令安装 skills，通过 symlink 方式链接，方便自动更新。
+**初始化时不安装 Skills**，改为在实际使用时由 Agent 动态安装，避免初始化时大量 API 调用触发 429 错误。
 
-#### Superpowers Skills（17个）
+**安装原则**：
+- 首次调用某个 Agent 时，如发现缺失 skill，自动安装
+- 使用 `npx skills add <url> --skill <name>` 安装
+- 已安装的 skill 跳过，不重复安装
 
+**已预安装的 Skill**：用户可提前安装常用 skills 到 `~/.claude/skills/`，初始化时会跳过已安装的。
+
+**常用 Skill 安装命令**（用户可选择性安装）：
 ```bash
+# Superpowers（开发流程）
 npx skills add https://github.com/obra/superpowers --skill brainstorming
-npx skills add https://github.com/obra/superpowers --skill dispatching-parallel-agents
-npx skills add https://github.com/obra/superpowers --skill executing-plans
-npx skills add https://github.com/obra/superpowers --skill finishing-a-development-branch
-npx skills add https://github.com/obra/superpowers --skill receiving-code-review
-npx skills add https://github.com/obra/superpowers --skill requesting-code-review
-npx skills add https://github.com/obra/superpowers --skill subagent-driven-development
-npx skills add https://github.com/obra/superpowers --skill systematic-debugging
-npx skills add https://github.com/obra/superpowers --skill test-driven-development
-npx skills add https://github.com/obra/superpowers --skill using-git-worktrees
-npx skills add https://github.com/obra/superpowers --skill using-superpowers
-npx skills add https://github.com/obra/superpowers --skill verification-before-completion
-npx skills add https://github.com/obra/superpowers --skill writing-plans
-npx skills add https://github.com/obra/superpowers --skill writing-skills
-# npx skills add removed: build-error-resolver not available
-# npx skills add removed: silent-failure-hunter not available
-# npx skills add removed: performance-optimizer not available
-```
 
-#### 其他常用 Skills
-
-```bash
-npx skills add https://github.com/vercel-labs/skills --skill find-skills
-npx skills add https://github.com/vercel-labs/skills --skill brainstorming
+# 前端开发
 npx skills add https://github.com/vercel-labs/skills --skill frontend-design
-npx skills add https://github.com/vercel-labs/skills --skill component-scaffold-generator
-npx skills add https://github.com/vercel-labs/skills --skill design-md
-```
 
-#### Browser Skills
-
-```bash
-npx skills add https://github.com/browserbase/skills --skill browser
-npx skills add https://github.com/browser-use/browser-use --skill browser-use
-```
-
-#### Design Skills
-
-```bash
-npx skills add https://github.com/anthropics/skills --skill frontend-design
-npx skills add https://github.com/leonxlnx/taste-skill --skill design-taste-frontend
-```
-
-#### Frontend Framework Skills
-
-```bash
-npx skills add https://github.com/vercel-labs/agent-skills --skill vercel-react-best-practices
-npx skills add https://github.com/vercel-labs/agent-skills --skill vercel-react-native-skills
-npx skills add https://github.com/vercel-labs/agent-skills --skill vercel-react-view-transitions
-npx skills add https://github.com/google-labs-code/stitch-skills --skill react:components
-npx skills add https://github.com/hyf0/vue-skills --skill vue-best-practices
-npx skills add https://github.com/antfu/skills --skill vue
-npx skills add https://github.com/hyf0/vue-skills --skill vue-debug-guides
-```
-
-#### Agent 用到的 Skills（检查是否已存在）
-
-检查以下 skills 是否已安装，未安装则添加：
-
-| Skill | 用途 |
-|-------|------|
-| improve-codebase-architecture | 代码库架构分析与改进（所有 agent 模板引用） |
-| karpathy-guidelines | Karpathy 开发原则 |
-| hookify | Hook 配置管理 |
-| skill-creator | Skill 创建工具 |
-| shadcn | UI 组件 |
-| postgres | PostgreSQL |
-| tauri-v2 | Tauri 桌面应用 |
-| browser | Browserbase 浏览器自动化（frontend/peaksbug 依赖） |
-| browser-use | Browser automation for E2E testing（design/frontend/qa agent 最终验证） |
-| design-taste-frontend | 设计品味评估（design agent 必须优先调用） |
-| frontend-design | 前端设计方法论（design agent 组合使用） |
-| systematic-debugging | 系统化调试（peaksbug 依赖） |
-| test-driven-development | 测试驱动开发（peaksbug 依赖） |
-
-#### 架构改进 Skill
-
-```bash
+# 架构改进
 npx skills add https://github.com/mattpocock/skills --skill improve-codebase-architecture
+
+# 测试相关
+npx skills add https://github.com/anthropics/skills --skill webapp-testing
 ```
-
-
-**逻辑**：
-
-1. 运行 `npx skills add <url> --skill <name>` 安装每个 skill
-2. Skills 使用 symlink 方式链接到 `~/.agents/skills/`
-3. 原始仓库更新后，可通过 `npx skills update` 自动同步
 
 #### OpenSpec CLI（用于存量项目迭代）
 

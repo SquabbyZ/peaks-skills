@@ -11,7 +11,6 @@ import { performance } from 'perf_hooks';
 
 import { detectTechStack, printTechStack } from './lib/tech-stack-detector.mjs';
 import { generateAgentConfigs } from './lib/agent-generator.mjs';
-import { getSkillsToInstall, installSkills } from './lib/skills-installer.mjs';
 import { createPeaksDirectory, createDataDirectories, configureMcpServers } from './lib/directory-creator.mjs';
 import { printAnimatedTitle, status } from './lib/terminal-ui.mjs';
 
@@ -61,10 +60,8 @@ async function main() {
     console.log(`\n   ${status.warning('未找到 peaks-sdd skill 目录，跳过 Agent 生成')}`);
   }
 
-  printAnimatedTitle('⬇ 安装 Skills');
-  const skillsToInstall = getSkillsToInstall(techStack);
-  console.log(`\x1b[90m   共 ${skillsToInstall.length} 个 Skills\x1b[0m`);
-  await installSkills(skillsToInstall);
+  // Skills 延迟安装提示（初始化时不安装，避免 429）
+  console.log(`\n   ${status.info('Skills 将在实际使用时按需安装')}`);
 
   printAnimatedTitle('📁 创建 .peaks 目录');
   createPeaksDirectory(projectPath);

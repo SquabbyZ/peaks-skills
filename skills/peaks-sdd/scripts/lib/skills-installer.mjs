@@ -17,64 +17,49 @@ import { status } from './terminal-ui.mjs';
  * @returns {Promise<object>} 安装结果
  */
 export async function installSkill(skillUrl, skillName, options = {}) {
-  const { skillDirName, global = true, maxRetries = 3 } = options;
+  const { skillDirName, global = true, maxRetries = 2, timeout = 90000 } = options;
   const globalSkillsDir = join(os.homedir(), '.claude', 'skills');
   const dirName = skillDirName || skillName;
   const skillDestDir = join(globalSkillsDir, dirName);
 
-  // 如果已安装，跳过
+  // 检查是否已安装
   if (existsSync(skillDestDir)) {
-    console.log(`  ${status.skip(`${skillName} 已安装`)}`);
+    console.log(`  ${status.skip(`${skillName} 已安装，跳过`)}`);
     return { success: true, skipped: true, name: skillName };
   }
 
   // 动态显示正在安装
-  process.stdout.write(`  ⏳ ${skillName} 安装中...`);
-  let lastError = null;
+  process.stdout.write(`  \x1b[33m⏳ ${skillName}\x1b[0m 安装中...`);
   const { execSync } = await import('child_process');
 
-  // 重试逻辑（非网络错误才重试）
-  for (let attempt = 1; attempt <= maxRetries; attempt++) {
-    try {
-      const installCmd = `npx -y skills add ${skillUrl} --skill ${skillName}`;
+  try {
+    const installCmd = `npx -y skills add ${skillUrl} --skill ${skillName}`;
+    execSync(installCmd, {
+      cwd: global ? os.homedir() : process.cwd(),
+      stdio: 'pipe',
+      timeout: timeout,
+    });
+    process.stdout.write(`\r  \x1b[32m✅ ${skillName}\x1b[0m 安装成功\n`);
+    return { success: true, skipped: false, name: skillName };
+  } catch (error) {
+    // 网络/npm错误都跳过，不阻塞流程
+    const isNetworkError =
+      error.message?.includes('timeout') ||
+      error.message?.includes('ETIMEDOUT') ||
+      error.message?.includes('ENOTFOUND') ||
+      error.message?.includes('ECONNREFUSED') ||
+      error.message?.includes('network') ||
+      error.message?.includes('npm') ||
+      error.message?.includes('not found') ||
+      error.message?.includes('404');
 
-      execSync(installCmd, {
-        cwd: global ? os.homedir() : process.cwd(),
-        stdio: 'pipe'
-      });
-
-      console.log(`  ${status.success(`${skillName} 安装成功`)}`);
-      return { success: true, skipped: false, name: skillName };
-    } catch (error) {
-      lastError = error;
-
-      // 判断是否是网络相关错误（不重试）
-      const isNetworkError =
-        error.message?.includes('timeout') ||
-        error.message?.includes('ETIMEDOUT') ||
-        error.message?.includes('ENOTFOUND') ||
-        error.message?.includes('ECONNREFUSED') ||
-        error.message?.includes('network');
-
-      if (isNetworkError || attempt >= maxRetries) {
-        const errorMsg = isNetworkError ? '网络错误' :
-                         error.message?.includes('npm') ? 'npm 错误' :
-                         error.message?.includes('not found') ? '未找到' :
-                         error.message?.includes('already exists') ? '已存在' : '安装失败';
-
-        console.log(`  ${status.error(`${skillName} 安装失败: ${errorMsg}`)}`);
-        if (attempt >= maxRetries && !isNetworkError) {
-          console.log(`     ${error.message?.slice(0, 150) || '未知错误'}`);
-        }
-        return { success: false, error: errorMsg, name: skillName };
-      }
-
-      // 非网络错误，重试前提示（只显示一次）
-      process.stdout.write(`\r  ⏳ ${skillName} 重试中...`);
+    if (isNetworkError) {
+      process.stdout.write(`\r  \x1b[33m⚠️ ${skillName}\x1b[0m 跳过（网络问题）\n`);
+      return { success: true, skipped: true, name: skillName };
     }
+    process.stdout.write(`\r  \x1b[31m❌ ${skillName}\x1b[0m 安装失败: ${error.message?.slice(0, 50)}\n`);
+    return { success: false, skipped: false, name: skillName, error: error.message };
   }
-
-  return { success: false, error: lastError?.message || '未知错误', name: skillName };
 }
 
 /**
