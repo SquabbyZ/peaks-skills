@@ -2,9 +2,13 @@
 /**
  * peaks-sdd 项目初始化脚本
  * 自动扫描项目技术栈并生成配置
+ *
+ * 用法:
+ *   node init.mjs <projectPath>                    # 自动检测技术栈
+ *   node init.mjs <projectPath> --frontend=react --backend=nestjs  # 指定技术栈
  */
 
-import { existsSync, mkdirSync } from 'fs';
+import { existsSync, mkdirSync, readdirSync, statSync, readFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { performance } from 'perf_hooks';
@@ -28,6 +32,95 @@ function getSkillDir() {
   return null;
 }
 
+/**
+ * 解析命令行参数中的技术栈覆盖
+ * @param {string[]} args - 命令行参数
+ * @returns {object|null} 技术栈覆盖对象
+ */
+function parseTechStackOverride(args) {
+  const override = {};
+  for (const arg of args) {
+    if (arg.startsWith('--')) {
+      const [key, value] = arg.slice(2).split('=');
+      if (key && value) {
+        if (key === 'frontend') override.frontend = value;
+        if (key === 'backend') override.backend = value;
+        if (key === 'ui') override.ui = value;
+        if (key === 'database') override.database = value;
+        if (key === 'monorepo') override.isMonorepo = value === 'true';
+      }
+    }
+  }
+  return Object.keys(override).length > 0 ? override : null;
+}
+
+/**
+ * 重新扫描 monorepo 子包的技术栈
+ * @param {string} projectPath - 项目路径
+ * @returns {object} 包含 monorepoPackages 和 packageDetails
+ */
+function scanMonorepoPackages(projectPath) {
+  const result = {
+    monorepoPackages: [],
+    packageDetails: {}
+  };
+
+  const packagesDir = join(projectPath, 'packages');
+  if (!existsSync(packagesDir)) return result;
+
+  const entries = readdirSync(packagesDir);
+  for (const pkgName of entries) {
+    const pkgPath = join(packagesDir, pkgName);
+    if (!statSync(pkgPath).isDirectory()) continue;
+
+    const pkgJsonPath = join(pkgPath, 'package.json');
+    if (!existsSync(pkgJsonPath)) continue;
+
+    try {
+      const subPkg = JSON.parse(readFileSync(pkgJsonPath, 'utf-8'));
+      const deps = { ...subPkg.dependencies, ...subPkg.devDependencies };
+
+      result.monorepoPackages.push(pkgName);
+
+      // 检测子包的前端框架
+      let frontendFramework = null;
+      if (deps.react) frontendFramework = 'react';
+      else if (deps.vue) frontendFramework = 'vue';
+      else if (deps.next) frontendFramework = 'next';
+
+      // 检测子包的后端框架
+      let backendFramework = null;
+      if (deps['@nestjs/core']) backendFramework = 'nestjs';
+      else if (deps.express) backendFramework = 'express';
+      else if (deps.fastify) backendFramework = 'fastify';
+
+      // 检测子包的 UI 库
+      let uiFramework = null;
+      if (deps.antd || deps['@ant-design/react']) uiFramework = 'antd';
+      else if (deps['@mui/material']) uiFramework = 'mui';
+      else if (deps['element-plus']) uiFramework = 'element-plus';
+      else if (deps['@chakra-ui/react']) uiFramework = 'chakra';
+
+      // 检测子包的数据库
+      let dbFramework = null;
+      if (deps.prisma) dbFramework = 'postgresql';
+      else if (deps.mongoose) dbFramework = 'mongodb';
+      else if (deps.typeorm) dbFramework = 'postgresql';
+
+      result.packageDetails[pkgName] = {
+        frontend: frontendFramework ? { framework: frontendFramework } : { framework: null },
+        backend: backendFramework ? { framework: backendFramework } : { framework: null },
+        ui: uiFramework ? { framework: uiFramework } : { framework: null },
+        database: dbFramework ? { framework: dbFramework } : { framework: null }
+      };
+    } catch (e) {
+      // 忽略解析失败的 package.json
+    }
+  }
+
+  return result;
+}
+
 async function main() {
   const startTime = performance.now();
   const projectPath = process.argv[2] || process.cwd();
@@ -38,8 +131,32 @@ async function main() {
   console.log('\x1b[1m\x1b[36m╚══════════════════════════════════════════════╝\x1b[0m');
   console.log(`\x1b[90m   扫描项目: ${projectPath}\x1b[0m`);
 
+  // 解析命令行参数中的技术栈覆盖
+  const args = process.argv.slice(3);
+  const techStackOverride = parseTechStackOverride(args);
+
   printAnimatedTitle('🔍 扫描项目');
-  const techStack = detectTechStack(projectPath);
+  let techStack = detectTechStack(projectPath);
+
+  // 如果有命令行参数传入的技术栈，使用传入的值覆盖检测结果
+  if (techStackOverride) {
+    console.log(`\x1b[90m   检测到技术栈覆盖参数\x1b[0m`);
+    if (techStackOverride.frontend) techStack.frontend = techStackOverride.frontend;
+    if (techStackOverride.backend) techStack.backend = techStackOverride.backend;
+    if (techStackOverride.ui) techStack.ui = techStackOverride.ui;
+    if (techStackOverride.database) techStack.database = techStackOverride.database;
+    if (techStackOverride.isMonorepo !== undefined) {
+      techStack.isMonorepo = techStackOverride.isMonorepo;
+    }
+
+    // 如果是 monorepo，重新扫描子包
+    if (techStack.isMonorepo) {
+      const monorepoInfo = scanMonorepoPackages(projectPath);
+      techStack.monorepoPackages = monorepoInfo.monorepoPackages;
+      techStack.packageDetails = monorepoInfo.packageDetails;
+    }
+  }
+
   printTechStack(techStack, projectPath);
 
   printAnimatedTitle('🧩 生成 Agents');

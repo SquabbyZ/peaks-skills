@@ -435,13 +435,25 @@ function generateQaSubAgents(techStack, templatesDir, agentsDir) {
   // 动态过滤 QA 子 agents
   const enabledQaSubAgents = [];
 
+  // 检测是否有前端/后端（支持 monorepo 和单包项目）
+  let hasFrontend = !!techStack.frontend;
+  let hasBackend = !!techStack.backend;
+
+  // 如果是 monorepo，检查各子包的技术栈
+  if (techStack.isMonorepo && techStack.packageDetails) {
+    for (const [pkgName, detail] of Object.entries(techStack.packageDetails)) {
+      if (detail.frontend?.framework) hasFrontend = true;
+      if (detail.backend?.framework) hasBackend = true;
+    }
+  }
+
   // 如果有前端，才启用前端相关 QA agents
-  if (techStack.frontend) {
+  if (hasFrontend) {
     enabledQaSubAgents.push('qa-frontend', 'qa-frontend-perf');
   }
 
   // 如果有后端，才启用后端相关 QA agents
-  if (techStack.backend) {
+  if (hasBackend) {
     enabledQaSubAgents.push('qa-backend', 'qa-backend-perf');
   }
 
@@ -805,6 +817,9 @@ function generateSubAgentFile(agentName, techStack, module, templatePath, destDi
  * @param {string} projectPath - 项目路径
  * @returns {Array} 生成的 agent 列表
  */
+// 初始化时保留的 agents（不覆盖，允许知识积累）
+const PRESERVED_AGENTS = ['product', 'design'];
+
 export function generateAgentConfigs(techStack, templatesDir, agentsDir, projectPath) {
   const agents = [];
 
@@ -832,6 +847,17 @@ export function generateAgentConfigs(techStack, templatesDir, agentsDir, project
       console.log(`\n\x1b[90m   共生成 ${qaSubAgents.length} 个 QA Agent\x1b[0m`);
       agents.push(...qaSubAgents);
       continue;
+    }
+
+    // product 和 design 保留已有配置（用于知识积累）
+    if (PRESERVED_AGENTS.includes(agent)) {
+      const destPath = join(agentsDir, `${agent}.md`);
+      if (existsSync(destPath)) {
+        console.log(`  ${status.info(`保留已有 ${agent}.md（知识积累）`)}`);
+        agents.push(agent);
+        continue;
+      }
+      // 如果不存在，则生成
     }
 
     const templatePath = join(templatesDir, `${agent}.md`);

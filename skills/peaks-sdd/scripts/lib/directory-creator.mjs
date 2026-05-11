@@ -23,6 +23,7 @@ export function createPeaksDirectory(projectPath) {
     { name: 'auto-tests', desc: '自动化测试脚本' },
     { name: 'checkpoints', desc: '中间检查点归档' },
     { name: 'bugs', desc: 'Bug 报告和修复记录' },
+    { name: 'knowledge', desc: 'Agent 知识积累（业务经验、设计偏好）' },
   ];
 
   console.log('\n\x1b[1m\x1b[36m📁\x1b[0m 创建 .peaks 目录结构:');
@@ -57,6 +58,7 @@ peaks-sdd 工作流产出物目录
 | \`auto-tests/\` | 自动化测试脚本 |
 | \`checkpoints/\` | 中间检查点归档 |
 | \`bugs/\` | Bug 报告和修复记录 |
+| \`knowledge/\` | Agent 知识积累（product/design 业务经验、设计偏好） |
 
 ## 命名规范
 
@@ -67,6 +69,7 @@ peaks-sdd 工作流产出物目录
 | Swagger | \`swagger-[功能名]-[YYYYMMDD].json\` |
 | Bug 报告 | \`bug-[问题描述]-[YYYYMMDD].md\` |
 | 自动测试 | \`auto-test-[功能名]-[YYYYMMDD].md\` |
+| 知识积累 | \`product-knowledge.md\`, \`design-knowledge.md\` |
 `;
     writeFileSync(readmePath, readmeContent, 'utf-8');
     console.log(`\x1b[32m  ✅ .peaks/README.md\x1b[0m`);

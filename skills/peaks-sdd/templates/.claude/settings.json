@@ -1,0 +1,60 @@
+{
+  "mcpServers": {
+    "gitnexus": {
+      "command": "npx",
+      "args": ["-y", "gitnexus@latest", "mcp", "--repo", "{{PROJECT_PATH}}"]
+    },
+    "claude-mem": {
+      "command": "npx",
+      "args": ["-y", "@the.dot/mem"]
+    },
+    "fs": {
+      "command": "npx",
+      "args": ["-y", "@bunas/fs-mcp"]
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp", "start"]
+    },
+    "chrome-devtools": {
+      "command": "chrome-devtools-mcp"
+    },
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp@latest"]
+    }
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|npm|pnpm|yarn",
+        "command": "node {{SKILL_PATH}}/scripts/check-gate.mjs check",
+        "description": "Code Review + Security 强制检查"
+      },
+      {
+        "matcher": "Bash",
+        "command": "node {{SKILL_PATH}}/scripts/context-monitor.mjs check",
+        "description": "Context 使用率检查"
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "command": "node {{SKILL_PATH}}/scripts/auto-format.mjs \"$FILE_PATH\"",
+        "description": "自动格式化代码"
+      },
+      {
+        "matcher": "Write",
+        "command": "node {{SKILL_PATH}}/scripts/file-size-check.mjs \"$FILE_PATH\"",
+        "description": "检查文件大小"
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": ".*",
+        "command": "node {{SKILL_PATH}}/scripts/verify-artifacts.mjs",
+        "description": "验证 peaks-sdd 产出物门禁"
+      }
+    ]
+  }
+}
