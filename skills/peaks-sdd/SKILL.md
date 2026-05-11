@@ -302,7 +302,7 @@ Step 1: AskUserQuestion 确认项目名称 + 创建目录
    ↓ 立即创建 {{PROJECT_NAME}}/ 目录
 Step 2: 创建 agent 模板 + .peaks/prds 目录
    ↓ 准备好脑暴所需的基础设施
-Step 3: 调用 PeaksSDD-product agent 进行脑暴
+Step 3: 调用 product agent 进行脑暴
    ↓ 产出 PRD（.peaks/prds/prd-[功能名]-[日期].md）
    ↓ 脑暴未完成不进入下一步
 Step 4: AskUserQuestion 确认技术栈
@@ -350,11 +350,11 @@ mkdir -p .peaks/prds
 mkdir -p .claude/agents
 ```
 
-**创建 PeaksSDD-product agent 配置**（用于脑暴）：
+**创建 product agent 配置**（用于脑暴）：
 
 ```markdown
 ---
-name: PeaksSDD-product
+name: product
 description: |
   PROACTIVELY product manager for requirements analysis and PRD creation.
   Fires when user needs PRD, product strategy, brainstorming, or user story definition.
@@ -386,7 +386,7 @@ hooks:
 # PeaksSDD-Product Agent
 
 ## 彩色终端输出
-🟦 [PeaksSDD-product] 产品需求分析 - peaks-sdd 工作流
+🟦 [product] 产品需求分析 - peaks-sdd 工作流
 
 ## 核心能力
 - 理解用户模糊描述，转化为清晰需求
@@ -404,11 +404,11 @@ hooks:
 **必须使用 AskUserQuestion 工具与用户直接交互**，每次提问只问一个核心问题。
 ```
 
-**创建 PeaksSDD-design agent 配置**（用于后续设计）：
+**创建 design agent 配置**（用于后续设计）：
 
 ```markdown
 ---
-name: PeaksSDD-design
+name: design
 description: |
   PROACTIVELY UI/UX designer. Fires when user mentions design, UI, visual, Figma, or interaction design.
 when_to_use: |
@@ -441,7 +441,7 @@ hooks:
 # PeaksSDD-Design Agent
 
 ## 彩色终端输出
-🟩 [PeaksSDD-design] UI/UX 设计 - peaks-sdd 工作流
+🟩 [design] UI/UX 设计 - peaks-sdd 工作流
 
 ## 核心能力
 - 评估设计品味偏好
@@ -450,13 +450,13 @@ hooks:
 ```
 
 **创建后确认**：
-- `.claude/agents/PeaksSDD-product.md` 已创建
-- `.claude/agents/PeaksSDD-design.md` 已创建
+- `.claude/agents/product.md` 已创建
+- `.claude/agents/design.md` 已创建
 - `.peaks/prds/` 目录已创建
 
-#### Step 3: 调用 PeaksSDD-product agent 脑暴
+#### Step 3: 调用 product agent 脑暴
 
-使用 peaksfeat 调度 `🟦 [PeaksSDD-product]` agent 进行交互式脑暴。
+使用 peaksfeat 调度 `🟦 [product]` agent 进行交互式脑暴。
 
 **强制要求**：
 1. 脑暴必须产出 `.peaks/prds/brainstorm-[日期].md` 文件
@@ -479,7 +479,7 @@ description: PeaksSDD产品需求分析专家，擅长脑暴和需求细化
 # PeaksSDD-Product Agent
 
 ## 彩色终端输出
-🟦 [PeaksSDD-product] 产品需求分析 - peaks-sdd 工作流
+🟦 [product] 产品需求分析 - peaks-sdd 工作流
 
 ## 核心能力
 - 理解用户模糊描述，转化为清晰需求
@@ -609,7 +609,7 @@ node $SKILL_PATH/scripts/init.mjs . --frontend=react --ui=shadcn --backend=nestj
 └─────────────────────────────────────────────────────────────────┘
                               ↓
 ┌─────────────────────────────────────────────────────────────────┐
-│ Step 3: 调用 PeaksSDD-product agent 脑暴                         │
+│ Step 3: 调用 product agent 脑暴                         │
 │   → 产出 .peaks/prds/brainstorm-[日期].md（必须）                │
 │   → 产出 .peaks/prds/prd-[功能名]-[日期].md                      │
 │   → 提出建设性建议并记录用户选择                                  │
