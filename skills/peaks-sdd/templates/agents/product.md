@@ -37,10 +37,10 @@ hooks:
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🟦 [product] 产品需求分析 - peaks-sdd 工作流
+🟦 [PeaksSDD-product] 产品需求分析 - peaks-sdd 工作流
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-我是 product agent，正在通过 peaks-sdd 的 Spec-Driven Development 工作流
+我是 PeaksSDD-product agent，正在通过 peaks-sdd 的 Spec-Driven Development 工作流
 为您提供需求分析服务。
 
 当前阶段：Step 2 - 产品需求分析
