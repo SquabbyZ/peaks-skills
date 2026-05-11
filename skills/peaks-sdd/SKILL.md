@@ -415,6 +415,9 @@ description: PeaksSDD产品需求分析专家，擅长脑暴和需求细化
 📦 项目结构：前后端项目默认使用 Monorepo（packages/web + packages/server）
 ```
 
+**⚠️ 确认后先搜索官方创建方式**
+确定技术栈后，必须先搜索对应技术的官方文档/CLI最佳实践，优先使用官方工具创建项目。
+
 #### Step 4: CLI 创建项目 + 初始化
 
 **Monorepo 结构**（前后端项目默认）：
@@ -422,21 +425,21 @@ description: PeaksSDD产品需求分析专家，擅长脑暴和需求细化
 ```bash
 # 在项目目录下执行
 echo '{"packages": ["packages/*"]}' > pnpm-workspace.yaml
+echo '{"name": "{{PROJECT_NAME}}", "private": true}' > package.json
 
-# 创建前端包
+# 创建前端包（使用官方创建方式）
+mkdir -p packages/web
 npx shadcn@latest init packages/web --yes
 
-# 创建后端包
-pnpm i -g @nestjs/cli
-nest new packages/server --package-manager pnpm --skip-git
-
-# 数据库（如需要）
-docker run --name {{PROJECT_NAME}}-postgres \
-  -e POSTGRES_PASSWORD=postgres \
-  -e POSTGRES_DB={{PROJECT_NAME}} \
-  -p 5432:5432 \
-  -d postgres:16-alpine
+# 创建后端包（使用 --directory 在 monorepo 中创建 NestJS 项目）
+pnpm dlx @nestjs/cli new server --directory packages/server --skip-git --package-manager pnpm
 ```
+
+**⚠️ 重要原则：确定技术栈后，必须先搜索官方最佳实践**
+- 不自己猜测命令
+- 优先使用官方 CLI 工具
+- 参考官网文档的创建方式
+- 如有疑问，先查文档再执行
 
 **单包结构**（纯前端或纯后端项目）：
 
