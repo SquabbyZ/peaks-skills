@@ -348,180 +348,73 @@ pwd  # 确认当前目录已切换到项目目录
 
 #### Step 2: 创建 agent 模板 + .peaks/prds 目录
 
-在项目目录下创建必要的基础设施，并写入 product agent：
+**复制所有 agent 模板到项目目录**：
 
 ```bash
 # 创建目录结构
 mkdir -p .peaks/prds
 mkdir -p .claude/agents
-```
 
-**创建 product agent 配置**（用于脑暴）：
+# 复制所有 agent 模板（重要：必须复制全部 agent，不只是 product）
+SKILL_PATH=$(find ~/.claude/skills/peaks-sdd/templates/agents -maxdepth 1 -name "*.md" | head -1 | sed 's|/[^/]*$||;s|/templates/agents||')
+if [ -z "$SKILL_PATH" ] || [ ! -d "$SKILL_PATH/templates/agents" ]; then
+  # 本地开发路径
+  SKILL_PATH="/Users/yuanyuan/Desktop/peaks-skills/skills/peaks-sdd"
+fi
 
-```markdown
----
-name: product
-description: |
-  PROACTIVELY product manager for requirements analysis and PRD creation.
-  Fires when user needs PRD, product strategy, brainstorming, or user story definition.
-when_to_use: |
-  需求、PRD、方案、产品策略、brainstorming、用户故事、需求分析、功能列表
-model: sonnet
-color: blue
-tools:
-  - Read
-  - Write
-  - Edit
-  - Bash
-  - Glob
-  - Grep
-  - mcp__claude-md-management__read
-  - mcp__claude-md-management__write
-  - mcp__claude-md-management__update
-skills:
-  - improve-codebase-architecture
-  - find-skills
-  - systematic-debugging
-  - brainstorming
-memory: project
-maxTurns: 30
-hooks:
-  - require-code-review
----
+# 复制所有 .md 文件
+cp -f "$SKILL_PATH/templates/agents"/*.md .claude/agents/ 2>/dev/null || true
 
-# PeaksSDD-Product Agent
-
-## 彩色终端输出
-
-🟦 [PeaksSDD-product] 产品需求分析 - peaks-sdd 工作流
-
-## 核心能力
-
-- 理解用户模糊描述，转化为清晰需求
-- 通过交互式问答确认细节（使用 AskUserQuestion）
-- 输出结构化 PRD
-
-## 工作方式
-
-1. 理解用户需求本质（不只是字面意思）
-2. 主动提问澄清模糊点（使用 grill-me 方式 + AskUserQuestion）
-3. 脑暴可能的扩展场景
-4. 提出建设性建议（安全性/UX/性能/监控）
-5. 输出结构化需求文档
-
-## 强制交互规则
-
-**必须使用 AskUserQuestion 工具与用户直接交互**，每次提问只问一个核心问题。
-```
-
-**创建 design agent 配置**（用于后续设计）：
-
-```markdown
----
-name: design
-description: |
-  PROACTIVELY UI/UX designer. Fires when user mentions design, UI, visual, Figma, or interaction design.
-when_to_use: |
-  设计、UI、视觉、设计稿、Figma、交互、界面风格、UI design
-model: sonnet
-color: pink
-tools:
-  - Read
-  - Write
-  - Edit
-  - Bash
-  - Glob
-  - mcp__frontend-design__design-to-code
-  - mcp__frontend-design__component-search
-  - mcp__frontend-design__style-guide
-  - mcp__claude-md-management__read
-  - mcp__claude-md-management__write
-skills:
-  - improve-codebase-architecture
-  - find-skills
-  - design-taste-frontend
-  - frontend-design
-  - browser-use
-memory: project
-maxTurns: 20
-hooks:
-  - require-code-review
----
-
-# PeaksSDD-Design Agent
-
-## 彩色终端输出
-
-🟩 [PeaksSDD-design] UI/UX 设计 - peaks-sdd 工作流
-
-## 核心能力
-
-- 评估设计品味偏好
-- 生成符合项目风格的设计方案
-- 使用 AskUserQuestion 与用户确认方向和细节
+# 复制 qa 子目录（qa 是一个目录，包含多个 qa agent）
+cp -rf "$SKILL_PATH/templates/agents/qa" .claude/agents/ 2>/dev/null || true
 ```
 
 **创建后确认**：
 
-- `.claude/agents/product.md` 已创建
-- `.claude/agents/design.md` 已创建
+- `.claude/agents/` 下有所有 agent 文件（product.md, design.md, frontend.md, backend.md, qa.md, peaksfeat.md, peaksbug.md 等）
+- `.claude/agents/qa/` 目录存在（包含 qa 子 agent）
 - `.peaks/prds/` 目录已创建
 
-#### Step 3: 调用 product agent 脑暴
+#### Step 3: 调用 product agent 脑暴 + 生成 PRD
 
-使用 peaksfeat 调度 `🟦 [product]` agent 进行交互式脑暴。
+**必须使用 peaksfeat 调度 `🟦 [product]` agent** 进行深度交互式脑暴。
 
-**强制要求**：
-
+**脑暴核心要求**：
 1. 脑暴必须产出 `.peaks/prds/brainstorm-[日期].md` 文件
-2. **没有 brainstorm 文件，不进入 Step 3**
-3. 脑暴要深入，不能只是简单问几个问题
+2. **没有 brainstorm 文件，不进入下一步**
+3. 脑暴必须深入，**至少 5 轮以上交互**（使用 AskUserQuestion）
+4. 必须提出**建设性建议**（安全性/UX/性能/监控）并记录用户选择
 
-**Brainstorm 检查点**：
+**Brainstorm 检查点**（每轮都要检查）：
 
 - [ ] 文件存在：`.peaks/prds/brainstorm-[日期].md`
 - [ ] 内容包含：业务类型、目标用户、核心流程、边界场景
+- [ ] 脑暴轮次 >= 5 轮
+- [ ] **已提出建设性建议并记录用户选择**
 - [ ] 用户明确表示"没有需要补充的"或类似确认
 
-**如果 .claude/agents/ 不存在**，先创建最小化 product agent 配置：
+**脑暴问题示例**（每轮只问一个核心问题）：
 
-```markdown
----
-name: product
-description: PeaksSDD产品需求分析专家，擅长脑暴和需求细化
----
+第 1 轮：
+- "这个项目的核心定位是什么？是客服机器人、AI 助手、还是其他？"
 
-# PeaksSDD-Product Agent
+第 2 轮：
+- "目标用户是谁？是企业内部员工、C 端客户、还是开发者？"
 
-## 彩色终端输出
+第 3 轮：
+- "核心功能有哪些？登录、对话、历史记录、还是其他？"
 
-🟦 [product] 产品需求分析 - peaks-sdd 工作流
+第 4 轮：
+- "是否需要考虑安全性？如用户认证、内容审核、数据加密？"
 
-## 核心能力
-
-- 理解用户模糊描述，转化为清晰需求
-- 通过交互式问答确认细节
-- 输出结构化 PRD
-
-## 工作方式
-
-1. 理解用户需求本质（不只是字面意思）
-2. 主动提问澄清模糊点（使用 grill-me 方式）
-3. 脑暴可能的扩展场景
-4. 输出结构化需求文档
-```
-
-**脑暴问题示例**：
-
-- "这个 AI 对话助手是做什么的？客服、聊天机器人、还是 AI 助手？"
-- "需要用户登录吗？有哪些角色？"
-- "对话历史需要持久化吗？"
-- "有什么特殊的功能需求吗？"
+第 5 轮：
+- "有什么性能要求？如响应时间、并发数、数据量？"
 
 **产出**：
 
 ```
 .peaks/prds/brainstorm-[日期].md
+.peaks/prds/prd-[功能名]-[日期].md  （PRD 确认后生成）
 ```
 
 #### Step 4: 确认技术栈（基于 PRD）
@@ -558,10 +451,21 @@ description: PeaksSDD产品需求分析专家，擅长脑暴和需求细化
 **⚠️ 确认后先搜索官方创建方式**
 确定技术栈后，必须先搜索对应技术的官方文档/CLI最佳实践，优先使用官方工具创建项目。
 
-#### Step 5: CLI 创建项目（使用官方方式）
+#### Step 5: 创建项目 + 设计确认（并行）
 
-**Monorepo 结构**（前后端项目默认）：
+**⚠️ 重要原则：确定技术栈后，必须先搜索官方最佳实践**
 
+- 不自己猜测命令
+- 优先使用官方 CLI 工具
+- 参考官网文档的创建方式
+- 如有疑问，先查文档再执行
+
+**项目创建 + 设计确认并行执行**：
+
+```
+[A] 项目创建命令（使用官方 CLI）：
+
+Monorepo 结构（前后端项目默认）：
 ```bash
 # 在项目目录下执行
 echo '{"packages": ["packages/*"]}' > pnpm-workspace.yaml
@@ -575,8 +479,7 @@ npx shadcn@latest init packages/web --yes
 pnpm dlx @nestjs/cli new server --directory packages/server --skip-git --package-manager pnpm
 ```
 
-**单包结构**（纯前端或纯后端项目）：
-
+单包结构（纯前端或纯后端项目）：
 ```bash
 # 纯前端
 npx shadcn@latest init . --yes
@@ -585,12 +488,13 @@ npx shadcn@latest init . --yes
 pnpm dlx @nestjs/cli new . --skip-git --package-manager pnpm
 ```
 
-**⚠️ 重要原则：确定技术栈后，必须先搜索官方最佳实践**
+[B] Design 确认（无前端则跳过）：
+- 调用 design agent
+- 基于 PRD 与用户确认页面布局和交互
+- 使用 AskUserQuestion 让用户确认设计稿
+- 产出 `.peaks/designs/design-spec-[功能名]-[日期].md`
 
-- 不自己猜测命令
-- 优先使用官方 CLI 工具
-- 参考官网文档的创建方式
-- 如有疑问，先查文档再执行
+**注意**：A 和 B 可并行执行，完成后汇合进入 Step 6
 
 #### Step 6: 初始化 .claude/agents/ 等配置
 
@@ -625,13 +529,14 @@ node $SKILL_PATH/scripts/init.mjs . --frontend=react --ui=shadcn --backend=nestj
 └─────────────────────────────────────────────────────────────────┘
                               ↓
 ┌─────────────────────────────────────────────────────────────────┐
-│ Step 2: 创建 agent 模板 + .peaks/prds 目录                       │
+│ Step 2: 复制所有 agent 模板到 .claude/agents/                    │
 │   mkdir -p .peaks/prds .claude/agents                           │
-│   cp product.md design.md .claude/agents/                        │
+│   cp templates/agents/*.md .claude/agents/                      │
+│   cp -r templates/agents/qa .claude/agents/                    │
 └─────────────────────────────────────────────────────────────────┘
                               ↓
 ┌─────────────────────────────────────────────────────────────────┐
-│ Step 3: 调用 product agent 脑暴                         │
+│ Step 3: 调用 product agent 脑暴（至少 5 轮交互）                  │
 │   → 产出 .peaks/prds/brainstorm-[日期].md（必须）                │
 │   → 产出 .peaks/prds/prd-[功能名]-[日期].md                      │
 │   → 提出建设性建议并记录用户选择                                  │
@@ -643,16 +548,38 @@ node $SKILL_PATH/scripts/init.mjs . --frontend=react --ui=shadcn --backend=nestj
 └─────────────────────────────────────────────────────────────────┘
                               ↓
 ┌─────────────────────────────────────────────────────────────────┐
-│ Step 5: 使用官方 CLI 创建项目                                     │
-│   npx shadcn@latest init packages/web --yes                     │
-│   pnpm dlx @nestjs/cli new server --directory packages/server   │
+│ Step 5: 创建项目 + 设计确认（并行）                               │
+│                                                              │
+│   [A] 使用官方 CLI 创建项目（纯后端可跳过）                      │
+│       npx shadcn@latest init packages/web --yes                │
+│       pnpm dlx @nestjs/cli new server --directory packages/server │
+│                                                              │
+│   [B] 调用 design agent 与用户确认页面（无前端则跳过）           │
+│       → 基于 PRD 确认页面布局和交互                              │
+│       → 用户通过 AskUserQuestion 确认设计稿                     │
+│       → 产出 .peaks/designs/design-spec-[功能名]-[日期].md     │
+│                                                              │
+│   注意：A 和 B 可并行执行，完成后汇合进入 Step 6                │
 └─────────────────────────────────────────────────────────────────┘
                               ↓
 ┌─────────────────────────────────────────────────────────────────┐
 │ Step 6: init.mjs 初始化 .claude/agents/ 等配置                  │
 │   node init.mjs . --frontend=react --backend=nestjs --monorepo  │
 └─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│ Step 7: 并行开发（与存量项目流程一致）                            │
+│   QA: 根据 PRD 编写测试用例 → .peaks/plans/test-cases-[日期].md │
+│   研发: 根据 PRD + Design 编写技术方案 → .peaks/plans/tech-[日期].md │
+│   技术方案确认后 → 创建功能目录及子 agent → 进入 OpenSpec 工作流   │
+└─────────────────────────────────────────────────────────────────┘
 ```
+
+**核心原则**：
+- 先规划（PRD）后实施（创建项目）
+- Step 5 中创建项目和设计确认**并行执行**
+- 无前端项目跳过 design 步骤
+- Step 7 起与存量项目流程一致（OpenSpec 工作流）
 
 **核心原则**：先规划（PRD）后实施（创建项目），确保创建项目前已有清晰的需求和技术方案。
 
