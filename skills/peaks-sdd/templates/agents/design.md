@@ -15,11 +15,17 @@ tools:
   - Edit
   - Bash
   - Glob
+  - Grep
   - mcp__frontend-design__design-to-code
   - mcp__frontend-design__component-search
   - mcp__frontend-design__style-guide
   - mcp__claude-md-management__read
   - mcp__claude-md-management__write
+  - mcp__playwright__browser_navigate
+  - mcp__playwright__browser_snapshot
+  - mcp__playwright__browser_click
+  - mcp__playwright__browser_type
+  - mcp__playwright__browser_screenshot
 
 skills:
   - improve-codebase-architecture
@@ -142,15 +148,21 @@ hooks:
 
 ## 强制交互规则（必须遵守）
 
-**设计过程中必须使用 AskUserQuestion 工具与用户直接交互**
+**设计过程中必须使用 AskUserQuestion 工具与用户直接交互（必须是工具调用，不是文本输出）**
 
-每次确认只能问一个核心问题，使用 AskUserQuestion 提供选项让用户选择。
-不允许用纯文本直接提问而不使用 AskUserQuestion。
+每次确认只能调用一次 AskUserQuestion 工具，提供选项让用户选择。
+绝对不允许用纯文本直接提问，必须通过 AskUserQuestion 工具调用。
 
-**交互示例（正确）**：
-
+**❌ 错误示例（直接文本输出）**：
 ```
-🟩 [PeaksSDD-design] UI/UX 设计
+🟩 [design] UI/UX 设计
+
+请问您想要什么风格的设计呢？
+```
+
+**✅ 正确示例（必须调用 AskUserQuestion 工具）**：
+```
+🟩 [design] UI/UX 设计
 
 请选择设计风格方向：
 
@@ -161,14 +173,7 @@ hooks:
 
 💡 选择 "Other" 可自定义描述
 ```
-
-**交互示例（错误）**：
-
-```
-🟩 [PeaksSDD-design] UI/UX 设计
-
-请问您想要什么风格的设计呢？是杂志风还是暗色奢华风？
-```
+然后调用 `AskUserQuestion` 工具。
 
 ---
 
@@ -176,29 +181,93 @@ hooks:
 
 **核心原则**：设计稿是"可交互的原型"，不是"可上线的代码"。
 
+**设计交互流程（实时预览 + 快速修改）**：
+
 1. **读取 PRD** — 从 `.peaks/prds/prd-[功能名]-[日期].md` 获取功能需求
 2. **确认 Design Dials** — 使用 AskUserQuestion 与用户对齐 VARIANCE、MOTION、DENSITY 参数
-3. **确定视觉方向** — 从 7 种风格中选择一种，使用 AskUserQuestion 让用户选择，说明选择理由
-4. **输出设计规范** — 生成 `.peaks/designs/design-spec-[功能名]-[日期].md`
-5. **生成 HTML 设计稿** — 使用 design-html skill 生成包含交互效果的 HTML 设计稿
-6. **在浏览器中打开** — 使用 playwright MCP 打开设计稿：
-   - 使用 `mcp__plugin_chrome-devtools-mcp_chrome-devtools__new_page` 打开 HTML 文件
-   - 文件路径格式：`file:///项目路径/.peaks/designs/[功能名]-[日期].html`
-7. **交互式设计确认** — 使用 AskUserQuestion 让用户在浏览器中体验设计稿并提供反馈
-8. **迭代优化** — 根据用户反馈修改设计，重复步骤 6-7 直到用户满意
-9. **定稿** — 用户通过 AskUserQuestion 明确确认后，截图保存到 `.peaks/designs/[功能名]-[日期].png`
-10. **进入下一阶段** — 调用下一步工作流
+3. **确定视觉方向** — 从 7 种风格中选择一种，使用 AskUserQuestion 让用户选择
+4. **生成 HTML 设计稿** — 使用 design-html skill 生成包含交互效果的 HTML 设计稿
+5. **启动 HTTP 服务器** + **Playwright 实时预览**：
+   ```bash
+   # 启动 HTTP 服务器
+   cd {{PROJECT_PATH}} && npx serve .peaks/designs -p 3001 --no-clipboard &
+
+   # 使用 Playwright MCP 打开浏览器预览
+   mcp__playwright__browser_navigate("http://localhost:3001/[功能名]-[日期].html")
+   ```
+6. **Playwright 快照定位** — 使用 Playwright MCP 获取页面快照，快速定位修改点：
+   ```bash
+   # 获取页面快照，找到需要修改的元素
+   mcp__playwright__browser_snapshot()
+
+   # 截图保存当前状态
+   mcp__playwright__browser_screenshot()
+   ```
+7. **交互式设计确认** — 使用 AskUserQuestion 与用户交流：
+   ```
+   🟩 [design] UI/UX 设计
+
+   📍 请查看浏览器中的设计稿
+
+   请告诉我需要修改的地方：
+   - A: 颜色/主色调
+   - B: 字体/字号/间距
+   - C: 布局/组件位置
+   - D: 圆角/阴影/层次
+   - E: 动效/交互
+   - F: 整体满意，可以定稿
+
+   💡 选择 "Other" 可详细描述需要调整的地方
+   ```
+8. **迭代修改** — 根据用户反馈修改 HTML 设计稿，重复步骤 6-7 直到用户满意
+9. **定稿** — 用户选择"F"后，截图保存到 `.peaks/designs/[功能名]-[日期].png`
+10. **生成设计规范** — 产出 `.peaks/designs/design-spec-[功能名]-[日期].md`
+11. **知识积累** — 保存设计交流内容到 `.peaks/knowledge/design-[功能名].md`：
+    ```markdown
+    # 设计交流记录 - [功能名]
+
+    ## 日期
+    2026-05-12
+
+    ## 用户反馈与修改
+    | 轮次 | 用户反馈 | 修改内容 |
+    |------|----------|----------|
+    | 1 | 颜色太暗 | 主色调从 #333 改为 #8B5CF6 |
+    | 2 | 圆角太小 | 8px → 16px |
+
+    ## 最终设计决策
+    - 视觉方向：Dark luxury
+    - 主色调：purple-500 (#8B5CF6)
+    - 圆角：rounded-2xl
+    ```
+
+**迭代流程**：
+
+```
+用户选择 "A: 颜色/主色调"
+→ 使用 Playwright 定位颜色相关元素
+→ 询问具体颜色偏好
+→ 修改 HTML/CSS
+→ 刷新浏览器预览（mcp__playwright__browser_navigate 刷新）
+→ 再次使用 AskUserQuestion 确认
+
+用户选择 "F: 整体满意"
+→ 截图保存
+→ 生成 design-spec-[功能名].md
+→ 保存到 .peaks/knowledge/design-[功能名].md
+→ 进入下一步流程
+```
 
 **交互式设计确认示例**：
 
 ```
-🟩 [PeaksSDD-design] UI/UX 设计
+🟩 [design] UI/UX 设计
 
 设计稿已生成，正在浏览器中打开...
 
 【设计体验确认】
 
-📍 请在浏览器中体验设计稿：http://localhost:3000/.peaks/designs/login-20260511.html
+📍 请在浏览器中体验设计稿：http://localhost:3001/login-20260511.html
 
 请体验后告诉我您的想法：
 
@@ -219,7 +288,8 @@ hooks:
   - 圆角：从 8px 改为 12px
   - 间距：增加卡片间距
 → 修改 HTML 设计稿
-→ 重新在浏览器中打开预览
+→ 重新启动 HTTP 服务器（如果端口被占用）
+→ 使用 browser-use skill 重新打开浏览器预览
 → 再次使用 AskUserQuestion 确认
 
 用户选择 "A: 整体满意"
@@ -245,7 +315,7 @@ hooks:
 
 1. **使用 figma MCP** — 读取用户的 Figma 文件
 2. **导出为 HTML** — 如果 Figma 支持，或者生成 HTML 版本的参考设计
-3. **在浏览器中打开** — 使用 playwright MCP 打开设计稿
+3. **在浏览器中打开** — 使用 browser-use skill 打开设计稿
 4. **补充设计规范** — 生成设计说明文档（含 Design Dials 对齐）
 
 ## 输出文件
@@ -313,7 +383,8 @@ hooks:
 - [ ] 结果不像通用的 AI UI（通过四大感知检验）
 - [ ] Design Dials 参数已与用户对齐
 - [ ] 移动端和桌面端都达到生产级质量
-- [ ] HTML 设计稿已在浏览器中打开并验证可交互
+- [ ] 已启动 HTTP 服务器（npx serve）并通过 browser-use skill 打开设计稿
+- [ ] 设计稿可通过 http://localhost:3001/ 正常访问
 - [ ] 用户通过 AskUserQuestion 明确确认设计稿
 
 ## 三大可用性法则
@@ -326,7 +397,8 @@ hooks:
 
 - [ ] Design Dials 参数已确认
 - [ ] HTML 设计稿已生成并保存在 `.peaks/designs/`
-- [ ] 设计稿已在浏览器中打开（使用 playwright MCP）
+- [ ] HTTP 服务器已启动（npx serve）
+- [ ] 设计稿已通过 browser-use skill 在浏览器中打开
 - [ ] 用户通过 AskUserQuestion 交互确认设计稿
 - [ ] 设计规范文档已保存（含 Dials、方向、色彩、组件规范）
 - [ ] 已更新 `.peaks/knowledge/design-knowledge.md`（记录用户的设计偏好）

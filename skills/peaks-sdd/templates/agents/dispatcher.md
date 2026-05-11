@@ -296,6 +296,131 @@ dispatcher 完成所有模块自测汇总后，产出此文件，然后触发 qa
 - [ ] dispatcher 汇总报告完整
 - [ ] 触发 qa-coordinator 时机正确（所有模块自测完成后）
 
+## CR+安全循环处理（Step 6）
+
+当 development 完成后，dispatcher 需要协调 CR + 安全检查循环。
+
+### CR+安全检查流程
+
+```
+开发完成 → dispatcher 触发 CR + 安全检查（并行）
+    ↓
+┌─ 全部通过 → 进入 QA 环节
+│
+└─ 有问题 → 分类问题 → 通知对应 agent 修复
+               ↓
+          agent 修复完成 → 重新执行 CR + 安全检查
+               ↓
+          循环直到全部通过（最多 10 次）
+```
+
+### 并行检查
+
+**[同时执行，无需用户确认]**：
+
+1. **code-reviewer-frontend**（如有前端）
+2. **code-reviewer-backend**（如有后端）
+3. **security-reviewer**
+
+### 问题分类与路由
+
+| 问题类型 | 负责人 | 路由 |
+|---------|-------|------|
+| frontend 相关问题 | frontend agent | 自动通知 |
+| backend 相关问题 | backend agent | 自动通知 |
+| 安全问题 | 对应 agent | 自动通知 |
+| 架构问题 | architect agent | 人工确认 |
+
+### 问题级别处理
+
+| 级别 | 处理方式 |
+|------|---------|
+| CRITICAL | 立即修复，不进入下一步 |
+| HIGH | 立即修复，不进入下一步 |
+| MEDIUM | 可选修复，记录后继续 |
+| LOW | 忽略，继续下一步 |
+
+### 循环控制
+
+**最大循环次数**：10 次
+
+**每次循环记录**：
+- 问题详情到 `.peaks/checkpoints/cr-issues-[N].md`
+- 循环次数到 `.peaks/checkpoints/cr-loop-count.txt`
+
+**超过限制**：
+- 中断工作流
+- 通知用户手动处理
+- 产出 `.peaks/checkpoints/cr-exceeded-limit.md`
+
+### CR+安全检查报告格式
+
+```markdown
+# CR+安全检查报告
+
+## 检查时间
+- 开始时间：YYYY-MM-DD HH:mm
+- 结束时间：YYYY-MM-DD HH:mm
+- 循环次数：N/10
+
+## 检查结果
+
+### Code Review（前端）
+| 文件 | 问题级别 | 问题描述 | 状态 |
+|------|---------|---------|------|
+| src/xxx.ts | HIGH | 未处理错误边界 | 待修复 |
+
+### Code Review（后端）
+| 文件 | 问题级别 | 问题描述 | 状态 |
+|------|---------|---------|------|
+| server/xxx.ts | MEDIUM | console.log 需移除 | 已忽略 |
+
+### 安全检查
+| 检查项 | 问题级别 | 问题描述 | 状态 |
+|--------|---------|---------|------|
+| SQL 注入 | CRITICAL | 参数未序列化 | 待修复 |
+
+## 问题汇总
+| 级别 | 数量 | 状态 |
+|------|------|------|
+| CRITICAL | 1 | 待修复 |
+| HIGH | 1 | 待修复 |
+| MEDIUM | 1 | 已忽略 |
+| LOW | 0 | - |
+
+## 结论
+❌ **检查未通过，需要修复后重新检查**
+- 第 N/10 次循环
+- 已通知对应 agent 修复
+```
+
+### 修复后重新检查
+
+agent 修复完成后，自动重新触发 CR + 安全检查：
+
+```
+agent 修复完成
+    ↓
+dispatcher 收集修复报告
+    ↓
+重新执行 CR + 安全检查（并行）
+    ↓
+┌─ 全部通过 → 产出 cr-security-passed.md → 进入 Step 7
+│
+└─ 仍有问题 → 继续循环 或 超过限制则中断
+```
+
+### 产出文件
+
+```
+.peaks/checkpoints/
+├── cr-issues-1.md           # 第 1 次循环问题
+├── cr-issues-2.md           # 第 2 次循环问题
+├── cr-loop-count.txt        # 当前循环次数
+├── cr-security-passed.md    # 全部通过报告
+└── cr-exceeded-limit.md    # 超过限制报告（如有）
+```
+
 ## Agent 池管理
 
 ### 池生成
@@ -327,4 +452,5 @@ dispatcher 完成所有模块自测汇总后，产出此文件，然后触发 qa
 - [ ] 交接协议正确传递共享文件状态
 - [ ] 各子 Agent 自测报告格式统一
 - [ ] dispatcher 汇总报告完整
-- [ ] 触发 qa-coordinator 时机正确（所有模块自测完成后）
+- [ ] CR+安全循环正确处理（最多 10 次）
+- [ ] 触发 qa-coordinator 时机正确（CR+安全全部通过）

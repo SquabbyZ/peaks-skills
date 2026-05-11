@@ -12,7 +12,7 @@ All notable changes to this project will be documented in this file.
 - 技术栈检测规则新增 UI 库检测章节（React + Vue 2/3 UI 库）
 
 **peaks-sdd MCP 目录配置**:
-- Step 0.5 新增 `.gitnexus/`、`.claude-mem/`、`.context7/` 目录创建
+- Step 0.5 新增 `.gitnexus/` 目录创建
 - Step 0.7 新增 `{{PROJECT_PATH}}` 变量传递项目根目录给 MCP
 
 ### Fixed
