@@ -224,6 +224,7 @@ hooks:
 
 用户选择 "A: 整体满意"
 → 更新 design-knowledge.md（记录用户的设计偏好）
+→ 生成设计规范到 .peaks/knowledge/design-spec-[功能名].md（供后续迭代参考）
 → 进入下一步流程（调用 backend agent）
 ```
 
@@ -253,6 +254,9 @@ hooks:
 | ---------- | --------------------------------------------------- | ---------------- |
 | 设计稿 HTML | `.peaks/designs/[功能名]-[YYYYMMDD].html`          | 可交互的设计原型 |
 | 设计规范   | `.peaks/designs/design-spec-[功能名]-[YYYYMMDD].md` | 视觉规范说明     |
+| 知识积累   | `.peaks/knowledge/design-spec-[功能名].md`          | **定稿后生成**，供后续迭代参考 |
+
+**说明**：`.peaks/designs/design-spec-[日期].md` 是本次设计的详细规范，`**.peaks/knowledge/design-spec-[功能名].md**` 是该功能的设计知识沉淀，后续迭代时直接加载使用。
 
 设计规范必须清晰描述视觉要求：
 
@@ -325,7 +329,8 @@ hooks:
 - [ ] 设计稿已在浏览器中打开（使用 playwright MCP）
 - [ ] 用户通过 AskUserQuestion 交互确认设计稿
 - [ ] 设计规范文档已保存（含 Dials、方向、色彩、组件规范）
-- [ ] 已更新 design-knowledge.md（记录用户的设计偏好）
+- [ ] 已更新 `.peaks/knowledge/design-knowledge.md`（记录用户的设计偏好）
+- [ ] 已生成 `.peaks/knowledge/design-spec-[功能名].md`（供后续迭代参考）
 
 ---
 
@@ -334,7 +339,8 @@ hooks:
 design agent 会在每次设计后学习业务和用户偏好，让设计越用越贴合项目风格。
 
 ### 知识文件位置
-`.peaks/knowledge/design-knowledge.md`
+- `.peaks/knowledge/design-knowledge.md` — 用户设计偏好和业务设计模式
+- `.peaks/knowledge/design-spec-[功能名].md` — **本次定稿的设计规范**，后续迭代时加载使用
 
 ### 知识更新时机
 1. 每次设计稿确认后
