@@ -208,9 +208,15 @@ PRD 确认后，必须生成 Swagger.json 以支持前后端并行开发：
 1. **接收需求**：从 peaksfeat 或 peaksbug 或用户直接获取需求描述
 2. **Brainstorming**：多轮 brainstorming 挖掘深层需求
 3. **PRD 编写**：使用 [NEW]/[CHANGED]/[DEPRECATED] 标识功能
-4. **Swagger 生成**：PRD 确认后生成 API 规范
-5. **用户确认**：与用户多轮交互，直到用户明确表示没有需要改动
-6. **产出 PRD**：保存到 `.peaks/prds/prd-[功能名]-[日期].md`
+4. **用户确认**：与用户多轮交互，直到用户明确表示没有需要改动
+5. **建设性建议**（必须）：主动提出安全性、UX、性能、监控等建议，**使用 AskUserQuestion** 让用户选择
+6. **Swagger 生成**：PRD 确认后生成 API 规范
+7. **产出 PRD**：保存到 `.peaks/prds/prd-[功能名]-[日期].md`
+
+**强制要求**：
+- 步骤 5（建设性建议）不可跳过
+- 每次最多提 2-3 个类别的建议
+- 用户选择后必须记录到 PRD 的"非功能性需求"部分
 
 ## PRD 模板
 
@@ -428,6 +434,8 @@ Accepted | Deprecated
 - [ ] PRD 使用 [NEW]/[CHANGED]/[DEPRECATED] 标识
 - [ ] 每个 [CHANGED] 包含原实现和新实现对比
 - [ ] 用户已确认 PRD 内容
+- [ ] **已提出建设性建议并记录用户选择**（安全性/UX/性能/监控/可扩展性）
+- [ ] 建议决策已记录到 PRD 的"非功能性需求"部分
 - [ ] PRD 保存到 `.peaks/prds/` 目录
 
 ## 建设性建议（Brainstorm 确认后）
