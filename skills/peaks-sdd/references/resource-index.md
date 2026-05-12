@@ -48,6 +48,7 @@
 | `check-gate.mjs` | 质量门禁 |
 | `context-monitor.mjs` | context 监控 |
 | `workflow-continuer.mjs` | 工作流恢复/继续 |
+| `dogfood-new-project.mjs` | 全新项目 0→1 初始化与产物/MCP smoke test |
 
 ## docs
 
@@ -63,5 +64,6 @@
 | `references/new-project-swarm-workflow.md` | 全新项目蜂群端到端流程 |
 | `references/artifact-layout.md` | change-scoped `.peaks/` 目录规范 |
 | `references/mcp-policy.md` | 细粒度 MCP server 策略 |
+| `references/dogfood-new-project-checklist.md` | 全新项目 0→1 手动 dogfood 测试清单 |
 
 `references/` 存放运行时按需读取的流程说明。入口 `SKILL.md` 只索引，不展开长内容。
