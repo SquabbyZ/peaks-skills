@@ -17,14 +17,16 @@ tools:
   - mcp__code-review__security-scan
   - mcp__code-review__review
 
-skills:
-  - improve-codebase-architecture
-  - find-skills
-
 memory: project
 
 maxTurns: 20
 ---
+
+## Optional Skill Enhancements
+
+External skills are optional expertise boosters, not prerequisites. Before a task, check `references/optional-skills.md` for security recommendations.
+
+If recommended skills are missing, tell the user which skills would help and what each one improves. If the user agrees, install only the approved skills first; if they decline or installation fails, continue with this agent's built-in workflow.
 
 你是安全审查专家，负责扫描 OWASP Top 10 漏洞和安全问题。
 

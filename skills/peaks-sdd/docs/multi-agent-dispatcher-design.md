@@ -6,12 +6,12 @@
 
 ### 1.1 问题陈述
 
-当前 peaks-sdd 的 `frontend.md` 和 `backend.md` agent 配置存在以下问题：
+peaks-sdd 已将前端、后端和 QA 研发职责拆成调度 agent + child agent：
 
-1. **配置过于庞大** — 单个 agent 包含所有技术栈规范、项目结构、开发流程、验收标准
-2. **无法并行开发** — 单一 agent 无法同时处理多个功能模块
-3. **缺乏冲突检测** — 多个子 agent 可能修改同一文件，或 A 删除的部分是 B 的依赖
-4. **代码冲突风险** — 缺乏调度机制，多 agent 并行时无法协调
+1. **前端调度** — `sub-front/frontend.md` 负责编写技术文档、拆任务和调度 `frontend-child`
+2. **后端调度** — `sub-back/backend.md` 负责编写技术文档、Swagger、拆任务和调度 `backend-child`
+3. **QA 调度** — `qa/qa.md` 负责编写测试用例、拆 QA brief 和调度 `qa-child`
+4. **冲突控制** — 调度 agent 维护文件所有权、依赖顺序和交接协议
 
 ### 1.2 设计目标
 
@@ -418,24 +418,25 @@ skills/peaks-sdd/docs/multi-agent-dispatcher-design.md
 skills/peaks-sdd/
 ├── templates/
 │   └── agents/
-│       ├── dispatcher.md        # 调度 Agent 模板
-│       ├── sub-agent.md         # 子 Agent 基类模板
-│       └── README.md            # Agent 配置说明
+│       ├── dispatcher.md        # 统一调度 Agent 模板
+│       ├── sub-front/           # 前端研发调度与 frontend-child 模板
+│       ├── sub-back/            # 后端研发调度与 backend-child 模板
+│       └── qa/                  # QA 调度与 qa-child 模板
 ├── scripts/
-│   ├── scan-project.ts          # 项目结构扫描脚本
-│   ├── generate-agents.ts      # Agent 池生成脚本
-│   └── dispatcher-engine.ts    # 调度引擎核心逻辑
+│   ├── lib/agent-generator.mjs   # 技术栈检测后的 agent 模板生成
+│   ├── lib/dispatcher-engine.mjs # 运行时模块扫描与任务调度
+│   ├── workflow-continuer.mjs    # 工作流状态恢复
+│   └── verify-artifacts.mjs      # 产物质量门禁
 └── docs/
     └── multi-agent-dispatcher-design.md
 ```
 
 ## 12. 后续工作
 
-- [ ] 实现项目结构扫描脚本 (`scan-project.ts`)
-- [ ] 实现 Agent 池动态生成 (`generate-agents.ts`)
-- [ ] 实现调度引擎 (`dispatcher-engine.ts`)
-- [ ] 拆分 `frontend.md` → 调度 Agent + 专属模块 Agent
-- [ ] 拆分 `backend.md` → 调度 Agent + 专属模块 Agent
-- [ ] 实现交接协议和状态注册表
-- [ ] 实现汇总测试协调器
-- [ ] 在 ice-cola 项目上验证完整流程
+- [x] 实现项目结构扫描与 agent 生成 (`scripts/lib/agent-generator.mjs`)
+- [x] 实现运行时调度引擎 (`scripts/lib/dispatcher-engine.mjs`)
+- [x] 拆分前端为 `sub-front/frontend.md` + `frontend-child.md`
+- [x] 拆分后端为 `sub-back/backend.md` + `backend-child.md`
+- [x] 合并 QA 为 `qa.md` + `qa-child.md`
+- [ ] 持续验证交接协议和状态注册表
+- [ ] 在真实项目上验证完整流程

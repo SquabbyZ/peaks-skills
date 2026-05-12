@@ -4,10 +4,11 @@
  * 验证 6 项强制产出物是否齐全
  */
 
-import { existsSync, readdirSync } from 'fs';
+import { existsSync, readdirSync, statSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { spawn } from 'child_process';
+import { getPeaksPaths, readCurrentChangeId } from './lib/change-artifacts.mjs';
 
 /**
  * 异步执行命令（Promise 版本，可中断）
@@ -49,6 +50,8 @@ const __dirname = dirname(__filename);
 // 默认项目路径（脚本所在目录的父目录）
 const defaultProjectPath = join(__dirname, '..', '..', '..', '..');
 const projectPath = process.argv[2] || defaultProjectPath;
+const currentChangeId = readCurrentChangeId(projectPath) || '1970-01-01-initial-product';
+const currentChangePath = getPeaksPaths(projectPath, currentChangeId).changeRelativePath;
 
 // 解析命令行参数
 const args = process.argv.slice(2);
@@ -59,51 +62,58 @@ const ARTIFACT_CHECKS = [
   {
     id: 1,
     name: 'PRD 文档',
-    pattern: '.peaks/prds/prd-*.md',
+    pattern: `.peaks/${currentChangePath}/product/prd.md`,
     required: true,
     missingAction: '通知 product 补全'
   },
   {
     id: 2,
+    name: '设计规范',
+    pattern: `.peaks/${currentChangePath}/design/design-spec.md`,
+    required: true,
+    missingAction: '通知 design 补全'
+  },
+  {
+    id: 3,
     name: '技术文档',
-    pattern: '.peaks/plans/tech-doc-*.md',
+    pattern: `.peaks/${currentChangePath}/architecture/system-design.md`,
     required: true,
     missingAction: '通知研发 Agent 补全'
   },
   {
-    id: 3,
+    id: 4,
     name: '测试用例',
-    pattern: '.peaks/test-docs/test-case-*.md',
+    pattern: `.peaks/${currentChangePath}/qa/test-plan.md`,
     required: true,
-    missingAction: '通知 qa-coordinator 补全'
+    missingAction: '通知 qa 补全'
   },
   {
-    id: 4,
+    id: 5,
     name: '模块自测报告',
-    pattern: '.peaks/reports/*-self-test-*.md',
+    pattern: `.peaks/${currentChangePath}/swarm/reports/*.md`,
     required: true,
     missingAction: '缺失模块重新调度子 Agent'
   },
   {
-    id: 5,
+    id: 6,
     name: 'TypeScript 编译',
     check: 'tsc',
     required: true,
     missingAction: '编译失败的模块不标记完成'
   },
   {
-    id: 6,
+    id: 7,
     name: '安全审查',
-    pattern: '.peaks/reports/security-review-*.md',
+    pattern: `.peaks/${currentChangePath}/review/security-review.md`,
     required: true,
     missingAction: '有 CRITICAL 问题则阻断'
   },
   {
-    id: 7,
-    name: '存量覆盖率',
+    id: 8,
+    name: '单元测试覆盖率',
     check: 'coverage',
-    required: false, // 非强制，但会警告
-    missingAction: '存量项目需补充单元测试'
+    required: false,
+    missingAction: '新项目需补充单元测试'
   }
 ];
 
@@ -134,13 +144,9 @@ function findMatchingFiles(basePath, pattern) {
   const wildcardIndex = patternParts.findIndex(p => p.includes('*') || p.includes('?'));
 
   if (wildcardIndex === -1) {
-    // 没有通配符，直接检查文件是否存在
     const fullPath = join(basePath, pattern);
-    if (existsSync(fullPath) && !readdirSync(fullPath, { withFileTypes: true }).some(d => !d.name)) {
-      // 是文件
-      if (existsSync(fullPath)) {
-        return [pattern];
-      }
+    if (existsSync(fullPath) && statSync(fullPath).isFile()) {
+      return [pattern];
     }
     return results;
   }

@@ -21,19 +21,30 @@ tools:
   - mcp__playwright__*
   - mcp__typescript-lsp__*
 
-skills:
-  - project-structure-scan
-  - task-analysis
-  - agent-pool-management
-  - handoff-coordination
-  - integration-test-orchestration
-
 memory: project
 
 maxTurns: 100
 ---
 
+## Optional Skill Enhancements
+
+External skills are optional expertise boosters, not prerequisites. Before a task, check `references/optional-skills.md` for dispatcher-specific recommendations.
+
+If recommended skills are missing, tell the user which skills would help and what each one improves. If the user agrees, install only the approved skills first; if they decline or installation fails, continue with this agent's built-in workflow.
+
 你是 Peaks-SDD 的调度中枢。
+
+## New Project Swarm Rules
+
+For empty or nearly-empty projects, use `references/new-project-swarm-workflow.md` and `references/artifact-layout.md`.
+
+- Resolve the active change from `.peaks/current-change`.
+- Write all phase artifacts under `.peaks/changes/<change-id>/`.
+- Do not write new workflow artifacts to legacy top-level `.peaks/prds`, `.peaks/designs`, `.peaks/reports`, or `.peaks/checkpoints`.
+- Generate `swarm/task-graph.json`, `swarm/waves.json`, `swarm/status.json`, and `swarm/file-ownership.json` before dispatching child agents.
+- Inject only the MCP servers needed for a given phase, following `references/mcp-policy.md`.
+- Do not start implementation until PRD, design spec, and architecture are confirmed.
+
 
 ## 核心职责
 
@@ -166,13 +177,13 @@ interface SharedFileRegistry {
 
 ### 流程
 ```
-各子 Agent 产出自测报告 → .peaks/reports/[module]-self-test-[timestamp].md
+各子 Agent 产出自测报告 → .peaks/changes/<change-id>/swarm/reports/[module]-self-test-[timestamp].md
     ↓
 dispatcher 收集所有自测报告
     ↓
 生成 dispatcher-summary-[timestamp].md
     ↓
-触发 qa-coordinator 进行 3 轮 QA 测试
+触发 qa 进行 3 轮 QA 测试
 ```
 
 ### 子 Agent 自测报告格式
@@ -186,8 +197,8 @@ dispatcher 收集所有自测报告
 - **自测时间**: 2026-05-10 16:00
 
 ## 关联文档
-- **需求**: .peaks/prds/prd-login-20260510.md
-- **设计稿**: .peaks/designs/login-20260510.png
+- **需求**: .peaks/changes/<change-id>/product/prd.md
+- **设计稿**: .peaks/changes/<change-id>/design/screenshots/approved-preview.png
 - **测试用例**: .peaks/test-docs/test-case-login-20260510.md
 
 ## 代码变更
@@ -271,10 +282,10 @@ dispatcher 收集所有自测报告
 
 ### dispatcher-summary-[timestamp].md 产出
 
-dispatcher 完成所有模块自测汇总后，产出此文件，然后触发 qa-coordinator。
+dispatcher 完成所有模块自测汇总后，产出此文件，然后触发 qa。
 
 ```
-.peaks/reports/
+.peaks/changes/<change-id>/swarm/reports/
 ├── [module]-self-test-[date].md     # 各模块自测报告（子 Agent 产出）
 ├── dispatcher-summary-[date].md     # dispatcher 汇总报告
 ├── round-1-issues.md                # QA 第 1 轮问题
@@ -294,7 +305,7 @@ dispatcher 完成所有模块自测汇总后，产出此文件，然后触发 qa
 - [ ] 交接协议正确传递共享文件状态
 - [ ] 各子 Agent 自测报告格式统一
 - [ ] dispatcher 汇总报告完整
-- [ ] 触发 qa-coordinator 时机正确（所有模块自测完成后）
+- [ ] 触发 qa 时机正确（所有模块自测完成后）
 
 ## CR+安全循环处理（Step 6）
 
@@ -345,13 +356,13 @@ dispatcher 完成所有模块自测汇总后，产出此文件，然后触发 qa
 **最大循环次数**：10 次
 
 **每次循环记录**：
-- 问题详情到 `.peaks/checkpoints/cr-issues-[N].md`
-- 循环次数到 `.peaks/checkpoints/cr-loop-count.txt`
+- 问题详情到 `.peaks/changes/<change-id>/checkpoints/cr-issues-[N].md`
+- 循环次数到 `.peaks/changes/<change-id>/checkpoints/cr-loop-count.txt`
 
 **超过限制**：
 - 中断工作流
 - 通知用户手动处理
-- 产出 `.peaks/checkpoints/cr-exceeded-limit.md`
+- 产出 `.peaks/changes/<change-id>/checkpoints/cr-exceeded-limit.md`
 
 ### CR+安全检查报告格式
 
@@ -413,7 +424,7 @@ dispatcher 收集修复报告
 ### 产出文件
 
 ```
-.peaks/checkpoints/
+.peaks/changes/<change-id>/checkpoints/
 ├── cr-issues-1.md           # 第 1 次循环问题
 ├── cr-issues-2.md           # 第 2 次循环问题
 ├── cr-loop-count.txt        # 当前循环次数
@@ -453,4 +464,4 @@ dispatcher 收集修复报告
 - [ ] 各子 Agent 自测报告格式统一
 - [ ] dispatcher 汇总报告完整
 - [ ] CR+安全循环正确处理（最多 10 次）
-- [ ] 触发 qa-coordinator 时机正确（CR+安全全部通过）
+- [ ] 触发 qa 时机正确（CR+安全全部通过）

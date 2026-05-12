@@ -4,9 +4,9 @@
 
 | 场景 | 工作流 | 入口 |
 |------|--------|------|
-| 新项目 (0→1) | OpenSpec | `/peaks-sdd 初始化` → `/peaks-sdd 添加...` |
+| 新项目 (0→1) | 空目录初始化工作流 | `/peaks-sdd 初始化我的项目` → `references/empty-project-workflow.md` |
 | 存量项目迭代 | OpenSpec | `openspec init` → `openspec new change <name>` |
-| Bug 修复 | peaksbug | `/peaks-sdd [bug描述]` |
+| Bug 修复 | dispatcher bug flow | `/peaks-sdd [bug描述]` |
 
 ## Agent 调度矩阵
 
@@ -17,7 +17,7 @@
 | backend | NestJS/Express 检测到 | API、业务逻辑 |
 | tauri | Tauri 检测到 | 桌面应用原生能力 |
 | postgres | 数据库检测到 | 表设计、迁移 |
-| qa | 始终 | E2E、自动化测试 |
+| qa | 始终 | 测试用例、E2E、自动化测试、QA 调度 |
 | devops | 始终 | 部署、环境配置 |
 | security-reviewer | 始终 | OWASP 安全审查 |
 | code-reviewer-frontend | 有前端变更 | 前端代码审查 |
@@ -26,16 +26,21 @@
 | peaksfeat | 始终 | 功能开发工作流入口 |
 | peaksbug | 始终 | Bug 修复工作流入口 |
 
-## Agent 与 Skills 映射
+## 可选 Skills 增强
 
-| Agent | 依赖 Skills |
-|-------|------------|
-| peaksfeat | improve-codebase-architecture, systematic-debugging, test-driven-development, find-skills |
+peaks-sdd 默认不要求新项目下载外部 skills。Agent 模板应以内置指令和本地脚本可独立运行；以下 skills 仅在已安装且网络可用时增强效果，缺失不得阻断流程。
+
+| Agent | 可选增强 Skills |
+|-------|----------------|
+| peaksfeat | improve-codebase-architecture, systematic-debugging, test-driven-development |
 | peaksbug | systematic-debugging, test-driven-development, code-review |
-| frontend | browser, browser-use, react:components, vue-best-practices, vue, vue-debug-guides, impeccable |
-| backend | - |
-| qa | test-driven-development, browser-use |
+| frontend | browser, browser-use, react:components, vercel-react-best-practices, vue-best-practices |
+| qa | webapp-testing, e2e-testing-patterns, javascript-testing-patterns |
 | design | design-taste-frontend, frontend-design |
+
+按需策略：先检查当前任务是否能明显受益；如果推荐 skill 未安装，说明安装收益并询问用户。用户同意后只安装已同意的 skills；用户拒绝或安装失败时使用内置流程继续。初始化阶段不批量下载。
+
+详见 `references/optional-skills.md`。
 
 ## OpenSpec 工作流（存量项目迭代）
 

@@ -17,6 +17,7 @@ import { detectTechStack, printTechStack } from './lib/tech-stack-detector.mjs';
 import { generateAgentConfigs } from './lib/agent-generator.mjs';
 import { createPeaksDirectory, createDataDirectories, configureMcpServers } from './lib/directory-creator.mjs';
 import { printAnimatedTitle, status } from './lib/terminal-ui.mjs';
+import { createChangeId } from './lib/change-artifacts.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -52,6 +53,15 @@ function parseTechStackOverride(args) {
     }
   }
   return Object.keys(override).length > 0 ? override : null;
+}
+
+function parseChangeName(args) {
+  for (const arg of args) {
+    if (arg.startsWith('--change=')) {
+      return arg.slice('--change='.length);
+    }
+  }
+  return 'initial-product';
 }
 
 /**
@@ -133,6 +143,8 @@ async function main() {
 
   // 解析命令行参数中的技术栈覆盖
   const args = process.argv.slice(3);
+  const changeName = parseChangeName(args);
+  const changeId = createChangeId(changeName);
   const techStackOverride = parseTechStackOverride(args);
 
   printAnimatedTitle('🔍 扫描项目');
@@ -164,11 +176,6 @@ async function main() {
     const templatesDir = join(skillDir, 'templates', 'agents');
     const agentsDir = join(projectPath, '.claude', 'agents');
 
-    // 清空 agents 目录重新生成
-    if (existsSync(agentsDir)) {
-      const { rmSync } = await import('fs');
-      rmSync(agentsDir, { recursive: true });
-    }
     mkdirSync(agentsDir, { recursive: true });
 
     const generatedAgents = generateAgentConfigs(techStack, templatesDir, agentsDir, projectPath);
@@ -181,13 +188,13 @@ async function main() {
   console.log(`\n   ${status.info('Skills 将在实际使用时按需安装')}`);
 
   printAnimatedTitle('📁 创建 .peaks 目录');
-  createPeaksDirectory(projectPath);
+  createPeaksDirectory(projectPath, { changeId });
 
   printAnimatedTitle('📂 创建数据目录');
   createDataDirectories(projectPath);
 
   printAnimatedTitle('🔌 配置 MCP 服务');
-  configureMcpServers(projectPath);
+  configureMcpServers(projectPath, techStack);
 
   const elapsed = ((performance.now() - startTime) / 1000).toFixed(2);
 

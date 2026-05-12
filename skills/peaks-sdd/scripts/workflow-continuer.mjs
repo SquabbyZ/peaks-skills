@@ -4,7 +4,7 @@
  * 检查当前状态并自动执行下一步
  */
 
-import { existsSync, readFileSync } from 'fs';
+import { existsSync, readFileSync, readdirSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { SessionStateManager, WorkflowState } from './lib/session-state-manager.mjs';
@@ -21,6 +21,11 @@ function getSkillDir() {
     }
   }
   return null;
+}
+
+function hasFileMatching(dir, matcher) {
+  if (!existsSync(dir)) return false;
+  return readdirSync(dir).some(matcher);
 }
 
 /**
@@ -45,21 +50,41 @@ const STATE_TRANSITIONS = {
 function checkArtifacts(projectPath, state) {
   const artifacts = {
     [WorkflowState.NAME_CONFIRMED]: () => existsSync(join(projectPath, 'package.json')),
-    [WorkflowState.PRD_DONE]: () => existsSync(join(projectPath, '.peaks', 'prds')),
+    [WorkflowState.PRD_DONE]: () => {
+      const prdsDir = join(projectPath, '.peaks', 'prds');
+      return hasFileMatching(prdsDir, name => name.startsWith('prd-') && name.endsWith('.md'));
+    },
     [WorkflowState.TECH_STACK_CONFIRMED]: () => true, // 技术栈在 state 中
-    [WorkflowState.DESIGN_DONE]: () => existsSync(join(projectPath, '.peaks', 'designs')),
+    [WorkflowState.DESIGN_DONE]: () => {
+      const designsDir = join(projectPath, '.peaks', 'designs');
+      return hasFileMatching(designsDir, name => name.endsWith('.png') || name.endsWith('.html') || name.endsWith('.md'));
+    },
     [WorkflowState.KNOWLEDGE_DONE]: () => existsSync(join(projectPath, '.peaks', 'knowledge', 'product-knowledge.md')),
     [WorkflowState.DOCS_DONE]: () => {
       const plansDir = join(projectPath, '.peaks', 'plans');
       const testDocsDir = join(projectPath, '.peaks', 'test-docs');
-      return existsSync(plansDir) && existsSync(testDocsDir);
+      return hasFileMatching(plansDir, name => name.startsWith('tech-doc-') && name.endsWith('.md'))
+        && hasFileMatching(testDocsDir, name => name.startsWith('test-case-') && name.endsWith('.md'));
     },
-    [WorkflowState.DEVELOPMENT_DONE]: () => existsSync(join(projectPath, '.peaks', 'reports', 'dispatcher-summary.md')),
-    [WorkflowState.CR_SECURITY_PASSED]: () => {
+    [WorkflowState.DEVELOPMENT_DONE]: () => {
       const reportsDir = join(projectPath, '.peaks', 'reports');
-      return existsSync(join(reportsDir, 'cr-report.md')) && existsSync(join(reportsDir, 'security-report.md'));
+      return hasFileMatching(reportsDir, name => name.startsWith('dispatcher-summary') && name.endsWith('.md'));
     },
-    [WorkflowState.QA_PASSED]: () => existsSync(join(projectPath, '.peaks', 'reports', 'final-report.md'))
+    [WorkflowState.CR_SECURITY_PASSED]: () => {
+      const checkpointsDir = join(projectPath, '.peaks', 'checkpoints');
+      const reportsDir = join(projectPath, '.peaks', 'reports');
+      const hasCodeReview = hasFileMatching(checkpointsDir, name => name.includes('code-review') && name.endsWith('.md'))
+        || hasFileMatching(reportsDir, name => name.includes('code-review') && name.endsWith('.md'))
+        || hasFileMatching(reportsDir, name => name.startsWith('cr-report') && name.endsWith('.md'));
+      const hasSecurity = hasFileMatching(checkpointsDir, name => name.includes('security') && name.endsWith('.md'))
+        || hasFileMatching(reportsDir, name => name.includes('security') && name.endsWith('.md'));
+      return hasCodeReview && hasSecurity;
+    },
+    [WorkflowState.QA_PASSED]: () => {
+      const reportsDir = join(projectPath, '.peaks', 'reports');
+      return hasFileMatching(reportsDir, name => name.startsWith('final-report') && name.endsWith('.md'))
+        || hasFileMatching(reportsDir, name => name.startsWith('qa-round') && name.endsWith('.md'));
+    }
   };
 
   const checker = artifacts[state];
@@ -135,7 +160,7 @@ function getStepInstruction(step) {
     'step6_docs': '并行生成技术文档和测试用例',
     'step7_development': '调度 dispatcher 拆分子 agent 开发',
     'step8_cr_security': '并行执行 CodeReview 和安全检查',
-    'step9_qa': '调度 qa-coordinator 执行 3 轮 QA 测试',
+    'step9_qa': '调度 qa 生成测试 brief 并执行 3 轮 QA 测试',
     'step10_deploy': '调度 devops 执行部署'
   };
   return instructions[step] || '未知步骤';

@@ -52,6 +52,26 @@ export function buildTechStackDesc(techStack) {
   return parts.join(' + ') || 'Unknown';
 }
 
+function hasFrontendStack(techStack) {
+  if (techStack.frontend || techStack.frontendFramework) return true;
+
+  if (techStack.isMonorepo && techStack.packageDetails) {
+    return Object.values(techStack.packageDetails).some(detail => detail.frontend?.framework || detail.frontend);
+  }
+
+  return false;
+}
+
+function hasBackendStack(techStack) {
+  if (techStack.backend || techStack.backendFramework) return true;
+
+  if (techStack.isMonorepo && techStack.packageDetails) {
+    return Object.values(techStack.packageDetails).some(detail => detail.backend?.framework || detail.backend);
+  }
+
+  return false;
+}
+
 /**
  * 提取 skills 部分的开始位置
  * @param {string} content - 文件内容
@@ -413,70 +433,21 @@ function getColorAnsi(colorName) {
  * @returns {Array} 生成的 agent 列表
  */
 function generateQaSubAgents(techStack, templatesDir, agentsDir) {
-  const qaSubAgents = [
-    'qa-coordinator',
-    'qa-frontend',
-    'qa-backend',
-    'qa-frontend-perf',
-    'qa-backend-perf',
-    'qa-security',
-    'qa-automation'
-  ];
-
+  const qaAgents = ['qa', 'qa-child'];
   const generated = [];
   const qaTemplateDir = join(templatesDir, 'qa');
-  const qaAgentsDir = join(agentsDir, 'qa');
 
-  // 创建 qa/ 子目录
-  if (!existsSync(qaAgentsDir)) {
-    mkdirSync(qaAgentsDir, { recursive: true });
-  }
-
-  // 动态过滤 QA 子 agents
-  const enabledQaSubAgents = [];
-
-  // 检测是否有前端/后端（支持 monorepo 和单包项目）
-  let hasFrontend = !!techStack.frontend;
-  let hasBackend = !!techStack.backend;
-
-  // 如果是 monorepo，检查各子包的技术栈
-  if (techStack.isMonorepo && techStack.packageDetails) {
-    for (const [pkgName, detail] of Object.entries(techStack.packageDetails)) {
-      if (detail.frontend?.framework) hasFrontend = true;
-      if (detail.backend?.framework) hasBackend = true;
-    }
-  }
-
-  // 如果有前端，才启用前端相关 QA agents
-  if (hasFrontend) {
-    enabledQaSubAgents.push('qa-frontend', 'qa-frontend-perf');
-  }
-
-  // 如果有后端，才启用后端相关 QA agents
-  if (hasBackend) {
-    enabledQaSubAgents.push('qa-backend', 'qa-backend-perf');
-  }
-
-  // 安全测试始终启用
-  enabledQaSubAgents.push('qa-security');
-
-  // 自动化测试脚本执行始终启用
-  enabledQaSubAgents.push('qa-automation');
-
-  // 测试调度始终启用
-  enabledQaSubAgents.push('qa-coordinator');
-
-  for (const agent of enabledQaSubAgents) {
+  for (const agent of qaAgents) {
     const templatePath = join(qaTemplateDir, `${agent}.md`);
-    const destPath = join(qaAgentsDir, `${agent}.md`);
+    const destPath = join(agentsDir, `${agent}.md`);
 
     if (existsSync(templatePath)) {
       const success = generateAgentFile(agent, techStack, templatePath, destPath);
       if (success) {
         const qaRole = getAgentRole(templatePath);
-        const qaRoleTag = qaRole ? ` \x1b[33m${qaRole}\x1b[0m` : ' \x1b[90mQA 子 Agent\x1b[0m';
+        const qaRoleTag = qaRole ? ` \x1b[33m${qaRole}\x1b[0m` : ' \x1b[90mQA Agent\x1b[0m';
         console.log(`  ${agentBadge(`${agent}.md`, getAgentColor(templatePath))}${qaRoleTag}`);
-        generated.push(`qa/${agent}`);
+        generated.push(agent);
       }
     } else {
       console.log(`  ${status.warning(`QA 模板不存在: ${agent}.md`)}`);
@@ -513,13 +484,9 @@ export function scanProjectModules(techStack, projectPath) {
     }
   }
 
-  // 检测单包项目的 src/ 目录
-  const srcDir = join(projectPath, 'src');
-  if (existsSync(srcDir)) {
-    const srcModules = scanModulesInPath(projectPath, techStack, '');
-    if (srcModules.length > 0) {
-      modules.push(...srcModules);
-    }
+  const srcModules = scanModulesInPath(projectPath, techStack, '');
+  if (srcModules.length > 0) {
+    modules.push(...srcModules);
   }
 
   return {
@@ -554,32 +521,16 @@ function scanModulesInPath(basePath, techStack, pkgName = '') {
   const isFrontend = techStack.frontend || techStack.frontendFramework;
   const isBackend = techStack.backend || (pkgName === 'server');
 
-  // 前端：以页面为模块
   if (isFrontend) {
-    const pagesDir = join(basePath, 'pages');
-    const appDir = join(basePath, 'app');
-
     const possiblePaths = [
-      { path: appDir, type: 'app-router' },
-      { path: pagesDir, type: 'pages' }
+      { path: join(basePath, 'src', 'app'), type: 'app-router' },
+      { path: join(basePath, 'app'), type: 'app-router' },
+      { path: join(basePath, 'src', 'pages'), type: 'pages' },
+      { path: join(basePath, 'pages'), type: 'pages' },
+      { path: join(basePath, 'src', 'features'), type: 'features' }
     ];
 
-    for (const { path, type } of possiblePaths) {
-      if (existsSync(path)) {
-        const entries = readdirSync(path);
-        for (const entry of entries) {
-          const entryPath = join(path, entry);
-          if (statSync(entryPath).isDirectory()) {
-            modules.push({
-              name: entry,
-              path: entryPath,
-              type,
-              techStack: detectModuleTechStack(entryPath, techStack)
-            });
-          }
-        }
-      }
-    }
+    scanModuleDirectories(possiblePaths, modules, techStack);
   }
 
   // 后端：以 src 下的目录为模块
@@ -602,6 +553,30 @@ function scanModulesInPath(basePath, techStack, pkgName = '') {
   }
 
   return modules;
+}
+
+function scanModuleDirectories(possiblePaths, modules, techStack) {
+  const seen = new Set(modules.map(module => module.path));
+
+  for (const { path, type } of possiblePaths) {
+    if (!existsSync(path)) continue;
+
+    const entries = readdirSync(path);
+    for (const entry of entries) {
+      if (entry.startsWith('_') || entry.startsWith('(')) continue;
+
+      const entryPath = join(path, entry);
+      if (!statSync(entryPath).isDirectory() || seen.has(entryPath)) continue;
+
+      seen.add(entryPath);
+      modules.push({
+        name: entry,
+        path: entryPath,
+        type,
+        techStack: detectModuleTechStack(entryPath, techStack)
+      });
+    }
+  }
 }
 
 /**
@@ -736,36 +711,28 @@ function generateModuleRegistry(scanResult) {
  * @returns {Array} 生成的 agent 列表
  */
 export function generateSubAgentConfigs(techStack, scanResult, templatesDir, agentsDir) {
-  const subAgentTemplatePath = join(templatesDir, 'sub-agent.md');
-  if (!existsSync(subAgentTemplatePath)) {
-    console.log(`  \x1b[33m⚠️  子 Agent 模板不存在\x1b[0m`);
-    return [];
-  }
+  const childTemplates = [
+    { name: 'frontend-child', templatePath: join(templatesDir, 'sub-front', 'frontend-child.md'), enabled: hasFrontendStack(techStack) },
+    { name: 'backend-child', templatePath: join(templatesDir, 'sub-back', 'backend-child.md'), enabled: hasBackendStack(techStack) }
+  ];
 
   const generated = [];
 
-  // 为每个包生成 Agent Pool
-  for (const pkg of scanResult.packages) {
-    const pkgAgentsDir = join(agentsDir, pkg.name);
-    if (!existsSync(pkgAgentsDir)) {
-      mkdirSync(pkgAgentsDir, { recursive: true });
+  for (const child of childTemplates) {
+    if (!child.enabled) continue;
+
+    if (!existsSync(child.templatePath)) {
+      console.log(`  ${status.warning(`子 Agent 模板不存在: ${child.name}.md`)}`);
+      continue;
     }
 
-    for (const mod of pkg.modules) {
-      const agentName = `${pkg.name}-${mod.name}-agent`;
-      const success = generateSubAgentFile(agentName, techStack, mod, subAgentTemplatePath, pkgAgentsDir);
-      if (success) {
-        generated.push(agentName);
-      }
-    }
-  }
-
-  // 为单包项目的模块生成 Agent
-  for (const mod of scanResult.modules) {
-    const agentName = `${mod.name}-agent`;
-    const success = generateSubAgentFile(agentName, techStack, mod, subAgentTemplatePath, agentsDir);
+    const destPath = join(agentsDir, `${child.name}.md`);
+    const success = generateAgentFile(child.name, techStack, child.templatePath, destPath);
     if (success) {
-      generated.push(agentName);
+      const role = getAgentRole(child.templatePath);
+      const roleTag = role ? ` \x1b[33m${role}\x1b[0m` : ' \x1b[90m子 Agent\x1b[0m';
+      console.log(`  ${agentBadge(`${child.name}.md`, getAgentColor(child.templatePath))}${roleTag}`);
+      generated.push(child.name);
     }
   }
 
@@ -829,10 +796,10 @@ export function generateAgentConfigs(techStack, templatesDir, agentsDir, project
   ];
 
   const stackAgents = [];
-  if (techStack.frontend) {
-    stackAgents.push('frontend', 'design');
+  if (hasFrontendStack(techStack)) {
+    stackAgents.push('sub-front/frontend', 'design');
   }
-  if (techStack.backend) stackAgents.push('backend');
+  if (hasBackendStack(techStack)) stackAgents.push('sub-back/backend');
   if (techStack.hasTauri) stackAgents.push('tauri');
   if (techStack.database) stackAgents.push('postgres');
 
@@ -861,18 +828,19 @@ export function generateAgentConfigs(techStack, templatesDir, agentsDir, project
     }
 
     const templatePath = join(templatesDir, `${agent}.md`);
-    const destPath = join(agentsDir, `${agent}.md`);
+    const outputAgentName = agent.includes('/') ? agent.split('/').at(-1) : agent;
+    const destPath = join(agentsDir, `${outputAgentName}.md`);
 
     if (existsSync(templatePath)) {
-      const success = generateAgentFile(agent, techStack, templatePath, destPath);
+      const success = generateAgentFile(outputAgentName, techStack, templatePath, destPath);
       if (success) {
         const desc = getAgentDescription(templatePath);
         const role = getAgentRole(templatePath);
         const color = getAgentColor(templatePath);
-        const badge = agentBadge(`${agent}.md`, color);
+        const badge = agentBadge(`${outputAgentName}.md`, color);
         const roleTag = role ? ` \x1b[33m${role}\x1b[0m` : '';
         console.log(`  ${badge}${roleTag}`);
-        agents.push(agent);
+        agents.push(outputAgentName);
       }
     } else {
       console.log(`  ${status.warning(`模板不存在: ${agent}.md`)}`);

@@ -23,11 +23,6 @@ tools:
   - mcp__claude-md-management__write
   - mcp__claude-md-management__update
 
-skills:
-  - improve-codebase-architecture
-  - find-skills
-  - systematic-debugging
-
 memory: project
 
 maxTurns: 50
@@ -36,6 +31,12 @@ hooks:
   - require-code-review
   - context-monitor
 ---
+
+## Optional Skill Enhancements
+
+External skills are optional expertise boosters, not prerequisites. Before a task, check `references/optional-skills.md` for peaksfeat-specific recommendations.
+
+If recommended skills are missing, tell the user which skills would help and what each one improves. If the user agrees, install only the approved skills first; if they decline or installation fails, continue with this agent's built-in workflow.
 
 ## Context 溢出自动处理策略
 
@@ -184,9 +185,9 @@ hooks:
 | 2. 产品需求分析 | **product** | grill-me 需求追问、PRD 编写、需求确认 | PRD 文档 | `.peaks/prds/prd-[功能名]-[日期].md` |
 | 3. 原型验证 | peaksfeat（内置） | 构建微型原型验证逻辑/UI 方案 | 原型代码（验证后删除） | — |
 | 4. UI/UX 设计 | **design** | design-taste-frontend → frontend-design → 设计稿生成 | 设计稿截图 | `.peaks/designs/[功能名]-[日期].png` |
-| 5. **并行：技术文档 + 测试用例** | **研发 + qa-coordinator** | 研发写技术文档，qa 写测试用例 + 分析影响 | 技术文档 + 测试用例 | `.peaks/plans/tech-doc-[日期].md` + `.peaks/test-docs/test-case-[日期].md` |
-| 6. 前后端开发 | **dispatcher** | 调度子 Agent 并行开发 → 自测报告 | 自测报告 | `.peaks/reports/[module]-self-test-[日期].md` |
-| 7. QA 整体测试（3 轮） | **qa-coordinator** | 分配子 Agent 测试、汇总结果、决策是否下一轮 | 测试报告 | `.peaks/reports/round-N-issues.md` |
+| 5. **并行：技术文档 + 测试用例** | **研发 + qa** | 研发写技术文档，qa 写测试用例 + 分析影响 | 技术文档 + 测试用例 | `.peaks/plans/tech-doc-[日期].md` + `.peaks/test-docs/test-case-[日期].md` |
+| 6. 前后端开发 | **frontend/backend 研发调度 Agent** | 基于技术文档生成 task graph 和 child briefs，调度 frontend-child/backend-child 开发 → 自测报告 | 自测报告 | `.peaks/reports/[module]-self-test-[日期].md` |
+| 7. QA 整体测试（3 轮） | **qa** | 基于测试用例生成 QA task graph 和 briefs，调度 qa-child 测试、汇总结果、决策是否下一轮 | 测试报告 | `.peaks/reports/round-N-issues.md` |
 | 8. 报告生成 + 自动化脚本更新 | **qa + devops** | 功能报告、更新自动化测试脚本 | 最终报告 | `.peaks/reports/final-report-[日期].md` |
 | 9. 运维部署 | **devops** | Docker 构建、服务部署、健康检查 | 部署结果 | `.peaks/deploys/` |
 
@@ -200,9 +201,9 @@ hooks:
   ├─ Step 4:  design → UI 设计稿（可选）
   ├─ Step 5:  并行调度
   │     ├─ 研发 Agent 写技术文档
-  │     └─ qa-coordinator 写测试用例 + 分析存量影响
-  ├─ Step 6:  dispatcher 协调开发 → 自测报告
-  ├─ Step 7:  qa-coordinator 整体 QA 测试（3 轮）
+  │     └─ qa 写测试用例 + 分析存量影响
+  ├─ Step 6:  frontend/backend 研发调度 → child agents 开发 → 自测报告
+  ├─ Step 7:  qa 调度 → qa-child 测试（3 轮）
   │     ├─ 第 1 轮：分配任务 → 并行执行 → 汇总 → 决策
   │     ├─ 第 2 轮：修复验证
   │     └─ 第 3 轮：最终验证
@@ -354,8 +355,8 @@ mcp__gitnexus__query("file_tree", path: "{{PROJECT_PATH}}/src")
 
 当任务涉及新页面、新交互、或需要明确视觉方向时，调度 design：
 
-1. **必须先调用 `Skill: design-taste-frontend`** — 评估设计品味和调性方向
-2. **调用 `Skill: frontend-design`** — 应用前端设计方法论
+1. 使用 design agent 内置 Design Dials 和 Anti-Slop 流程评估设计品味和调性方向
+2. 如果 `design-taste-frontend` / `frontend-design` 已安装且可用，可调用它们作为增强评估；缺失时直接继续
 3. 分析 PRD 中的功能需求
 4. 确定视觉方向（7 种风格中选择）
 5. 生成设计稿
@@ -366,7 +367,7 @@ mcp__gitnexus__query("file_tree", path: "{{PROJECT_PATH}}/src")
 7. 修改直到用户确认
 8. 截图保存到 `.peaks/designs/[功能名]-[日期].png`
 
-> **强制规则**：design agent 必须先使用 `design-taste-frontend` skill 评估设计品味，未经评估的设计方案视为无效。
+> **设计规则**：design agent 优先使用内置 Design Dials 和 Anti-Slop 流程评估设计方向；`design-taste-frontend` 等外部 skills 只作为已安装时的可选增强，不得因缺失或下载失败阻断流程。
 
 **何时跳过设计**：纯数据管理类页面（表格增删改查）、纯接口开发，可跳过设计阶段，直接进入开发。
 
@@ -384,16 +385,16 @@ mcp__gitnexus__query("file_tree", path: "{{PROJECT_PATH}}/src")
 
 | 项目类型 | 并行内容 |
 |---------|---------|
-| 混合项目 | 研发写技术文档 + qa-coordinator 写测试用例 |
-| 纯前端项目 | 研发写技术文档 + qa-coordinator 写测试用例（无 API 部分） |
-| 纯后端项目 | 研发写技术文档 + qa-coordinator 写测试用例（无设计稿） |
+| 混合项目 | 研发写技术文档 + qa 写测试用例 |
+| 纯前端项目 | 研发写技术文档 + qa 写测试用例（无 API 部分） |
+| 纯后端项目 | 研发写技术文档 + qa 写测试用例（无设计稿） |
 
 **研发 Agent（技术文档）**：
 1. 基于 PRD 和设计稿（如有）编写技术文档
 2. 技术文档包含：架构设计、接口定义、数据模型、模块划分
 3. 产出到 `.peaks/plans/tech-doc-[功能名]-[日期].md`
 
-**qa-coordinator（测试用例）**：
+**qa（测试用例）**：
 1. 基于 PRD 和设计稿编写测试用例
 2. 分析本次需求对存量功能的影响
 3. 如有影响，在测试用例中标记 + 禁用相关自动化脚本（不在此刻执行）
@@ -402,7 +403,7 @@ mcp__gitnexus__query("file_tree", path: "{{PROJECT_PATH}}/src")
 **并行执行**：
 ```
 ┌─────────────────────────────────┐    ┌─────────────────────────────────┐
-│ 🟨 [frontend/backend] 研发 Agent │    │ 🟧 [qa] qa-coordinator           │
+│ 🟨 [frontend/backend] 研发 Agent │    │ 🟧 [qa] qa           │
 │ 写技术文档                        │    │ 写测试用例 + 分析影响范围         │
 └─────────────────────────────────┘    └─────────────────────────────────┘
 ```
@@ -444,7 +445,7 @@ mcp__gitnexus__query("file_tree", path: "{{PROJECT_PATH}}/src")
    ├─ 所有模块自测报告存在？
    ├─ TypeScript 编译通过？
    └─ 安全审查完成（无 CRITICAL）？
-6. 门禁全部通过 → 触发 qa-coordinator
+6. 门禁全部通过 → 触发 qa
    门禁有缺失 → 列出缺失项，通知对应 Agent 补全后重新检查
 ```
 
@@ -530,20 +531,20 @@ mcp__gitnexus__query("file_tree", path: "{{PROJECT_PATH}}/src")
 ✅ **4/5 模块自测通过，可以进入 QA**
 ```
 
-### 第七步：QA 整体测试（3 轮，qa-coordinator 协调）
+### 第七步：QA 整体测试（3 轮，qa 协调）
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🔵 [peaksfeat] Step 7：QA 整体测试（3 轮）
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-→ 调度 🟧 [qa-coordinator] 进行 3 轮 QA 测试...
+→ 调度 🟧 [qa] 进行 3 轮 QA 测试...
    第 1 轮：基础功能测试
    第 2 轮：修复验证
    第 3 轮：最终验证
    产出：.peaks/reports/round-N-issues.md + final-report-[日期].md
 
-[正在切换到 qa-coordinator agent...]
+[正在切换到 qa agent...]
 ```
 
 **前置条件**：dispatcher 汇总报告已完成
@@ -551,26 +552,26 @@ mcp__gitnexus__query("file_tree", path: "{{PROJECT_PATH}}/src")
 **工作流程**：
 
 ```
-qa-coordinator 接入
+qa 接入
     ↓
 读取：PRD + 设计稿 + 测试用例 + dispatcher汇总报告
     ↓
 ┌─ 第 1 轮 QA ─────────────────────────────────────────┐
-│  1. qa-coordinator 分配任务给所有 QA 子 Agent（并行） │
-│     ├─ qa-frontend                                    │
-│     ├─ qa-backend                                     │
-│     ├─ qa-frontend-perf                              │
-│     ├─ qa-backend-perf                               │
-│     ├─ qa-security                                   │
-│     └─ qa-automation（执行存量自动化测试）             │
+│  1. qa 根据测试用例生成 QA task graph 和 briefs        │
+│     ├─ frontend-functional → qa-child                 │
+│     ├─ backend-functional → qa-child                  │
+│     ├─ frontend-performance → qa-child                │
+│     ├─ backend-performance → qa-child                 │
+│     ├─ security → qa-child                            │
+│     └─ automation（如存在自动化脚本）→ qa-child        │
 │                                                    │
-│  2. qa-coordinator 等待子 Agent 完成                 │
+│  2. qa 按依赖和环境约束并行/串行调度 qa-child          │
 │                                                    │
-│  3. qa-coordinator 执行存量自动化测试                │
-│     （标记第三步禁用的用例，跳过执行）                  │
+│  3. qa 收集 qa-child 结果和自动化测试报告             │
+│     （标记禁用的用例，跳过执行）                       │
 │     └─ 如有问题 → 记录风险 → 不阻塞继续               │
 │                                                    │
-│  4. qa-coordinator 汇总结果 → round-1-issues.md     │
+│  4. qa 汇总结果 → round-1-issues.md     │
 │                                                    │
 │  5. 决策：                                           │
 │     ├─ 有问题 → 分配修复给研发 → 等待自测 → 第 2 轮  │
@@ -594,7 +595,7 @@ qa-coordinator 接入
 | 第 2 轮 | 修复后验证 | 所有测试通过 |
 | 第 3 轮 | 最终验证 | 所有测试通过 |
 
-**qa-coordinator 职责**：
+**qa 职责**：
 - 任务分配：决定哪些子 Agent 测什么
 - 结果汇总：收集所有子 Agent 结果，汇总成 round-N-issues.md
 - 决策推进：根据汇总结果决定是否进入下一轮
@@ -613,8 +614,8 @@ qa-coordinator 接入
 
 **测试全部通过后**：
 
-1. qa-coordinator 生成最终报告 → `.peaks/reports/final-report-[功能名]-[日期].md`
-2. qa-coordinator 更新自动化测试脚本 → `.peaks/auto-tests/`
+1. qa 生成最终报告 → `.peaks/reports/final-report-[功能名]-[日期].md`
+2. qa 更新自动化测试脚本 → `.peaks/auto-tests/`
    - 新增本次需求的测试用例
    - 移除已废弃的测试用例
    - 更新因本次需求变动的测试用例

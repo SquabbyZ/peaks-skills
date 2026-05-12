@@ -34,6 +34,7 @@ export class DispatcherEngine {
   scanProjectStructure() {
     const packagesDir = join(this.projectPath, 'packages');
     const packages = [];
+    const modules = this.scanModules(this.projectPath);
 
     if (existsSync(packagesDir)) {
       const entries = readdirSync(packagesDir);
@@ -51,7 +52,8 @@ export class DispatcherEngine {
 
     return {
       projectType: packages.length > 0 ? 'multi-package' : 'single-package',
-      packages
+      packages,
+      modules
     };
   }
 
@@ -60,27 +62,35 @@ export class DispatcherEngine {
    */
   scanModules(pkgPath) {
     const modules = [];
-    const srcDir = join(pkgPath, 'src');
-    const featuresDir = join(srcDir, 'features');
-    const pagesDir = join(srcDir, 'pages');
+    const possiblePaths = [
+      { path: join(pkgPath, 'src', 'features'), type: 'features' },
+      { path: join(pkgPath, 'src', 'app'), type: 'app-router' },
+      { path: join(pkgPath, 'app'), type: 'app-router' },
+      { path: join(pkgPath, 'src', 'pages'), type: 'pages' },
+      { path: join(pkgPath, 'pages'), type: 'pages' },
+      { path: join(pkgPath, 'src'), type: 'backend-module' }
+    ];
+    const seen = new Set();
 
-    const scanDir = (dir, type) => {
-      if (!existsSync(dir)) return;
-      const entries = readdirSync(dir);
+    for (const { path, type } of possiblePaths) {
+      if (!existsSync(path)) continue;
+
+      const entries = readdirSync(path);
       for (const entry of entries) {
-        const entryPath = join(dir, entry);
-        if (statSync(entryPath).isDirectory()) {
-          modules.push({
-            name: entry,
-            path: entryPath,
-            type
-          });
-        }
-      }
-    };
+        if (entry.startsWith('_') || entry.startsWith('(')) continue;
+        if (type === 'backend-module' && ['app', 'pages', 'features', 'components', 'hooks', 'styles'].includes(entry)) continue;
 
-    scanDir(featuresDir, 'features');
-    scanDir(pagesDir, 'pages');
+        const entryPath = join(path, entry);
+        if (!statSync(entryPath).isDirectory() || seen.has(entryPath)) continue;
+
+        seen.add(entryPath);
+        modules.push({
+          name: entry,
+          path: entryPath,
+          type
+        });
+      }
+    }
 
     return modules;
   }
@@ -105,21 +115,23 @@ export class DispatcherEngine {
       'ai-models': ['ai-model', 'ai-models', 'model', '模型', 'ai']
     };
 
-    for (const pkg of scanResult.packages) {
-      for (const mod of pkg.modules) {
-        const modLower = mod.name.toLowerCase();
-        // 直接匹配模块名
-        if (taskLower.includes(modLower)) {
-          involvedModules.push({ ...mod, package: pkg.name });
-          continue;
-        }
-        // 关键词匹配
-        for (const [keyword, terms] of Object.entries(keywords)) {
-          if (modLower.includes(keyword) || terms.some(t => taskLower.includes(t))) {
-            const exists = involvedModules.find(m => m.name === mod.name && m.package === pkg.name);
-            if (!exists) {
-              involvedModules.push({ ...mod, package: pkg.name });
-            }
+    const scanEntries = [
+      ...(scanResult.packages || []).flatMap(pkg => pkg.modules.map(mod => ({ mod, packageName: pkg.name }))),
+      ...(scanResult.modules || []).map(mod => ({ mod, packageName: '' }))
+    ];
+
+    for (const { mod, packageName } of scanEntries) {
+      const modLower = mod.name.toLowerCase();
+      if (taskLower.includes(modLower)) {
+        involvedModules.push({ ...mod, package: packageName });
+        continue;
+      }
+
+      for (const [keyword, terms] of Object.entries(keywords)) {
+        if (modLower.includes(keyword) || terms.some(t => taskLower.includes(t))) {
+          const exists = involvedModules.find(m => m.name === mod.name && m.package === packageName);
+          if (!exists) {
+            involvedModules.push({ ...mod, package: packageName });
           }
         }
       }
@@ -156,12 +168,12 @@ export class DispatcherEngine {
    * 获取模块 Agent 配置路径
    */
   getModuleAgentPath(module, agentType = 'sub-agent') {
-    // 尝试多个可能的路径
+    const fallbackAgent = module.type?.includes('backend') ? 'backend-child.md' : 'frontend-child.md';
     const possiblePaths = [
       join(this.agentsDir, `${module.package}-${module.name}-agent.md`),
       join(this.agentsDir, `${module.name}-agent.md`),
-      join(this.agentsDir, module.package, `${module.name}-agent.md`),
-      join(this.agentsDir, 'sub-agent.md')  // 通用子 Agent 模板
+      join(this.agentsDir, module.package || '', `${module.name}-agent.md`),
+      join(this.agentsDir, fallbackAgent)
     ];
 
     for (const path of possiblePaths) {
