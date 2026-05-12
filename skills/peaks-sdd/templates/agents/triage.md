@@ -6,7 +6,7 @@ description: |
 when_to_use: |
   分类、triage、issue、bug、状态机、Agent Brief、wontfix
 
-model: sonnet
+model: haiku
 color: amber
 
 tools:

@@ -64,6 +64,7 @@
 | `references/new-project-swarm-workflow.md` | 全新项目蜂群端到端流程 |
 | `references/artifact-layout.md` | change-scoped `.peaks/` 目录规范 |
 | `references/mcp-policy.md` | 细粒度 MCP server 策略 |
+| `references/model-routing.md` | agent 按职责选择 haiku/sonnet/opus 的模型路由策略 |
 | `references/dogfood-new-project-checklist.md` | 全新项目 0→1 手动 dogfood 测试清单 |
 
 `references/` 存放运行时按需读取的流程说明。入口 `SKILL.md` 只索引，不展开长内容。

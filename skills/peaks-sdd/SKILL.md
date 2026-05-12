@@ -112,6 +112,7 @@ openspec/           # 后续存量功能迭代规格预留
 | `references/new-project-swarm-workflow.md` | 全新项目蜂群端到端流程 |
 | `references/artifact-layout.md` | `.peaks/project` 和 change-scoped 产物目录规范 |
 | `references/mcp-policy.md` | 细粒度 MCP 使用、默认启用和阶段注入策略 |
+| `references/model-routing.md` | agent 按职责选择 haiku/sonnet/opus 的模型路由策略 |
 | `references/empty-project-workflow.md` | 从空目录创建新项目的完整 0→1 流程 |
 | `references/existing-project-initialization.md` | 已有项目初始化、MCP 增量配置、Skills 按需安装 |
 | `references/openspec-workflow.md` | 存量项目功能开发的 OpenSpec 工作流 |

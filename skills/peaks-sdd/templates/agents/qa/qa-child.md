@@ -6,7 +6,7 @@ description: |
 when_to_use: |
   QA 子任务执行、功能测试、前端性能测试、后端性能测试、安全测试、自动化测试
 
-model: sonnet
+model: haiku
 color: violet
 background: true
 
