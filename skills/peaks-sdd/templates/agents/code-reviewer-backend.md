@@ -109,7 +109,7 @@ const apiKey = process.env.API_KEY;
 
 ## 输出文件
 
-代码审查报告保存到 `.peaks/reports/cr-backend-[模块名]-[日期].md`：
+代码审查报告保存到 `.peaks/changes/<change-id>/review/code-review.md`：
 
 ```markdown
 # 后端 Code Review 报告 - [模块名]
@@ -118,6 +118,7 @@ const apiKey = process.env.API_KEY;
 - **审查时间**: YYYY-MM-DD HH:mm
 - **审查范围**: [模块名]
 - **审查结果**: Approve / Request Changes
+- **Verdict**: APPROVE / REQUEST_CHANGES
 
 ## 问题列表
 
@@ -151,4 +152,4 @@ const apiKey = process.env.API_KEY;
 - [ ] 无 HIGH 问题（或已记录）
 - [ ] 代码遵循 NestJS + TypeScript 规范
 - [ ] 无 SQL 注入风险
-- [ ] 审查报告已保存到 `.peaks/reports/`
+- [ ] 审查报告已保存到 `.peaks/changes/<change-id>/review/code-review.md`

@@ -6,8 +6,8 @@
  * 在 npm/pnpm/yarn 命令前检查是否有未完成的 CR 或 Security Scan
  */
 
-import { existsSync, readFileSync, readdirSync, statSync } from 'fs';
-import { join, basename } from 'path';
+import { existsSync, readFileSync, readdirSync } from 'fs';
+import { dirname, join, resolve } from 'path';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -15,44 +15,55 @@ const __dirname = dirname(__filename);
 
 // 检查是否有待处理的 CR 或 Security 问题
 function checkPendingReviews() {
-  const checks = [];
-
-  // 检查是否有 pending 的 Code Review
-  const crPatterns = [
-    '.peaks/reports/*cr*.md',
-    '.peaks/reports/*review*.md',
-    '.peaks/reports/*code-review*.md'
-  ];
-
-  // 检查是否有 pending 的 Security 问题
-  const securityPatterns = [
-    '.peaks/reports/*security*.md',
-    '.peaks/reports/*vulnerability*.md'
-  ];
-
   try {
-    const reportsDir = join(process.cwd(), '.peaks', 'reports');
-    if (existsSync(reportsDir)) {
-      const files = readdirSync(reportsDir);
+    const projectRoot = resolveProjectRoot(process.argv[3] || process.cwd());
+    const currentChangePath = readCurrentChangePath(projectRoot);
+    if (!currentChangePath) return { pendingCR: true, pendingSecurity: true };
 
-      const pendingCR = files.some(f => {
-        const lower = f.toLowerCase();
-        return (lower.includes('cr') || lower.includes('review') || lower.includes('code-review')) &&
-               !lower.includes('pass') && !lower.includes('pass');
-      });
+    const reviewDir = join(projectRoot, '.peaks', currentChangePath, 'review');
+    if (!existsSync(reviewDir)) return { pendingCR: true, pendingSecurity: true };
 
-      const pendingSecurity = files.some(f => {
-        const lower = f.toLowerCase();
-        return lower.includes('security') || lower.includes('vulnerability');
-      });
+    const files = readdirSync(reviewDir, { withFileTypes: true });
+    const pendingCR = hasPendingReview(files, reviewDir, 'code-review.md');
+    const pendingSecurity = hasPendingReview(files, reviewDir, 'security-review.md');
 
-      return { pendingCR, pendingSecurity };
-    }
-  } catch (e) {
-    // ignore
+    return { pendingCR, pendingSecurity };
+  } catch {
+    return { pendingCR: true, pendingSecurity: true };
   }
+}
 
-  return { pendingCR: false, pendingSecurity: false };
+function hasPendingReview(entries, reviewDir, expectedFileName) {
+  const entry = entries.find(item => item.name === expectedFileName);
+  if (!entry) return true;
+
+  return !entry.isFile() || !isPassingReview(join(reviewDir, expectedFileName));
+}
+
+function isPassingReview(filePath) {
+  const content = readFileSync(filePath, 'utf-8');
+  return /^Verdict:\s*(APPROVE|PASS|通过)\s*$/im.test(content);
+}
+
+function resolveProjectRoot(startPath) {
+  let current = resolve(startPath);
+
+  while (true) {
+    if (existsSync(join(current, '.peaks', 'current-change'))) return current;
+
+    const parent = dirname(current);
+    if (parent === current) return resolve(startPath);
+    current = parent;
+  }
+}
+
+function readCurrentChangePath(projectPath) {
+  const currentChangeFile = join(projectPath, '.peaks', 'current-change');
+  if (!existsSync(currentChangeFile)) return null;
+
+  const content = readFileSync(currentChangeFile, 'utf-8').trim().replace(/\\/g, '/');
+  if (!content || content.includes('..') || !content.startsWith('changes/')) return null;
+  return content;
 }
 
 function printGateStatus(command) {

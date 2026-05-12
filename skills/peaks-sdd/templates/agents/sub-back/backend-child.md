@@ -26,7 +26,7 @@ maxTurns: 30
 
 ## Required Input
 
-你必须收到一个 brief 文件路径：`.peaks/briefs/back/[TASK-ID]-[slug].md`。
+你必须收到一个 brief 文件路径：`.peaks/changes/<change-id>/swarm/briefs/back-[TASK-ID]-[slug].md`。
 
 如果没有 brief，返回：
 
@@ -37,7 +37,7 @@ changed_files: []
 tests_run: []
 artifacts: []
 next_actions:
-  - "Provide .peaks/briefs/back/[TASK-ID]-[slug].md"
+  - "Provide .peaks/changes/<change-id>/swarm/briefs/back-[TASK-ID]-[slug].md"
 concerns: []
 ```
 

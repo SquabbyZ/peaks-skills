@@ -85,7 +85,7 @@ If recommended skills are missing, tell the user which skills would help and wha
 
 ## 输出文件
 
-安全审查报告保存到 `.peaks/reports/security-[模块名]-[日期].md`：
+安全审查报告保存到 `.peaks/changes/<change-id>/review/security-review.md`：
 
 ```markdown
 # [模块名] 安全审查报告
@@ -109,6 +109,8 @@ If recommended skills are missing, tell the user which skills would help and wha
 
 ## 结论
 
+Verdict: PASS / BLOCK
+
 ✅ **通过** / ❌ **阻塞** - 存在 CRITICAL/HIGH 问题
 ```
 
@@ -116,4 +118,4 @@ If recommended skills are missing, tell the user which skills would help and wha
 
 - [ ] 无 CRITICAL 漏洞
 - [ ] 所有 HIGH 漏洞已修复或已记录
-- [ ] 安全报告已保存到 `.peaks/reports/`
+- [ ] 安全报告已保存到 `.peaks/changes/<change-id>/review/security-review.md`

@@ -55,7 +55,7 @@ If recommended skills are missing, tell the user which skills would help and wha
 
 ### 1. 编写后端技术文档
 
-读取 PRD + DB schema + API 要求 + 测试用例，编写后端技术文档到 `.peaks/tech/backend-tech-doc-[功能名]-[日期].md`。没有技术文档时禁止调度子 agent：
+读取 PRD + DB schema + API 要求 + 测试用例，编写或更新 `.peaks/changes/<change-id>/architecture/system-design.md` 的后端技术方案章节。没有技术文档时禁止调度子 agent：
 
 ```markdown
 # 后端技术方案 - [功能名]
@@ -72,7 +72,7 @@ If recommended skills are missing, tell the user which skills would help and wha
 | /api/xxx | POST | /api/xxx | {...} | {...} | 说明 |
 
 ### swagger.json 生成
-- 路径：`.peaks/swagger/swagger-[功能名].json`
+- 路径：`.peaks/changes/<change-id>/openspec/openapi.json`
 - 使用 swagger 规范定义所有 API
 
 ## 模块划分
@@ -124,8 +124,8 @@ t=4: Agent1 完成 BE-002
 **流程**：
 
 1. 从后端技术文档的任务表生成 task graph。
-2. 写入 `.peaks/dispatch/back-task-graph-[功能名]-[日期].json`。
-3. 为每个任务生成 `.peaks/briefs/back/[TASK-ID]-[slug].md`。
+2. 写入 `.peaks/changes/<change-id>/dispatch/back-task-graph.json`。
+3. 为每个任务生成 `.peaks/changes/<change-id>/swarm/briefs/back-[TASK-ID]-[slug].md`。
 4. 按 wave 调度：无依赖任务并行，有依赖任务等待上游 DONE。
 5. 子 agent 只接收 brief 路径和必要项目路径，不接收大段散乱上下文。
 
@@ -134,7 +134,7 @@ t=4: Agent1 完成 BE-002
 ```text
 Agent(
   subagent_type="backend-child",
-  prompt="执行 brief: .peaks/briefs/back/[TASK-ID]-[slug].md。必须遵守 brief 的文件边界和 YAML Response Format。"
+  prompt="执行 brief: .peaks/changes/<change-id>/swarm/briefs/back-[TASK-ID]-[slug].md。必须遵守 brief 的文件边界和 YAML Response Format。"
 )
 ```
 
@@ -144,7 +144,7 @@ Agent(
 
 **重要：swagger.json 必须先完成**，供前端进行 Mock 数据开发
 
-生成 `.peaks/swagger/swagger-[功能名].json`：
+生成 `.peaks/changes/<change-id>/openspec/openapi.json`：
 
 ```json
 {
@@ -219,12 +219,12 @@ Step 10: 汇总到 backend-summary-[日期].md
 
 | 文件 | 路径 | 说明 |
 |------|------|------|
-| 后端技术文档 | `.peaks/tech/backend-tech-doc-[功能名]-[日期].md` | 后端技术方案 |
-| swagger.json | `.peaks/swagger/swagger-[功能名].json` | API 定义（先完成） |
-| Task graph | `.peaks/dispatch/back-task-graph-[功能名]-[日期].json` | 后端任务依赖图 |
-| Child briefs | `.peaks/briefs/back/BE-*-*.md` | 后端子 agent 执行 brief |
-| 自测报告 | `.peaks/reports/BE-*-self-test-[日期].md` | 各子 agent 自测 |
-| 汇总报告 | `.peaks/reports/backend-summary-[日期].md` | 后端汇总 |
+| 后端技术文档 | `.peaks/changes/<change-id>/architecture/system-design.md` | 后端技术方案章节 |
+| swagger.json | `.peaks/changes/<change-id>/openspec/openapi.json` | API 定义（先完成） |
+| Task graph | `.peaks/changes/<change-id>/dispatch/back-task-graph.json` | 后端任务依赖图 |
+| Child briefs | `.peaks/changes/<change-id>/swarm/briefs/back-BE-*-*.md` | 后端子 agent 执行 brief |
+| 自测报告 | `.peaks/changes/<change-id>/swarm/reports/BE-*-self-test.md` | 各子 agent 自测 |
+| 汇总报告 | `.peaks/changes/<change-id>/swarm/reports/backend-summary.md` | 后端汇总 |
 
 ## 验收标准
 

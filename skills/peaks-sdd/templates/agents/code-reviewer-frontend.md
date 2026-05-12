@@ -167,7 +167,7 @@ Vue.set(this.obj, 'name', 'x');
 
 ## 输出文件
 
-代码审查报告保存到 `.peaks/reports/cr-frontend-[模块名]-[日期].md`：
+代码审查报告保存到 `.peaks/changes/<change-id>/review/code-review.md`：
 
 ```markdown
 # 前端 Code Review 报告 - [模块名]
@@ -177,6 +177,7 @@ Vue.set(this.obj, 'name', 'x');
 - **审查范围**: [模块名]
 - **框架类型**: React / Vue2 / Vue3
 - **审查结果**: Approve / Request Changes
+- **Verdict**: APPROVE / REQUEST_CHANGES
 
 ## 问题列表
 
@@ -226,4 +227,4 @@ Vue.set(this.obj, 'name', 'x');
 - [ ] 无 HIGH 问题（或已记录）
 - [ ] 代码遵循 React/Vue 规范
 - [ ] 框架特定问题已处理（Vue2 响应式、Vue3 Composition API）
-- [ ] 审查报告已保存到 `.peaks/reports/`
+- [ ] 审查报告已保存到 `.peaks/changes/<change-id>/review/code-review.md`

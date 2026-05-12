@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'fs';
 import { tmpdir } from 'os';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
@@ -41,7 +41,9 @@ function run(command, args, options = {}) {
 }
 
 function writeArtifact(relativePath, content) {
-  writeFileSync(join(projectPath, relativePath), content, 'utf-8');
+  const fullPath = join(projectPath, relativePath);
+  mkdirSync(dirname(fullPath), { recursive: true });
+  writeFileSync(fullPath, content, 'utf-8');
 }
 
 console.log(`Dogfood project: ${projectPath}`);
@@ -108,11 +110,73 @@ if (currentChange) {
   writeArtifact(`${changeRoot}/architecture/system-design.md`, '# System Design\n');
   writeArtifact(`${changeRoot}/qa/test-plan.md`, '# Test Plan\n');
   writeArtifact(`${changeRoot}/swarm/reports/self-test.md`, '# Self Test\n');
+  writeArtifact(`${changeRoot}/review/code-review.md`, '# Code Review\n');
   writeArtifact(`${changeRoot}/review/security-review.md`, '# Security Review\n');
+  writeArtifact(`${changeRoot}/final-report.md`, '# Final Report\n');
 
   const verifyResult = run('node', [verifyScript, projectPath]);
   if (verifyResult.status === 0) pass('verify-artifacts accepts current change artifacts');
   else fail('verify-artifacts accepts current change artifacts', verifyResult.stderr || verifyResult.stdout);
+}
+
+const nestedProjectPath = mkdtempSync(join(tmpdir(), 'peaks-sdd-nested-'));
+try {
+  const nestedChangeId = 'changes/2026-05-12-ccr-desktop';
+  const nestedChangeRoot = `.peaks/${nestedChangeId}`;
+  mkdirSync(join(nestedProjectPath, 'ccr-desktop'), { recursive: true });
+  mkdirSync(join(nestedProjectPath, '.peaks'), { recursive: true });
+  writeFileSync(join(nestedProjectPath, '.peaks', 'current-change'), `${nestedChangeId}\n`, 'utf-8');
+  const nestedFiles = [
+    '.peaks/project/overview.md',
+    '.peaks/project/product-knowledge.md',
+    '.peaks/project/roadmap.md',
+    '.peaks/project/decisions.md',
+    '.claude/agents/dispatcher.md',
+    '.claude/agents/product.md',
+    '.claude/agents/qa.md',
+    `${nestedChangeRoot}/product/prd.md`,
+    `${nestedChangeRoot}/design/design-spec.md`,
+    `${nestedChangeRoot}/architecture/system-design.md`,
+    `${nestedChangeRoot}/qa/test-plan.md`,
+    `${nestedChangeRoot}/swarm/reports/self-test.md`,
+    `${nestedChangeRoot}/review/code-review.md`,
+    `${nestedChangeRoot}/review/security-review.md`,
+    `${nestedChangeRoot}/final-report.md`,
+    'ccr-desktop/package.json',
+    'ccr-desktop/tsconfig.json',
+    'ccr-desktop/node_modules/typescript/package.json',
+    'ccr-desktop/node_modules/typescript/bin/tsc'
+  ];
+
+  for (const file of nestedFiles) {
+    const fullPath = join(nestedProjectPath, file);
+    mkdirSync(dirname(fullPath), { recursive: true });
+    const content = file.endsWith('ccr-desktop/package.json') || file.endsWith('ccr-desktop\\package.json')
+      ? '{"scripts":{"build":"tsc --noEmit"},"devDependencies":{"typescript":"~5.8.3"}}\n'
+      : file.endsWith('typescript/package.json') || file.endsWith('typescript\\package.json')
+        ? '{"bin":{"tsc":"./bin/tsc"}}\n'
+        : file.endsWith('tsconfig.json')
+          ? '{"compilerOptions":{"noEmit":true},"files":[]}\n'
+          : file.endsWith('/tsc') || file.endsWith('\\tsc')
+            ? 'process.exit(0);\n'
+            : '# Fixture\n';
+    writeFileSync(fullPath, content, 'utf-8');
+  }
+
+  const nestedVerifyResult = run('node', [verifyScript, nestedProjectPath]);
+  const blocksWithoutOptIn = nestedVerifyResult.status !== 0;
+  if (blocksWithoutOptIn) pass('verify-artifacts blocks nested app compile without local-tool opt-in');
+  else fail('verify-artifacts blocks nested app compile without local-tool opt-in', nestedVerifyResult.stderr || nestedVerifyResult.stdout);
+
+  const nestedCompileResult = run('node', [verifyScript, nestedProjectPath, '--allow-local-tools']);
+  if (nestedCompileResult.status === 0) pass('verify-artifacts can compile nested app with explicit local-tool opt-in');
+  else fail('verify-artifacts can compile nested app with explicit local-tool opt-in', nestedCompileResult.stderr || nestedCompileResult.stdout);
+} finally {
+  if (process.env.PEAKS_DOGFOOD_KEEP !== '1') {
+    rmSync(nestedProjectPath, { recursive: true, force: true });
+  } else {
+    console.log(`\nKept nested dogfood project: ${nestedProjectPath}`);
+  }
 }
 
 const failed = checks.filter(check => check.status === 'FAIL');

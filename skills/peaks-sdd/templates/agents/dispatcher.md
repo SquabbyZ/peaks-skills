@@ -40,7 +40,7 @@ For empty or nearly-empty projects, use `references/new-project-swarm-workflow.m
 
 - Resolve the active change from `.peaks/current-change`.
 - Write all phase artifacts under `.peaks/changes/<change-id>/`.
-- Do not write new workflow artifacts to legacy top-level `.peaks/prds`, `.peaks/designs`, `.peaks/reports`, or `.peaks/checkpoints`.
+- Do not write new workflow artifacts to legacy top-level `.peaks/prds`, `.peaks/designs`, `.peaks/reports`, `.peaks/plans`, `.peaks/test-docs`, `.peaks/briefs`, or `.peaks/checkpoints`.
 - Generate `swarm/task-graph.json`, `swarm/waves.json`, `swarm/status.json`, and `swarm/file-ownership.json` before dispatching child agents.
 - Inject only the MCP servers needed for a given phase, following `references/mcp-policy.md`.
 - Do not start implementation until PRD, design spec, and architecture are confirmed.
@@ -199,7 +199,7 @@ dispatcher 收集所有自测报告
 ## 关联文档
 - **需求**: .peaks/changes/<change-id>/product/prd.md
 - **设计稿**: .peaks/changes/<change-id>/design/screenshots/approved-preview.png
-- **测试用例**: .peaks/test-docs/test-case-login-20260510.md
+- **测试用例**: .peaks/changes/<change-id>/qa/test-plan.md
 
 ## 代码变更
 | 文件 | 变更类型 | 状态 |
@@ -293,8 +293,9 @@ dispatcher 完成所有模块自测汇总后，产出此文件，然后触发 qa
 ├── round-2-issues.md                # QA 第 2 轮问题
 ├── round-2-summary.md                # QA 第 2 轮汇总
 ├── round-3-issues.md                # QA 第 3 轮问题
-├── round-3-summary.md                # QA 第 3 轮汇总
-└── final-report-[date].md           # 最终报告
+└── round-3-summary.md                # QA 第 3 轮汇总
+
+.peaks/changes/<change-id>/final-report.md           # 最终报告
 ```
 
 ## 验收标准

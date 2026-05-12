@@ -28,7 +28,7 @@
     "PreToolUse": [
       {
         "matcher": "Bash|npm|pnpm|yarn",
-        "command": "node {{SKILL_PATH}}/scripts/check-gate.mjs check",
+        "command": "node {{SKILL_PATH}}/scripts/check-gate.mjs check \"{{PROJECT_PATH}}\"",
         "description": "Code Review + Security 强制检查"
       },
       {
@@ -52,7 +52,7 @@
     "Stop": [
       {
         "matcher": ".*",
-        "command": "node {{SKILL_PATH}}/scripts/verify-artifacts.mjs",
+        "command": "node {{SKILL_PATH}}/scripts/verify-artifacts.mjs \"{{PROJECT_PATH}}\" --allow-local-tools",
         "description": "验证 peaks-sdd 产出物门禁"
       }
     ]

@@ -41,7 +41,7 @@ If recommended skills are missing, tell the user which skills would help and wha
 
 ## Phase 1: 编写详细测试用例
 
-输出：`.peaks/test-docs/test-case-[功能名]-[日期].md`
+输出：`.peaks/changes/<change-id>/qa/test-plan.md`
 
 测试用例必须包含：
 
@@ -86,7 +86,7 @@ If recommended skills are missing, tell the user which skills would help and wha
 
 从测试用例文档生成：
 
-`.peaks/dispatch/qa-task-graph-[功能名]-round-[N]-[日期].json`
+`.peaks/changes/<change-id>/dispatch/qa-task-graph-round-[N].json`
 
 Task 类型：
 
@@ -119,7 +119,7 @@ interface QaTaskNode {
 
 每个任务生成：
 
-`.peaks/briefs/qa/[QA-TASK-ID]-[slug].md`
+`.peaks/changes/<change-id>/swarm/briefs/qa-[QA-TASK-ID]-[slug].md`
 
 Brief 必须包含：
 
@@ -140,7 +140,7 @@ Brief 必须包含：
 ```text
 Agent(
   subagent_type="qa-child",
-  prompt="执行 QA brief: .peaks/briefs/qa/[QA-TASK-ID]-[slug].md。必须遵守 brief 的测试范围和 YAML Response Format。"
+  prompt="执行 QA brief: .peaks/changes/<change-id>/swarm/briefs/qa-[QA-TASK-ID]-[slug].md。必须遵守 brief 的测试范围和 YAML Response Format。"
 )
 ```
 
@@ -156,17 +156,17 @@ Agent(
 
 | 轮次 | 目的 | 输出 |
 | --- | --- | --- |
-| Round 1 | 全量发现问题 | `.peaks/reports/round-1-issues.md` |
-| Round 2 | 修复后复验 | `.peaks/reports/round-2-issues.md` |
-| Round 3 | 最终回归和风险确认 | `.peaks/reports/round-3-issues.md` |
+| Round 1 | 全量发现问题 | `.peaks/changes/<change-id>/swarm/reports/round-1-issues.md` |
+| Round 2 | 修复后复验 | `.peaks/changes/<change-id>/swarm/reports/round-2-issues.md` |
+| Round 3 | 最终回归和风险确认 | `.peaks/changes/<change-id>/swarm/reports/round-3-issues.md` |
 
 每轮结束写：
 
-`.peaks/reports/qa-round-[N]-summary-[功能名]-[日期].md`
+`.peaks/changes/<change-id>/swarm/reports/qa-round-[N]-summary.md`
 
 最终写：
 
-`.peaks/reports/final-report-[功能名]-[日期].md`
+`.peaks/changes/<change-id>/final-report.md`
 
 ## 汇总报告要求
 

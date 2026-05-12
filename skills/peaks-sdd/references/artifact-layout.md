@@ -40,7 +40,12 @@ peaks-sdd stores durable workflow state in `.peaks/`. Do not rely on conversatio
         reports/
       dispatch/
       qa/
+        test-plan.md
+        e2e-report.md
+        screenshots/
       review/
+        code-review.md
+        security-review.md
       checkpoints/
       final-report.md
 ```
@@ -51,4 +56,5 @@ peaks-sdd stores durable workflow state in `.peaks/`. Do not rely on conversatio
 - `.peaks/current-change` contains the active relative path, for example `changes/2026-05-12-initial-product`.
 - `.peaks/project/` stores cross-iteration knowledge only.
 - Child agents receive explicit change-scoped file paths in their briefs.
-- Do not write new artifacts to legacy top-level `.peaks/prds`, `.peaks/designs`, `.peaks/reports`, or `.peaks/checkpoints`.
+- Required completion gates are `product/prd.md`, `design/design-spec.md`, `architecture/system-design.md`, `qa/test-plan.md`, `swarm/reports/*.md`, `review/code-review.md`, `review/security-review.md`, and `final-report.md` inside the active change.
+- Do not write new artifacts to legacy top-level `.peaks/prds`, `.peaks/designs`, `.peaks/reports`, `.peaks/plans`, `.peaks/test-docs`, `.peaks/briefs`, or `.peaks/checkpoints`.

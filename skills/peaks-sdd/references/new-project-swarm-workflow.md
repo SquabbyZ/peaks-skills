@@ -15,7 +15,8 @@ Use this when the current directory is empty or nearly empty and the user descri
 9. Execute bounded waves with max 5 child agents per wave and max 10 development child agents.
 10. Require unit tests in implementation briefs.
 11. Run code review, security review, QA, and fix waves until no CRITICAL/HIGH issues remain.
-12. Start the app, verify the core path, and write `final-report.md`.
+12. Write canonical gate artifacts: `review/code-review.md`, `review/security-review.md`, `qa/test-plan.md`, `swarm/reports/*.md`, and `final-report.md`.
+13. Start the app, verify the core path, and write final verification evidence into `final-report.md`.
 
 ## Gates
 

@@ -4,8 +4,8 @@
  * 验证 6 项强制产出物是否齐全
  */
 
-import { existsSync, readdirSync, statSync } from 'fs';
-import { join, dirname } from 'path';
+import { existsSync, readFileSync, realpathSync, readdirSync, statSync } from 'fs';
+import { dirname, isAbsolute, join, relative, resolve } from 'path';
 import { fileURLToPath } from 'url';
 import { spawn } from 'child_process';
 import { getPeaksPaths, readCurrentChangeId } from './lib/change-artifacts.mjs';
@@ -20,7 +20,7 @@ function execAsync(command, args, options = {}) {
     const child = spawn(command, args, {
       cwd: options.cwd || process.cwd(),
       stdio: ['ignore', 'pipe', 'pipe'],
-      shell: false
+      shell: options.shell || false
     });
 
     const timeout = options.timeout || 60000;
@@ -45,18 +45,27 @@ function execAsync(command, args, options = {}) {
 }
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 
-// 默认项目路径（脚本所在目录的父目录）
-const defaultProjectPath = join(__dirname, '..', '..', '..', '..');
-const projectPath = process.argv[2] || defaultProjectPath;
+const args = process.argv.slice(2);
+const projectPathArg = args.find(arg => !arg.startsWith('-'));
+const projectPath = resolveProjectRoot(projectPathArg || process.cwd());
 const currentChangeId = readCurrentChangeId(projectPath) || '1970-01-01-initial-product';
 const currentChangePath = getPeaksPaths(projectPath, currentChangeId).changeRelativePath;
-
-// 解析命令行参数
-const args = process.argv.slice(2);
 const skipCoverage = args.includes('--force') || args.includes('-f');
+const allowLocalTools = args.includes('--allow-local-tools') || process.env.PEAKS_SDD_ALLOW_LOCAL_TOOLS === '1';
 const targetCoverage = 80; // 目标覆盖率
+
+function resolveProjectRoot(startPath) {
+  let current = resolve(startPath);
+
+  while (true) {
+    if (existsSync(join(current, '.peaks', 'current-change'))) return current;
+
+    const parent = dirname(current);
+    if (parent === current) return resolve(startPath);
+    current = parent;
+  }
+}
 
 const ARTIFACT_CHECKS = [
   {
@@ -96,10 +105,10 @@ const ARTIFACT_CHECKS = [
   },
   {
     id: 6,
-    name: 'TypeScript 编译',
-    check: 'tsc',
+    name: 'Code Review',
+    pattern: `.peaks/${currentChangePath}/review/code-review.md`,
     required: true,
-    missingAction: '编译失败的模块不标记完成'
+    missingAction: '通知 code-reviewer 补全'
   },
   {
     id: 7,
@@ -110,6 +119,27 @@ const ARTIFACT_CHECKS = [
   },
   {
     id: 8,
+    name: '最终报告',
+    pattern: `.peaks/${currentChangePath}/final-report.md`,
+    required: true,
+    missingAction: '汇总 PRD、设计、架构、review、QA 和验证证据'
+  },
+  {
+    id: 9,
+    name: '初始化基线',
+    check: 'init-baseline',
+    required: true,
+    missingAction: '重新运行 peaks-sdd 初始化补齐 project docs 和 agents'
+  },
+  {
+    id: 10,
+    name: 'TypeScript 编译',
+    check: 'tsc',
+    required: true,
+    missingAction: '编译失败的模块不标记完成'
+  },
+  {
+    id: 11,
     name: '单元测试覆盖率',
     check: 'coverage',
     required: false,
@@ -216,7 +246,16 @@ async function checkPackageTypeScript(pkgPath, pkgName) {
     return { name: pkgName, pass: null, message: '无 tsconfig.json' };
   }
 
-  const result = await execAsync('npx', ['tsc', '--noEmit', '--pretty', 'false'], {
+  if (!allowLocalTools) {
+    return { name: pkgName, pass: false, message: '已发现 tsconfig，需 --allow-local-tools 执行编译' };
+  }
+
+  const runner = resolveLocalTscRunner(pkgPath);
+  if (!runner) {
+    return { name: pkgName, pass: null, message: '未安装 TypeScript' };
+  }
+
+  const result = await execAsync(runner.command, [...runner.args, '--noEmit', '--pretty', 'false'], {
     cwd: pkgPath,
     timeout: 60000
   });
@@ -235,52 +274,109 @@ async function checkPackageTypeScript(pkgPath, pkgName) {
   return { name: pkgName, pass: false, message: `${errorCount} errors` };
 }
 
+function resolveLocalTscRunner(pkgPath) {
+  const pkgJsonPath = join(pkgPath, 'node_modules', 'typescript', 'package.json');
+  if (!existsSync(pkgJsonPath)) return null;
+
+  try {
+    const pkg = JSON.parse(readFileSync(pkgJsonPath, 'utf-8'));
+    const bin = typeof pkg.bin === 'string' ? pkg.bin : pkg.bin?.tsc;
+    if (!bin || isAbsolute(bin) || bin.includes('..')) return null;
+
+    const typescriptDir = resolve(pkgPath, 'node_modules', 'typescript');
+    const binPath = resolve(typescriptDir, bin);
+    if (!existsSync(binPath)) return null;
+
+    const packageRoot = resolve(pkgPath);
+    const realTypescriptDir = realpathSync(typescriptDir);
+    const realBinPath = realpathSync(binPath);
+    const realPackageRoot = realpathSync(packageRoot);
+    if (!isInsideDirectory(realPackageRoot, realTypescriptDir)) return null;
+    if (!isInsideDirectory(realTypescriptDir, realBinPath)) return null;
+    return { command: process.execPath, args: [realBinPath] };
+  } catch {
+    return null;
+  }
+}
+
+function isInsideDirectory(parentDir, childPath) {
+  const parent = parentDir.endsWith(pathSeparator()) ? parentDir : `${parentDir}${pathSeparator()}`;
+  return childPath === parentDir || childPath.startsWith(parent);
+}
+
+function pathSeparator() {
+  return process.platform === 'win32' ? '\\' : '/';
+}
+
+function discoverTypeScriptProjects(basePath) {
+  const roots = [];
+  const seen = new Set();
+  const ignoredDirs = new Set(['.git', '.claude', '.peaks', '.gitnexus', 'node_modules', 'dist', 'build', 'target', 'coverage']);
+  const maxDepth = 3;
+
+  function addProject(dir) {
+    if (seen.has(dir)) return;
+    seen.add(dir);
+    const name = relative(basePath, dir).replace(/\\/g, '/') || '(root)';
+    roots.push({ path: dir, name });
+  }
+
+  function walk(dir, depth) {
+    if (depth > maxDepth) return;
+    const hasTsconfig = existsSync(join(dir, 'tsconfig.json'));
+    if (hasTsconfig) {
+      addProject(dir);
+    }
+
+    let entries = [];
+    try {
+      entries = readdirSync(dir, { withFileTypes: true });
+    } catch {
+      return;
+    }
+
+    for (const entry of entries) {
+      if (!entry.isDirectory() || ignoredDirs.has(entry.name)) continue;
+      walk(join(dir, entry.name), depth + 1);
+    }
+  }
+
+  walk(basePath, 0);
+  return roots;
+}
+
+function checkInitializationBaseline(basePath) {
+  const requiredFiles = [
+    '.peaks/current-change',
+    '.peaks/project/overview.md',
+    '.peaks/project/product-knowledge.md',
+    '.peaks/project/roadmap.md',
+    '.peaks/project/decisions.md',
+    '.claude/agents/dispatcher.md',
+    '.claude/agents/product.md',
+    '.claude/agents/qa.md'
+  ];
+
+  const missing = requiredFiles.filter(file => !existsSync(join(basePath, file)));
+  if (missing.length > 0) {
+    return { pass: false, message: `缺失 ${missing.slice(0, 3).join(', ')}${missing.length > 3 ? '...' : ''}` };
+  }
+
+  return { pass: true, message: 'project docs 和 agents 已就绪' };
+}
+
 /**
- * 检查 TypeScript 编译（遍历各子包）
+ * 检查 TypeScript 编译（递归发现根目录和嵌套 app）
  * @param {string} basePath - 项目路径
  * @returns {Promise<object>} 检查结果
  */
 async function checkTypeScriptCompile(basePath) {
-  // 遍历可能的子包目录
-  const subDirs = ['packages', 'apps', 'src'];
-  const allResults = [];
-  let hasAnyTsconfig = false;
-
-  for (const subDir of subDirs) {
-    const subPath = join(basePath, subDir);
-    if (!existsSync(subPath)) continue;
-
-    try {
-      const entries = readdirSync(subPath, { withFileTypes: true });
-      for (const entry of entries) {
-        if (!entry.isDirectory()) continue;
-        const pkgPath = join(subPath, entry.name);
-        const tsconfigPath = join(pkgPath, 'tsconfig.json');
-        if (existsSync(tsconfigPath)) {
-          hasAnyTsconfig = true;
-          allResults.push(checkPackageTypeScript(pkgPath, `${subDir}/${entry.name}`));
-        }
-      }
-    } catch (e) {
-      // 目录不可访问时跳过
-    }
-  }
-
-  // 检查根目录
-  const rootTsconfig = join(basePath, 'tsconfig.json');
-  if (existsSync(rootTsconfig)) {
-    hasAnyTsconfig = true;
-    allResults.push(checkPackageTypeScript(basePath, '(root)'));
-  }
-
-  if (!hasAnyTsconfig) {
+  const projects = discoverTypeScriptProjects(basePath);
+  if (projects.length === 0) {
     return { pass: null, message: '未找到 tsconfig.json' };
   }
 
-  // 等待所有包检查完成
-  const results = await Promise.all(allResults);
-
-  // 汇总结果
+  const results = await Promise.all(projects.map(project => checkPackageTypeScript(project.path, project.name)));
   const failed = results.filter(r => r.pass === false);
   const passed = results.filter(r => r.pass === true);
   const skipped = results.filter(r => r.pass === null);
@@ -290,11 +386,12 @@ async function checkTypeScriptCompile(basePath) {
     return { pass: false, message: `${failed.length} 包失败: ${details}` };
   }
 
-  if (passed.length > 0 && skipped.length === 0) {
-    return { pass: true, message: `${passed.length} 包全部通过` };
+  if (passed.length > 0) {
+    const skippedMessage = skipped.length > 0 ? `, ${skipped.length} 跳过` : '';
+    return { pass: true, message: `${passed.length} 包通过${skippedMessage}` };
   }
 
-  return { pass: true, message: `${passed.length} 通过, ${skipped.length} 跳过` };
+  return { pass: false, message: `${skipped.length} 包未执行编译` };
 }
 
 /**
@@ -498,6 +595,17 @@ export async function runGateChecks(basePath) {
         allPassed = false;
         result.details = '未找到';
       }
+    } else if (check.check === 'init-baseline') {
+      const baselineResult = checkInitializationBaseline(basePath);
+      result.details = baselineResult.message;
+
+      if (baselineResult.pass) {
+        result.status = '✅';
+        result.pass = true;
+      } else {
+        result.status = '❌';
+        allPassed = false;
+      }
     } else if (check.check === 'tsc') {
       const tscResult = await checkTypeScriptCompile(basePath);
       result.details = tscResult.message;
@@ -599,7 +707,7 @@ function printResults(checkResult) {
   return checkResult.passed;
 }
 
-if (process.argv[1]?.endsWith('.mjs')) {
+if (resolve(process.argv[1] || '') === resolve(__filename)) {
   (async () => {
     const result = await runGateChecks(projectPath);
     const passed = printResults(result);

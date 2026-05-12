@@ -57,7 +57,7 @@ If recommended skills are missing, tell the user which skills would help and wha
 
 ### 1. 编写前端技术文档
 
-读取 PRD + 设计稿 + Swagger/API contract + 测试用例，编写前端技术文档到 `.peaks/tech/frontend-tech-doc-[功能名]-[日期].md`。没有技术文档时禁止调度子 agent：
+读取 PRD + 设计稿 + Swagger/API contract + 测试用例，编写或更新 `.peaks/changes/<change-id>/architecture/system-design.md` 的前端技术方案章节。没有技术文档时禁止调度子 agent：
 
 ```markdown
 # 前端技术方案 - [功能名]
@@ -126,8 +126,8 @@ t=4: Agent1 完成 FE-003
 **流程**：
 
 1. 从前端技术文档的任务表生成 task graph。
-2. 写入 `.peaks/dispatch/front-task-graph-[功能名]-[日期].json`。
-3. 为每个任务生成 `.peaks/briefs/front/[TASK-ID]-[slug].md`。
+2. 写入 `.peaks/changes/<change-id>/dispatch/front-task-graph.json`。
+3. 为每个任务生成 `.peaks/changes/<change-id>/swarm/briefs/front-[TASK-ID]-[slug].md`。
 4. 按 wave 调度：无依赖任务并行，有依赖任务等待上游 DONE。
 5. 子 agent 只接收 brief 路径和必要项目路径，不接收大段散乱上下文。
 
@@ -136,7 +136,7 @@ t=4: Agent1 完成 FE-003
 ```text
 Agent(
   subagent_type="frontend-child",
-  prompt="执行 brief: .peaks/briefs/front/[TASK-ID]-[slug].md。必须遵守 brief 的文件边界和 YAML Response Format。"
+  prompt="执行 brief: .peaks/changes/<change-id>/swarm/briefs/front-[TASK-ID]-[slug].md。必须遵守 brief 的文件边界和 YAML Response Format。"
 )
 ```
 
@@ -175,12 +175,12 @@ Step 9: 汇总到 frontend-summary-[日期].md
 
 | 文件 | 路径 | 说明 |
 |------|------|------|
-| 前端技术文档 | `.peaks/tech/frontend-tech-doc-[功能名]-[日期].md` | 前端技术方案 |
+| 前端技术文档 | `.peaks/changes/<change-id>/architecture/system-design.md` | 前端技术方案章节 |
 | Mock 数据 | `src/mocks/` | API Mock 配置 |
-| Task graph | `.peaks/dispatch/front-task-graph-[功能名]-[日期].json` | 前端任务依赖图 |
-| Child briefs | `.peaks/briefs/front/FE-*-*.md` | 前端子 agent 执行 brief |
-| 自测报告 | `.peaks/reports/FE-*-self-test-[日期].md` | 各子 agent 自测 |
-| 汇总报告 | `.peaks/reports/frontend-summary-[日期].md` | 前端汇总 |
+| Task graph | `.peaks/changes/<change-id>/dispatch/front-task-graph.json` | 前端任务依赖图 |
+| Child briefs | `.peaks/changes/<change-id>/swarm/briefs/front-FE-*-*.md` | 前端子 agent 执行 brief |
+| 自测报告 | `.peaks/changes/<change-id>/swarm/reports/FE-*-self-test.md` | 各子 agent 自测 |
+| 汇总报告 | `.peaks/changes/<change-id>/swarm/reports/frontend-summary.md` | 前端汇总 |
 
 ## 验收标准
 
