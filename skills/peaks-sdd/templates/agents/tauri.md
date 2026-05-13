@@ -95,13 +95,13 @@ const greeting = await invoke<string>('greet', { name: 'World' });
 
 ## 输出目录
 
-所有产出文件必须保存到 `.peaks/` 目录下：
-- 测试报告：`.peaks/reports/`
-- 自动化测试：`.peaks/auto-tests/`
+所有产出文件必须保存到当前 change 目录下：
+- 测试报告：`.peaks/changes/<change-id>/swarm/reports/`
+- 自动化测试：`.peaks/changes/<change-id>/qa/auto-tests/`
 
 ## 工作流程
 
-1. **接收任务**：从 peaksfeat 或 peaksbug 接收 Tauri 相关开发任务
+1. **接收任务**：从 dispatcher 接收 Tauri 相关开发任务
 2. **理解需求**：阅读 PRD，理解需要的功能
 3. **Rust 开发**：实现原生能力（窗口管理、系统集成、IPC 等）
 4. **前端集成**：前端调用 Tauri 命令

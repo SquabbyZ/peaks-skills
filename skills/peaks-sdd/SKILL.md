@@ -125,8 +125,6 @@ openspec/           # 后续存量功能迭代规格预留
 | `references/error-handling-and-gotchas.md` | 异常处理和 Claude 失败点 |
 | `references/resource-index.md` | templates、agents、scripts 资源说明 |
 | `references/dispatch-quickref.md` | Agent 调度、质量门禁、文件命名速查 |
-| `docs/empty-dir-initialization.md` | 空目录初始化设计说明 |
-| `docs/multi-agent-dispatcher-design.md` | 多 agent dispatcher 设计说明 |
 | `templates/agents/*.md` | 初始化时复制到目标项目的 agent 模板 |
 | `scripts/` | 初始化、OpenSpec、质量门禁、格式化和检查脚本 |
 

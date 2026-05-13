@@ -57,7 +57,7 @@ If recommended skills are missing, tell the user which skills would help and wha
 
 ### 1. 编写前端技术文档
 
-读取 PRD + 设计稿 + Swagger/API contract + 测试用例，编写或更新 `.peaks/changes/<change-id>/architecture/system-design.md` 的前端技术方案章节。没有技术文档时禁止调度子 agent：
+读取 PRD + 设计稿 + Swagger/API contract + 测试用例，编写或更新 `.peaks/changes/<change-id>/architecture/system-design.md` 的前端技术方案章节。没有可评审技术文档和 `architecture/system-design-confirmation.md` 用户确认记录时，禁止调度子 agent：
 
 ```markdown
 # 前端技术方案 - [功能名]

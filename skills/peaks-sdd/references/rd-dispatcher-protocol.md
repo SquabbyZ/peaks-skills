@@ -26,8 +26,8 @@ The R&D dispatcher must write a domain technical document before dispatching chi
 
 | Domain | Output |
 | --- | --- |
-| Frontend | `.peaks/tech/frontend-tech-doc-[feature]-[YYYYMMDD].md` |
-| Backend | `.peaks/tech/backend-tech-doc-[feature]-[YYYYMMDD].md` |
+| Frontend | `.peaks/changes/<change-id>/architecture/system-design.md` |
+| Backend | `.peaks/changes/<change-id>/architecture/system-design.md` |
 
 The technical document must include:
 
@@ -66,7 +66,7 @@ interface RdTaskGraph {
 Write the task graph to:
 
 ```text
-.peaks/dispatch/[front|back]-task-graph-[feature]-[YYYYMMDD].json
+.peaks/changes/<change-id>/dispatch/[front|back]-task-graph.json
 ```
 
 ## Dependency Rules
@@ -85,7 +85,7 @@ Every child agent receives a brief file. Do not rely on conversation context.
 Brief path:
 
 ```text
-.peaks/briefs/[front|back]/[TASK-ID]-[slug].md
+.peaks/changes/<change-id>/swarm/briefs/[front|back]-[TASK-ID]-[slug].md
 ```
 
 Brief template:
@@ -169,7 +169,7 @@ For each child task:
 Write summary:
 
 ```text
-.peaks/reports/[frontend|backend]-summary-[feature]-[YYYYMMDD].md
+.peaks/changes/<change-id>/swarm/reports/[frontend|backend]-summary.md
 ```
 
 Summary must include:

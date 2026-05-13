@@ -56,5 +56,6 @@ peaks-sdd stores durable workflow state in `.peaks/`. Do not rely on conversatio
 - `.peaks/current-change` contains the active relative path, for example `changes/2026-05-12-initial-product`.
 - `.peaks/project/` stores cross-iteration knowledge only.
 - Child agents receive explicit change-scoped file paths in their briefs.
-- Required completion gates are `product/prd.md`, `design/design-spec.md`, `architecture/system-design.md`, `qa/test-plan.md`, `swarm/reports/*.md`, `review/code-review.md`, `review/security-review.md`, and `final-report.md` inside the active change.
+- Required completion gates are `product/brainstorm.md`, `product/prd.md`, `design/design-spec.md`, `architecture/system-design.md`, `qa/test-plan.md`, `swarm/reports/*.md`, `review/code-review.md`, `review/security-review.md`, and `final-report.md` inside the active change.
+- `product/brainstorm.md` must be an interaction log with at least 5 AskUserQuestion rounds, user answers/selections, and decisions. Analysis summaries or open-question drafts must use `product/brainstorm-draft.md` and cannot advance the gate.
 - Do not write new artifacts to legacy top-level `.peaks/prds`, `.peaks/designs`, `.peaks/reports`, `.peaks/plans`, `.peaks/test-docs`, `.peaks/briefs`, or `.peaks/checkpoints`.

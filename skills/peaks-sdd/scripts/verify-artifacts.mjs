@@ -49,11 +49,15 @@ const __filename = fileURLToPath(import.meta.url);
 const args = process.argv.slice(2);
 const projectPathArg = args.find(arg => !arg.startsWith('-'));
 const projectPath = resolveProjectRoot(projectPathArg || process.cwd());
-const currentChangeId = readCurrentChangeId(projectPath) || '1970-01-01-initial-product';
-const currentChangePath = getPeaksPaths(projectPath, currentChangeId).changeRelativePath;
 const skipCoverage = args.includes('--force') || args.includes('-f');
 const allowLocalTools = args.includes('--allow-local-tools') || process.env.PEAKS_SDD_ALLOW_LOCAL_TOOLS === '1';
-const targetCoverage = 80; // 目标覆盖率
+const defaultTargetCoverage = 95; // 应用/业务项目强制单元测试覆盖率
+const componentLibraryTargetCoverage = 60; // 开源组件库覆盖率要求
+
+function getCurrentChangePath(basePath) {
+  const currentChangeId = readCurrentChangeId(basePath) || '1970-01-01-initial-product';
+  return getPeaksPaths(basePath, currentChangeId).changeRelativePath;
+}
 
 function resolveProjectRoot(startPath) {
   let current = resolve(startPath);
@@ -67,85 +71,166 @@ function resolveProjectRoot(startPath) {
   }
 }
 
-const ARTIFACT_CHECKS = [
-  {
-    id: 1,
-    name: 'PRD 文档',
-    pattern: `.peaks/${currentChangePath}/product/prd.md`,
-    required: true,
-    missingAction: '通知 product 补全'
-  },
-  {
-    id: 2,
-    name: '设计规范',
-    pattern: `.peaks/${currentChangePath}/design/design-spec.md`,
-    required: true,
-    missingAction: '通知 design 补全'
-  },
-  {
-    id: 3,
-    name: '技术文档',
-    pattern: `.peaks/${currentChangePath}/architecture/system-design.md`,
-    required: true,
-    missingAction: '通知研发 Agent 补全'
-  },
-  {
-    id: 4,
-    name: '测试用例',
-    pattern: `.peaks/${currentChangePath}/qa/test-plan.md`,
-    required: true,
-    missingAction: '通知 qa 补全'
-  },
-  {
-    id: 5,
-    name: '模块自测报告',
-    pattern: `.peaks/${currentChangePath}/swarm/reports/*.md`,
-    required: true,
-    missingAction: '缺失模块重新调度子 Agent'
-  },
-  {
-    id: 6,
-    name: 'Code Review',
-    pattern: `.peaks/${currentChangePath}/review/code-review.md`,
-    required: true,
-    missingAction: '通知 code-reviewer 补全'
-  },
-  {
-    id: 7,
-    name: '安全审查',
-    pattern: `.peaks/${currentChangePath}/review/security-review.md`,
-    required: true,
-    missingAction: '有 CRITICAL 问题则阻断'
-  },
-  {
-    id: 8,
-    name: '最终报告',
-    pattern: `.peaks/${currentChangePath}/final-report.md`,
-    required: true,
-    missingAction: '汇总 PRD、设计、架构、review、QA 和验证证据'
-  },
-  {
-    id: 9,
-    name: '初始化基线',
-    check: 'init-baseline',
-    required: true,
-    missingAction: '重新运行 peaks-sdd 初始化补齐 project docs 和 agents'
-  },
-  {
-    id: 10,
-    name: 'TypeScript 编译',
-    check: 'tsc',
-    required: true,
-    missingAction: '编译失败的模块不标记完成'
-  },
-  {
-    id: 11,
-    name: '单元测试覆盖率',
-    check: 'coverage',
-    required: false,
-    missingAction: '新项目需补充单元测试'
-  }
-];
+function buildArtifactChecks(currentChangePath, options = {}) {
+  const checks = [
+    {
+      id: 1,
+      name: '交互式脑暴记录',
+      check: 'interactive-brainstorm',
+      file: `.peaks/${currentChangePath}/product/brainstorm.md`,
+      required: true,
+      missingAction: '必须先通过 AskUserQuestion 完成至少 5 轮真实用户脑暴，不能用自动分析摘要代替'
+    },
+    {
+      id: 2,
+      name: 'PRD 文档',
+      pattern: `.peaks/${currentChangePath}/product/prd.md`,
+      required: true,
+      missingAction: '通知 product 补全'
+    },
+    {
+      id: 3,
+      name: 'PRD 可评审性',
+      check: 'reviewable-prd',
+      file: `.peaks/${currentChangePath}/product/prd.md`,
+      required: true,
+      missingAction: 'PRD 必须包含问题、用户、目标、范围、需求、验收标准、风险和开放问题'
+    },
+    {
+      id: 3,
+      name: 'PRD 阻塞确认',
+      check: 'confirmation',
+      file: `.peaks/${currentChangePath}/product/prd-confirmation.md`,
+      required: true,
+      missingAction: 'PRD 必须经用户明确确认后才能进入设计/技术方案'
+    },
+    ...(options.hasUi ? [
+      {
+        id: 3,
+        name: '设计规范',
+        pattern: `.peaks/${currentChangePath}/design/design-spec.md`,
+        required: true,
+        missingAction: '通知 design 补全'
+      },
+      {
+        id: 4,
+        name: '可视化设计稿',
+        check: 'visual-design',
+        required: true,
+        missingAction: 'UI 项目必须补充可预览 HTML 设计稿或等价设计平台产物'
+      },
+      {
+        id: 5,
+        name: '设计阻塞确认',
+        check: 'confirmation',
+        file: `.peaks/${currentChangePath}/design/design-confirmation.md`,
+        required: true,
+        missingAction: '设计稿必须经用户明确确认后才能进入技术方案'
+      }
+    ] : []),
+    {
+      id: 6,
+      name: '技术文档',
+      pattern: `.peaks/${currentChangePath}/architecture/system-design.md`,
+      required: true,
+      missingAction: '通知研发 Agent 补全'
+    },
+    {
+      id: 7,
+      name: '技术方案阻塞确认',
+      check: 'confirmation',
+      file: `.peaks/${currentChangePath}/architecture/system-design-confirmation.md`,
+      required: true,
+      missingAction: '技术方案必须经用户明确确认后才能进入 task graph / swarm'
+    },
+    {
+      id: 8,
+      name: '测试用例',
+      pattern: `.peaks/${currentChangePath}/qa/test-plan.md`,
+      required: true,
+      missingAction: '通知 qa 补全'
+    },
+    {
+      id: 9,
+      name: '模块自测报告',
+      pattern: `.peaks/${currentChangePath}/swarm/reports/*.md`,
+      required: true,
+      missingAction: '缺失模块重新调度子 Agent'
+    },
+    {
+      id: 10,
+      name: 'Code Review',
+      pattern: `.peaks/${currentChangePath}/review/code-review.md`,
+      required: true,
+      missingAction: '通知 code-reviewer 补全'
+    },
+    {
+      id: 11,
+      name: '安全审查',
+      pattern: `.peaks/${currentChangePath}/security/security-report.md`,
+      required: true,
+      missingAction: '有 CRITICAL 问题则阻断'
+    },
+    {
+      id: 12,
+      name: '功能测试报告',
+      pattern: `.peaks/${currentChangePath}/qa/functional-report.md`,
+      required: true,
+      missingAction: '通知 qa 补全功能测试报告'
+    },
+    {
+      id: 13,
+      name: '性能测试报告',
+      pattern: `.peaks/${currentChangePath}/qa/performance-report.md`,
+      required: true,
+      missingAction: '通知 qa 补全性能测试报告'
+    },
+    {
+      id: 14,
+      name: 'QA 三轮测试',
+      check: 'qa-rounds',
+      required: true,
+      missingAction: '必须完成 qa-round-1/2/3 和 acceptance-report'
+    },
+    {
+      id: 15,
+      name: '最终报告',
+      pattern: `.peaks/${currentChangePath}/final-report.md`,
+      required: true,
+      missingAction: '汇总 PRD、设计、架构、review、QA 和验证证据'
+    },
+    {
+      id: 16,
+      name: '初始化基线',
+      check: 'init-baseline',
+      required: true,
+      missingAction: '重新运行 peaks-sdd 初始化补齐 project docs 和 agents'
+    },
+    {
+      id: 17,
+      name: 'TypeScript 编译',
+      check: 'tsc',
+      required: true,
+      missingAction: '编译失败的模块不标记完成'
+    },
+    {
+      id: 18,
+      name: '单元测试报告',
+      check: 'unit-test-report',
+      required: true,
+      missingAction: '必须输出单元测试报告到 .peaks/ut/'
+    },
+    {
+      id: 19,
+      name: '单元测试覆盖率',
+      check: 'coverage',
+      required: true,
+      missingAction: '必须补充单元测试并达到项目类型覆盖率阈值'
+    }
+  ];
+
+  return checks;
+}
 
 /**
  * 简单的 glob 模式匹配
@@ -365,6 +450,166 @@ function checkInitializationBaseline(basePath) {
   return { pass: true, message: 'project docs 和 agents 已就绪' };
 }
 
+function checkInteractiveBrainstorm(basePath, relativePath) {
+  const fullPath = join(basePath, relativePath);
+  if (!existsSync(fullPath)) {
+    return { pass: false, message: '未找到 brainstorm.md' };
+  }
+
+  const content = readFileSync(fullPath, 'utf-8');
+  const rounds = content.match(/(^|\n)##+\s*(Round|第\s*\d+\s*轮|轮次|问题)/gi) || [];
+  const userAnswers = content.match(/(^|\n)\s*[-*]?\s*(user answer|用户回答|用户选择|用户输入|answer|selection)\s*[:：]/gi) || [];
+  const decisions = content.match(/(^|\n)\s*[-*]?\s*(decision|结论|确认|用户确认)\s*[:：]/gi) || [];
+  const hasAskUserQuestion = /AskUserQuestion/i.test(content);
+  const hasOpenQuestionsOnly = /需要确认的问题|待确认|open questions/i.test(content) && userAnswers.length === 0;
+
+  if (rounds.length < 5 || userAnswers.length < 5 || decisions.length < 5 || !hasAskUserQuestion || hasOpenQuestionsOnly) {
+    return { pass: false, message: 'brainstorm.md 必须记录至少 5 轮 AskUserQuestion、用户回答和确认结论' };
+  }
+
+  return { pass: true, message: `记录 ${rounds.length} 轮交互式脑暴` };
+}
+
+function checkReviewablePrd(basePath, relativePath) {
+  const fullPath = join(basePath, relativePath);
+  if (!existsSync(fullPath)) {
+    return { pass: false, message: '未找到 PRD' };
+  }
+
+  const content = readFileSync(fullPath, 'utf-8');
+  const requiredSections = [
+    /##\s*(Problem|问题|背景)/i,
+    /##\s*(Target Users|目标用户|用户)/i,
+    /##\s*(Goals|目标|成功指标)/i,
+    /##\s*(Non-Goals|非目标|范围)/i,
+    /##\s*(User Stories|用户故事|用户场景)/i,
+    /##\s*(Functional Requirements|功能需求|需求)/i,
+    /##\s*(Non-Functional Requirements|非功能需求|质量属性)/i,
+    /##\s*(Acceptance Criteria|验收标准)/i,
+    /##\s*(Risks and Open Questions|风险|开放问题)/i
+  ];
+  const missingCount = requiredSections.filter(section => !section.test(content)).length;
+  if (missingCount > 0 || content.trim().length < 600) {
+    return { pass: false, message: `PRD 不可评审：缺少 ${missingCount} 个必要章节或内容过短` };
+  }
+
+  return { pass: true, message: 'PRD 达到可评审结构' };
+}
+
+function checkUnitTestReport(basePath) {
+  const utDir = join(basePath, '.peaks', 'ut');
+  if (!existsSync(utDir)) {
+    return { pass: false, message: '未找到 .peaks/ut' };
+  }
+
+  const hasReport = findMatchingFiles(basePath, '.peaks/ut/*unit*report*.md').length > 0
+    || findMatchingFiles(basePath, '.peaks/ut/*test*report*.md').length > 0;
+  const hasCoverage = findMatchingFiles(basePath, '.peaks/ut/coverage-summary.json').length > 0
+    || findMatchingFiles(basePath, '.peaks/ut/*coverage*.json').length > 0;
+
+  if (!hasReport || !hasCoverage) {
+    return { pass: false, message: '缺少 unit-test-report 或 coverage-summary' };
+  }
+
+  return { pass: true, message: '单元测试报告已归档到 .peaks/ut' };
+}
+
+function hasUiProject(basePath) {
+  const pkgPath = join(basePath, 'package.json');
+  if (existsSync(pkgPath)) {
+    try {
+      const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8'));
+      const deps = { ...pkg.dependencies, ...pkg.devDependencies, ...pkg.peerDependencies };
+      if (deps.react || deps.vue || deps.svelte || deps.next || deps.vite || deps['@tauri-apps/api']) return true;
+    } catch {}
+  }
+
+  return existsSync(join(basePath, 'src', 'pages'))
+    || existsSync(join(basePath, 'src', 'app'))
+    || existsSync(join(basePath, 'app'))
+    || existsSync(join(basePath, 'pages'))
+    || existsSync(join(basePath, 'src', 'components'));
+}
+
+function checkVisualDesign(basePath, currentChangePath) {
+  const designDir = join(basePath, '.peaks', currentChangePath, 'design');
+  if (!existsSync(designDir)) {
+    return { pass: false, message: '未找到 design 目录' };
+  }
+
+  const allowedExtensions = new Set(['.html', '.png', '.jpg', '.jpeg', '.svg', '.pdf']);
+  const files = readdirSync(designDir).filter(name => {
+    const lowerName = name.toLowerCase();
+    if (![...allowedExtensions].some(ext => lowerName.endsWith(ext))) return false;
+
+    const fullPath = join(designDir, name);
+    if (!statSync(fullPath).isFile() || statSync(fullPath).size < 1024) return false;
+
+    if (lowerName.endsWith('.html')) {
+      const content = readFileSync(fullPath, 'utf-8').toLowerCase();
+      return content.includes('<html') || content.includes('<!doctype html');
+    }
+
+    const bytes = readFileSync(fullPath);
+    if (lowerName.endsWith('.png')) return hasSignature(bytes, [0x89, 0x50, 0x4e, 0x47]);
+    if (lowerName.endsWith('.jpg') || lowerName.endsWith('.jpeg')) return hasSignature(bytes, [0xff, 0xd8, 0xff]);
+    if (lowerName.endsWith('.pdf')) return bytes.subarray(0, 4).toString('utf-8') === '%PDF';
+    if (lowerName.endsWith('.svg')) return bytes.toString('utf-8', 0, Math.min(bytes.length, 256)).toLowerCase().includes('<svg');
+
+    return false;
+  });
+
+  if (files.length === 0) {
+    return { pass: false, message: '未找到可视化设计稿' };
+  }
+
+  return { pass: true, message: `找到 ${files.length} 个视觉产物` };
+}
+
+function hasSignature(bytes, signature) {
+  return signature.every((byte, index) => bytes[index] === byte);
+}
+
+function checkConfirmation(basePath, relativePath) {
+  const fullPath = join(basePath, relativePath);
+  if (!existsSync(fullPath)) {
+    return { pass: false, message: '未找到确认记录' };
+  }
+
+  const content = readFileSync(fullPath, 'utf-8').trim();
+  if (!content) {
+    return { pass: false, message: '确认记录为空' };
+  }
+
+  const hasApprovedStatus = /(^|\n)status:\s*approved\b/i.test(content);
+  const hasApprover = /(^|\n)approver:\s*\S+/i.test(content);
+  const hasApprovedAt = /(^|\n)approvedAt:\s*\S+/i.test(content);
+  const hasArtifact = /(^|\n)artifact:\s*\S+/i.test(content);
+  const hasSource = /(^|\n)source:\s*\S+/i.test(content);
+  const decision = content.match(/(^|\n)decision:\s*(.+)/i)?.[2]?.trim() || '';
+  if (!hasApprovedStatus || !hasApprover || !hasApprovedAt || !hasArtifact || !hasSource || decision.length < 20) {
+    return { pass: false, message: '确认记录缺少 approved 状态、审批人、时间、来源、artifact 或有效 decision' };
+  }
+
+  return { pass: true, message: '已记录用户阻塞确认' };
+}
+
+function checkQaRounds(basePath, currentChangePath) {
+  const requiredFiles = [
+    `.peaks/${currentChangePath}/qa/qa-round-1.md`,
+    `.peaks/${currentChangePath}/qa/qa-round-2.md`,
+    `.peaks/${currentChangePath}/qa/qa-round-3.md`,
+    `.peaks/${currentChangePath}/qa/acceptance-report.md`
+  ];
+  const missing = requiredFiles.filter(file => !existsSync(join(basePath, file)));
+
+  if (missing.length > 0) {
+    return { pass: false, message: `缺失 ${missing.map(file => file.split('/').at(-1)).join(', ')}` };
+  }
+
+  return { pass: true, message: 'QA 3 轮测试和验收报告齐全' };
+}
+
 /**
  * 检查 TypeScript 编译（递归发现根目录和嵌套 app）
  * @param {string} basePath - 项目路径
@@ -423,49 +668,47 @@ async function detectTestFramework(pkgPath) {
  * @returns {Promise<object>} 检查结果
  */
 async function checkPackageCoverage(pkgPath, pkgName) {
-  // 查找覆盖率报告
   const coverageFiles = [
     join(pkgPath, 'coverage', 'coverage-summary.json'),
-    join(pkgPath, 'coverage', 'lcov.info'),
-    join(pkgPath, 'coverage', ' Clover.xml'),
-    join(pkgPath, 'coverage', 'cobertura-coverage.xml'),
-  ];
+    pkgName === '(root)' ? join(pkgPath, '.peaks', 'ut', 'coverage-summary.json') : null
+  ].filter(Boolean);
 
-  for (const cf of coverageFiles) {
-    if (existsSync(cf)) {
-      try {
-        const { readFileSync } = await import('fs');
-        const content = readFileSync(cf, 'utf-8');
-        let coverage = 0;
-        if (cf.endsWith('.json')) {
-          const data = JSON.parse(content);
-          coverage = data.total?.lines?.pct || 0;
-        } else if (cf.endsWith('.info')) {
-          // lcov.info 格式
-          const match = content.match(/LH:\d+\n?.*?LV:\d+/g);
-          if (match) {
-            let hit = 0, found = 0;
-            for (const m of match) {
-              const parts = m.split('\n');
-              const lv = parts[1]?.match(/LV:(\d+)/);
-              const lh = parts[0]?.match(/LH:(\d+)/);
-              if (lv) found += parseInt(lv[1]);
-              if (lh) hit += parseInt(lh[1]);
-            }
-            coverage = found > 0 ? (hit / found * 100) : 0;
-          }
-        }
-        return {
-          name: pkgName,
-          pass: coverage >= targetCoverage,
-          message: `覆盖率 ${coverage.toFixed(2)}%`,
-          coverage
-        };
-      } catch {}
-    }
+  for (const coverageFile of coverageFiles) {
+    if (!existsSync(coverageFile)) continue;
+
+    try {
+      const content = readFileSync(coverageFile, 'utf-8');
+      const coverage = parseCoveragePercent(coverageFile, content);
+      return {
+        name: pkgName,
+        pass: true,
+        message: `覆盖率 ${coverage.toFixed(2)}%`,
+        coverage
+      };
+    } catch {}
   }
 
-  return { name: pkgName, pass: null, message: '无覆盖率报告', coverage: 0 };
+  return { name: pkgName, pass: null, message: '无覆盖率报告（需要 coverage/coverage-summary.json 或 .peaks/ut/coverage-summary.json）', coverage: 0 };
+}
+
+function parseCoveragePercent(coverageFile, content) {
+  if (coverageFile.endsWith('.json')) {
+    const data = JSON.parse(content);
+    const metrics = ['lines', 'statements', 'branches', 'functions'];
+    const values = metrics.map(metric => Number(data.total?.[metric]?.pct ?? 0));
+    return Math.min(...values);
+  }
+
+  if (coverageFile.endsWith('.info')) {
+    const foundMatches = [...content.matchAll(/^LF:(\d+)$/gm)];
+    const hitMatches = [...content.matchAll(/^LH:(\d+)$/gm)];
+    const found = foundMatches.reduce((sum, match) => sum + Number(match[1]), 0);
+    const hit = hitMatches.reduce((sum, match) => sum + Number(match[1]), 0);
+    return found > 0 ? (hit / found) * 100 : 0;
+  }
+
+  const lineRate = content.match(/line-rate="([0-9.]+)"/);
+  return lineRate ? Number(lineRate[1]) * 100 : 0;
 }
 
 /**
@@ -474,86 +717,77 @@ async function checkPackageCoverage(pkgPath, pkgName) {
  * @returns {Promise<object>} 检查结果
  */
 async function checkLegacyCoverage(basePath) {
-  // 检查是否是存量项目（有旧代码但无测试）
-  const subDirs = ['packages', 'apps', 'src'];
-  const packages = [];
+  const targetCoverage = getCoverageTarget(basePath);
+  const projects = discoverCoverageProjects(basePath);
+  const coverageResults = [];
 
-  for (const subDir of subDirs) {
-    const subPath = join(basePath, subDir);
-    if (!existsSync(subPath)) continue;
+  for (const project of projects) {
+    coverageResults.push(await checkPackageCoverage(project.path, project.name));
+  }
+
+  const missing = coverageResults.filter(result => result.pass === null);
+  if (missing.length > 0) {
+    const details = missing.map(result => `${result.name}: ${result.message}`).join('; ');
+    return { pass: false, message: `${details}，必须运行单元测试并达到目标 ${targetCoverage}%` };
+  }
+
+  const failed = coverageResults.filter(result => result.coverage < targetCoverage);
+  if (failed.length > 0) {
+    const details = failed.map(result => `${result.name}: ${result.message}`).join('; ');
+    return { pass: false, message: `${details}，低于目标 ${targetCoverage}%` };
+  }
+
+  const details = coverageResults.map(result => `${result.name}: ${result.message}`).join('; ');
+  return { pass: true, message: `${details}，目标 ${targetCoverage}%` };
+}
+
+function getCoverageTarget(basePath) {
+  return isOpenSourceComponentLibrary(basePath) ? componentLibraryTargetCoverage : defaultTargetCoverage;
+}
+
+function isOpenSourceComponentLibrary(basePath) {
+  const pkgPath = join(basePath, 'package.json');
+  if (!existsSync(pkgPath)) return false;
+
+  try {
+    const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8'));
+    const text = [
+      pkg.name,
+      pkg.description,
+      ...(Array.isArray(pkg.keywords) ? pkg.keywords : [])
+    ].filter(Boolean).join(' ').toLowerCase();
+    const hasLibrarySignal = Boolean(pkg.exports || pkg.module || pkg.main || pkg.types);
+    const hasComponentSignal = /component|components|ui-library|design-system|react/.test(text)
+      || Boolean(pkg.peerDependencies?.react || pkg.peerDependencies?.vue);
+    const isOpenSourceLike = pkg.private !== true;
+    return isOpenSourceLike && hasLibrarySignal && hasComponentSignal;
+  } catch {
+    return false;
+  }
+}
+
+function discoverCoverageProjects(basePath) {
+  const projects = [{ path: basePath, name: '(root)' }];
+  const seen = new Set([basePath]);
+  const candidateDirs = ['packages', 'apps'];
+
+  for (const dirName of candidateDirs) {
+    const dirPath = join(basePath, dirName);
+    if (!existsSync(dirPath)) continue;
+
     try {
-      const entries = readdirSync(subPath, { withFileTypes: true });
+      const entries = readdirSync(dirPath, { withFileTypes: true });
       for (const entry of entries) {
         if (!entry.isDirectory()) continue;
-        const pkgPath = join(subPath, entry.name);
-        const tsconfigPath = join(pkgPath, 'tsconfig.json');
-        if (existsSync(tsconfigPath)) {
-          packages.push({ path: pkgPath, name: `${subDir}/${entry.name}` });
-        }
+        const projectPath = join(dirPath, entry.name);
+        if (seen.has(projectPath)) continue;
+        seen.add(projectPath);
+        projects.push({ path: projectPath, name: `${dirName}/${entry.name}` });
       }
     } catch {}
   }
 
-  if (packages.length === 0) {
-    return { skip: true, message: '未找到子包' };
-  }
-
-  // 检查是否有 vitest.config 或 jest.config
-  let hasTestConfig = false;
-  let testFramework = null;
-  for (const pkg of packages) {
-    const configs = ['vitest.config.ts', 'vitest.config.js', 'jest.config.js', 'jest.config.ts'];
-    for (const cfg of configs) {
-      if (existsSync(join(pkg.path, cfg))) {
-        hasTestConfig = true;
-        testFramework = cfg.startsWith('vitest') ? 'vitest' : 'jest';
-        break;
-      }
-    }
-    if (hasTestConfig) break;
-  }
-
-  if (!hasTestConfig) {
-    return {
-      pass: false,
-      message: '存量项目未配置单元测试 (建议: npx vitest --init)'
-    };
-  }
-
-  // 如果指定了 --force，强制检查覆盖率
-  if (!skipCoverage) {
-    return {
-      skip: true,
-      message: `已跳过覆盖率检查 (覆盖率要求 ${targetCoverage}%, 可用 --force 强制检查)`
-    };
-  }
-
-  // 运行覆盖率检查
-  let hasCoverage = false;
-  let totalPackages = packages.length;
-  let passedPackages = 0;
-
-  for (const pkg of packages) {
-    const result = await checkPackageCoverage(pkg.path, pkg.name);
-    if (result.pass !== null) {
-      hasCoverage = true;
-      if (result.pass) passedPackages++;
-    }
-  }
-
-  if (!hasCoverage) {
-    return { pass: false, message: '请先运行单元测试生成覆盖率报告' };
-  }
-
-  const failCount = totalPackages - passedPackages;
-  if (failCount > 0) {
-    return {
-      pass: false,
-      message: `${failCount}/${totalPackages} 包覆盖率未达标 (< ${targetCoverage}%)`
-    };
-  }
-
-  return { pass: true, message: `所有包覆盖率达标 (${passedPackages}/${totalPackages})` };
+  return projects;
 }
 
 // 辅助函数：读取文件
@@ -570,8 +804,10 @@ async function readFile(path, encoding) {
 export async function runGateChecks(basePath) {
   const results = [];
   let allPassed = true;
+  const currentChangePath = getCurrentChangePath(basePath);
+  const hasUi = hasUiProject(basePath);
 
-  for (const check of ARTIFACT_CHECKS) {
+  for (const check of buildArtifactChecks(currentChangePath, { hasUi })) {
     const result = {
       id: check.id,
       name: check.name,
@@ -595,11 +831,77 @@ export async function runGateChecks(basePath) {
         allPassed = false;
         result.details = '未找到';
       }
+    } else if (check.check === 'interactive-brainstorm') {
+      const brainstormResult = checkInteractiveBrainstorm(basePath, check.file);
+      result.details = brainstormResult.message;
+
+      if (brainstormResult.pass) {
+        result.status = '✅';
+        result.pass = true;
+      } else {
+        result.status = '❌';
+        allPassed = false;
+      }
+    } else if (check.check === 'reviewable-prd') {
+      const prdResult = checkReviewablePrd(basePath, check.file);
+      result.details = prdResult.message;
+
+      if (prdResult.pass) {
+        result.status = '✅';
+        result.pass = true;
+      } else {
+        result.status = '❌';
+        allPassed = false;
+      }
+    } else if (check.check === 'unit-test-report') {
+      const utResult = checkUnitTestReport(basePath);
+      result.details = utResult.message;
+
+      if (utResult.pass) {
+        result.status = '✅';
+        result.pass = true;
+      } else {
+        result.status = '❌';
+        allPassed = false;
+      }
     } else if (check.check === 'init-baseline') {
       const baselineResult = checkInitializationBaseline(basePath);
       result.details = baselineResult.message;
 
       if (baselineResult.pass) {
+        result.status = '✅';
+        result.pass = true;
+      } else {
+        result.status = '❌';
+        allPassed = false;
+      }
+    } else if (check.check === 'confirmation') {
+      const confirmationResult = checkConfirmation(basePath, check.file);
+      result.details = confirmationResult.message;
+
+      if (confirmationResult.pass) {
+        result.status = '✅';
+        result.pass = true;
+      } else {
+        result.status = '❌';
+        allPassed = false;
+      }
+    } else if (check.check === 'visual-design') {
+      const visualResult = checkVisualDesign(basePath, currentChangePath);
+      result.details = visualResult.message;
+
+      if (visualResult.pass) {
+        result.status = '✅';
+        result.pass = true;
+      } else {
+        result.status = '❌';
+        allPassed = false;
+      }
+    } else if (check.check === 'qa-rounds') {
+      const qaResult = checkQaRounds(basePath, currentChangePath);
+      result.details = qaResult.message;
+
+      if (qaResult.pass) {
         result.status = '✅';
         result.pass = true;
       } else {
@@ -621,20 +923,15 @@ export async function runGateChecks(basePath) {
         result.details = tscResult.message || '跳过';
       }
     } else if (check.check === 'coverage') {
-      // 覆盖率检查（仅警告，不阻断）
       const coverageResult = await checkLegacyCoverage(basePath);
       result.details = coverageResult.message;
 
-      if (coverageResult.skip) {
-        result.status = '⏭️';
-        result.pass = true;
-      } else if (coverageResult.pass) {
+      if (coverageResult.pass) {
         result.status = '✅';
         result.pass = true;
       } else {
-        result.status = '⚠️';
-        result.pass = true; // 不阻断，但有警告
-        result.details += ' (已跳过，可 --force 强制检查)';
+        result.status = '❌';
+        allPassed = false;
       }
     }
 
@@ -668,7 +965,8 @@ function printResults(checkResult) {
   for (const r of checkResult.results) {
     const name = r.name.padEnd(18).slice(0, 18);
     const details = r.details.slice(0, 23).padEnd(23);
-    console.log(`│ ${r.id.toString().padStart(2)} │ ${name} │ ${r.status} ${r.pass ? 'PASS' : 'FAIL'} │ ${details} │`);
+    const displayId = (checkResult.results.indexOf(r) + 1).toString().padStart(2);
+    console.log(`│ ${displayId} │ ${name} │ ${r.status} ${r.pass ? 'PASS' : 'FAIL'} │ ${details} │`);
   }
 
   console.log('└────┴────────────────────┴──────────────────┴───────────────────────────┘');

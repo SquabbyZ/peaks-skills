@@ -45,7 +45,7 @@ openspec/
 
 ```
 新项目 (0→1) 或复杂项目
-  → 使用 Spec-It (peaksfeat)
+  → 使用 dispatcher 的 0→1 swarm workflow
   → 完整的工作流：Constitution → PRD → 设计 → 开发 → 测试 → 部署
 
 存量项目功能迭代 (1→n)

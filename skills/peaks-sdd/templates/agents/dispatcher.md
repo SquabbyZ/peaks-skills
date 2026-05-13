@@ -198,7 +198,7 @@ dispatcher 收集所有自测报告
 
 ## 关联文档
 - **需求**: .peaks/changes/<change-id>/product/prd.md
-- **设计稿**: .peaks/changes/<change-id>/design/screenshots/approved-preview.png
+- **设计稿**: .peaks/changes/<change-id>/design/approved-preview.png
 - **测试用例**: .peaks/changes/<change-id>/qa/test-plan.md
 
 ## 代码变更

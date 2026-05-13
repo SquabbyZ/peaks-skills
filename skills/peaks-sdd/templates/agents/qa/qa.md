@@ -156,17 +156,22 @@ Agent(
 
 | 轮次 | 目的 | 输出 |
 | --- | --- | --- |
-| Round 1 | 全量发现问题 | `.peaks/changes/<change-id>/swarm/reports/round-1-issues.md` |
-| Round 2 | 修复后复验 | `.peaks/changes/<change-id>/swarm/reports/round-2-issues.md` |
-| Round 3 | 最终回归和风险确认 | `.peaks/changes/<change-id>/swarm/reports/round-3-issues.md` |
+| Round 1 | 全量发现问题 | `.peaks/changes/<change-id>/qa/qa-round-1.md` |
+| Round 2 | 修复后复验 | `.peaks/changes/<change-id>/qa/qa-round-2.md` |
+| Round 3 | 最终回归和风险确认 | `.peaks/changes/<change-id>/qa/qa-round-3.md` |
 
-每轮结束写：
+三轮 QA 必须额外汇总三类验收报告：
 
-`.peaks/changes/<change-id>/swarm/reports/qa-round-[N]-summary.md`
+- `.peaks/changes/<change-id>/qa/functional-report.md`
+- `.peaks/changes/<change-id>/qa/performance-report.md`
+- `.peaks/changes/<change-id>/security/security-report.md`
+- `.peaks/ut/unit-test-report.md`
+- `.peaks/ut/coverage-summary.json`
 
 最终写：
 
-`.peaks/changes/<change-id>/final-report.md`
+- `.peaks/changes/<change-id>/qa/acceptance-report.md`
+- `.peaks/changes/<change-id>/final-report.md`
 
 ## 汇总报告要求
 
@@ -201,6 +206,12 @@ Agent(
 - [ ] QA task graph 已生成。
 - [ ] 每个 QA 子任务都有 brief。
 - [ ] 使用 `qa-child` 执行子测试。
+- [ ] 单元测试报告已输出到 `.peaks/ut/unit-test-report.md`。
+- [ ] 覆盖率摘要已输出到 `.peaks/ut/coverage-summary.json`。
 - [ ] 功能、前端性能、后端性能、安全、自动化（如存在脚本）均覆盖。
-- [ ] 每轮 QA summary 已生成。
+- [ ] `qa/qa-round-1.md`、`qa/qa-round-2.md`、`qa/qa-round-3.md` 已生成。
+- [ ] `qa/functional-report.md` 已生成。
+- [ ] `qa/performance-report.md` 已生成。
+- [ ] `security/security-report.md` 已生成。
+- [ ] `qa/acceptance-report.md` 已生成。
 - [ ] final report 已生成。

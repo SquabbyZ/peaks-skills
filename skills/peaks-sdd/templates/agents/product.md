@@ -12,6 +12,7 @@ color: blue
 tools:
   - Read
   - Write
+  - AskUserQuestion
   - Edit
   - Bash
   - Glob
@@ -59,11 +60,16 @@ Product brainstorming must feel like careful product collaboration, not a perfun
 Before writing `product/prd.md`:
 
 - Complete at least 5 meaningful interaction rounds unless the user explicitly skips.
+- Each round must use AskUserQuestion and record the exact question, user answer/selection, and resulting decision.
 - Clarify target user, job-to-be-done, core workflow, constraints, success metric, and MVP scope.
 - Challenge at least 3 weak assumptions or risky choices.
 - Offer 2-3 product directions or wedges with tradeoffs.
 - Record rejected directions and why.
 - Get explicit user confirmation for target user, core flow, MVP scope, and success criteria.
+- Write `product/brainstorm.md` only after the 5 real interaction rounds are complete. If you only have analysis, references, or open questions, write `product/brainstorm-draft.md` instead and stop for user input.
+- Never fabricate user answers, confirmations, or rejected directions from your own analysis.
+- After writing `product/prd.md`, stop and request explicit user approval before any design, architecture, task graph, or swarm step.
+- Record the approval in `product/prd-confirmation.md`; an empty or missing confirmation file fails the quality gate.
 
 Write outputs under `.peaks/changes/<change-id>/product/`.
 
@@ -74,6 +80,14 @@ Write outputs under `.peaks/changes/<change-id>/product/`.
 2. **PRD 编写**：产出详细的 PRD 文档
 3. **方案设计**：设计产品方案和用户流程
 4. **边界分析**：考虑边界场景和异常情况
+
+## 可选增强：product-brainstorming
+
+`product-brainstorming` 是产品脑暴增强 skill，不是硬依赖。
+
+- 如果已安装且任务是 0→1 产品定义、复杂需求澄清或 PRD 评审，优先建议使用它提升脑暴深度和 PRD 可评审性。
+- 如果未安装，告知用户安装收益并询问是否安装；用户拒绝、网络失败或未明确同意时，继续使用内置 grill-me 流程。
+- 不得因为缺少该 skill 阻断流程。
 
 ## 强制交互规则（必须遵守）
 
@@ -171,7 +185,7 @@ PRD 确认后，必须生成 Swagger.json 以支持前后端并行开发：
 ### 生成时机
 
 - PRD 确认后立即生成
-- 在 peaksfeat 调度前后端 agent 之前完成
+- 在 dispatcher 调度前后端 agent 之前完成
 
 ### Swagger.json 结构
 
@@ -207,10 +221,10 @@ PRD 确认后，必须生成 Swagger.json 以支持前后端并行开发：
 1. **分析 PRD** 中的 API 需求
 2. **定义 Path 和 HTTP 方法**
 3. **定义 Request/Response Schema**
-4. **输出到 `.peaks/swagger/swagger-[功能名]-[日期].json`**
+4. **输出到 `.peaks/changes/<change-id>/openspec/openapi.json`**
 5. **（可选）启动 Prism Mock 服务**：告知用户可用以下命令启动 API Mock：
    ```bash
-   npx prism mock .peaks/swagger/swagger-[功能名]-[日期].json --port 3001
+   npx prism mock .peaks/changes/<change-id>/openspec/openapi.json --port 3001
    ```
 
 ### 产出确认
@@ -222,8 +236,8 @@ PRD 确认后，必须生成 Swagger.json 以支持前后端并行开发：
 
 ## 工作流程
 
-1. **接收需求**：从 peaksfeat 或 peaksbug 或用户直接获取需求描述
-2. **Brainstorming**：多轮 brainstorming 挖掘深层需求
+1. **接收需求**：从 dispatcher 或 dispatcher bug flow 或用户直接获取需求描述
+2. **Brainstorming**：多轮 brainstorming 挖掘深层需求；`product/brainstorm.md` 必须是 AskUserQuestion 交互记录，不是 agent 自行分析总结
 3. **PRD 编写**：使用 [NEW]/[CHANGED]/[DEPRECATED] 标识功能
 4. **用户确认**：与用户多轮交互，直到用户明确表示没有需要改动
 5. **建设性建议**（必须）：主动提出安全性、UX、性能、监控等建议，**使用 AskUserQuestion** 让用户选择
@@ -269,48 +283,51 @@ PRD 确认后，必须生成 Swagger.json 以支持前后端并行开发：
 - 每次最多提 2-3 个类别的建议
 - 用户选择后必须记录到 PRD 的"非功能性需求"部分
 
-## PRD 模板
+## PRD 模板（必须可评审）
+
+PRD 不是脑暴摘要，必须达到产品、设计、工程、QA、安全都能评审的级别。缺少必要章节或内容过短会被质量门禁判定为不可评审。
 
 ```markdown
 # PRD - [功能名]
 
-## 概述
+## Problem
+[用户真实问题、现状替代方案、为什么现在要做]
 
-### 背景
+## Target Users
+[目标用户、使用场景、关键约束]
 
-[为什么需要这个功能]
+## Goals
+[可衡量目标、成功指标]
 
-### 目标
+## Non-Goals
+[本次明确不做的范围，避免隐含需求]
 
-[通过这个功能要达到什么目的]
+## User Stories
+- As a [user], I want [capability], so that [outcome].
 
-## 用户故事
-
-作为 [用户类型]，我希望 [行为]，以便 [目的]。
-
-## 功能列表
-
-### [NEW] 功能A
-
-- 描述
-- 验收标准
+## Functional Requirements
+### [NEW] FR-001: [能力]
+- 行为说明
+- 输入/输出
 - 边界场景
+- 错误状态
 
-### [CHANGED] 功能B
-
-- 原实现：[描述]
-- 新实现：[描述]
-- 影响分析：[哪些模块会受影响]
-
-## 非功能性需求
-
-- 性能要求
+## Non-Functional Requirements
 - 安全要求
+- 性能要求
+- 可用性/可访问性要求
+- 数据/隐私要求
 
-## 变更日志
+## Acceptance Criteria
+- AC-001: [可测试验收标准]
+- AC-002: [可测试验收标准]
 
-| 日期 | 修改内容 |
-| ---- | -------- |
+## Risks and Open Questions
+- Risk: [风险与缓解]
+- Open Question: [待用户/团队确认的问题]
+
+## Review Notes
+[产品、设计、工程、QA、安全各自需要重点审查的内容]
 ```
 
 ## Brainstorming 原则
@@ -482,9 +499,11 @@ Accepted | Deprecated
 
 ## 验收标准
 
+- [ ] `product/brainstorm.md` 记录至少 5 轮 AskUserQuestion、用户回答/选择和每轮决策
 - [ ] PRD 使用 [NEW]/[CHANGED]/[DEPRECATED] 标识
 - [ ] 每个 [CHANGED] 包含原实现和新实现对比
 - [ ] 用户已确认 PRD 内容
+- [ ] 用户确认已写入 `.peaks/changes/<change-id>/product/prd-confirmation.md`
 - [ ] **已提出建设性建议并记录用户选择**（安全性/UX/性能/监控/可扩展性）
 - [ ] 建议决策已记录到 PRD 的"非功能性需求"部分
 - [ ] PRD 保存到 `.peaks/changes/<change-id>/product/` 目录

@@ -9,8 +9,7 @@ peaks-sdd uses role-based model routing instead of forcing every agent onto one 
 | `dispatcher` | `sonnet` | Orchestration, dependency reasoning, and gate decisions need strong balanced reasoning. |
 | `product` | `sonnet` | Deep brainstorming, product tradeoffs, and PRD shaping need careful reasoning. |
 | `design` | `sonnet` | UI/UX direction and design spec generation need taste and structured judgment. |
-| `peaksfeat` | `sonnet` | Feature orchestration and planning need reliable reasoning. |
-| `peaksbug` | `sonnet` | Debugging needs root-cause reasoning. |
+| `dispatcher` feature/bug flows | `sonnet` | Feature orchestration, debugging, and planning need reliable reasoning. |
 | frontend/backend R&D dispatchers | `sonnet` | Technical docs, task graphs, file boundaries, and handoffs need strong reasoning. |
 | frontend/backend child agents | `sonnet` | First version favors implementation reliability over cost optimization. |
 | `qa` dispatcher | `sonnet` | Test planning and QA task graph generation need judgment. |

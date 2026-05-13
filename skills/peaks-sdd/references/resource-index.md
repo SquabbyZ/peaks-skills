@@ -13,7 +13,7 @@
 | `sub-front/frontend-child.md` | 前端子任务实现 |
 | `sub-back/backend.md` | 后端研发调度：写技术文档、拆任务、调度 backend-child |
 | `sub-back/backend-child.md` | 后端子任务实现 |
-| `dispatcher.md` | 统一调度：初始化、功能开发、Bug 修复、研发调度、QA 调度 |
+| `dispatcher.md` | 唯一统一入口：初始化、功能开发、Bug 修复、研发调度、QA 调度 |
 | `product.md` | 始终生成 |
 | `qa.md` | 始终生成 |
 | `devops.md` | 始终生成 |
@@ -49,13 +49,6 @@
 | `context-monitor.mjs` | context 监控 |
 | `workflow-continuer.mjs` | 工作流恢复/继续 |
 | `dogfood-new-project.mjs` | 全新项目 0→1 初始化与产物/MCP smoke test |
-
-## docs
-
-| 文档 | 用途 |
-| --- | --- |
-| `docs/empty-dir-initialization.md` | 空目录初始化详细设计 |
-| `docs/multi-agent-dispatcher-design.md` | 多 agent dispatcher 设计 |
 
 ## references
 

@@ -81,8 +81,8 @@ docker exec -it <container_name> psql -U postgres -c "\l"
 
 所有产出文件必须保存到 `.peaks/` 目录下：
 
-- 部署脚本：`.peaks/deploys/`
-- 报告：`.peaks/reports/`
+- 部署脚本：`.peaks/changes/<change-id>/deploy/`
+- 报告：`.peaks/changes/<change-id>/deploy/deploy-report.md`
 
 ## 工作流程
 
@@ -112,8 +112,8 @@ docker exec -it <container_name> psql -U postgres -c "\l"
 
 ### 5. 产出报告
 
-1. 部署脚本保存到 `.peaks/deploys/`
-2. 部署报告保存到 `.peaks/reports/`
+1. 部署脚本保存到 `.peaks/changes/<change-id>/deploy/`
+2. 部署报告保存到 `.peaks/changes/<change-id>/deploy/deploy-report.md`
 
 ## 部署脚本格式
 

@@ -11,7 +11,7 @@
 
 1. **确认项目名称**：用 AskUserQuestion 提供建议名称，并允许 Other 自定义。
 2. **创建项目目录并初始化**：创建 `.peaks/`、`.claude/agents/`、`.gitnexus/`，复制 `templates/agents/`。
-3. **Product 脑暴**：至少 5 轮有效交互，包含建设性挑战、MVP 收敛和用户确认，产出当前 change 的 `product/brainstorm.md` 和 `product/prd.md`。
+3. **Product 脑暴**：至少 5 轮 AskUserQuestion 有效交互，记录每轮问题、用户回答/选择和决策；只有真实交互完成后才能产出当前 change 的 `product/brainstorm.md` 和 `product/prd.md`，自动分析或待确认问题只能写入 `product/brainstorm-draft.md`。
 4. **知识积累**：从 PRD 提取跨迭代稳定业务知识，更新 `.peaks/project/product-knowledge.md`。
 5. **确认技术栈**：确认前端、后端、数据库、monorepo/单包结构；优先搜索官方创建方式。
 6. **前端设计确认**：如有前端，推荐 awesome-design-md 风格参考，使用 design-taste-frontend / ui-ux-pro-max 能力，生成 HTML 设计稿，启动预览，直到用户确认“整体满意”，然后产出当前 change 的 `design/design-spec.md`。
@@ -45,7 +45,7 @@
 
 ## Gates
 
-- 没有 brainstorm 文件，不进入 PRD。
+- 没有至少 5 轮 AskUserQuestion 证据的 `product/brainstorm.md`，不进入 PRD；`brainstorm-draft.md` 不能替代。
 - PRD 未确认，不确认技术栈。
 - 设计稿未确认，不进入技术文档和开发。
 - 技术文档和测试用例未确认，不进入开发。

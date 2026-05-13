@@ -785,13 +785,13 @@ function generateSubAgentFile(agentName, techStack, module, templatePath, destDi
  * @returns {Array} 生成的 agent 列表
  */
 // 初始化时保留的 agents（不覆盖，允许知识积累）
-const PRESERVED_AGENTS = ['product', 'design'];
+const PRESERVED_AGENTS = ['design'];
 
 export function generateAgentConfigs(techStack, templatesDir, agentsDir, projectPath) {
   const agents = [];
 
   const baseAgents = [
-    'peaksfeat', 'peaksbug', 'product', 'qa', 'devops', 'security-reviewer',
+    'product', 'qa', 'devops', 'security-reviewer',
     'code-reviewer-frontend', 'code-reviewer-backend', 'triage'
   ];
 
@@ -816,7 +816,7 @@ export function generateAgentConfigs(techStack, templatesDir, agentsDir, project
       continue;
     }
 
-    // product 和 design 保留已有配置（用于知识积累）
+    // design 保留已有配置（用于知识积累）；product 需要随模板升级以获得最新门禁工具和 PRD 规则
     if (PRESERVED_AGENTS.includes(agent)) {
       const destPath = join(agentsDir, `${agent}.md`);
       if (existsSync(destPath)) {

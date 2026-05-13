@@ -55,7 +55,7 @@ If recommended skills are missing, tell the user which skills would help and wha
 
 ### 1. 编写后端技术文档
 
-读取 PRD + DB schema + API 要求 + 测试用例，编写或更新 `.peaks/changes/<change-id>/architecture/system-design.md` 的后端技术方案章节。没有技术文档时禁止调度子 agent：
+读取 PRD + DB schema + API 要求 + 测试用例，编写或更新 `.peaks/changes/<change-id>/architecture/system-design.md` 的后端技术方案章节。没有可评审技术文档和 `architecture/system-design-confirmation.md` 用户确认记录时，禁止调度子 agent：
 
 ```markdown
 # 后端技术方案 - [功能名]

@@ -28,8 +28,8 @@ If the user approves, install only the approved skills. If the user declines or 
 
 | Agent | Optional skills | Benefits | Built-in fallback |
 | --- | --- | --- | --- |
-| product | `brainstorming`, `office-hours` | Better requirement discovery, product tradeoff questioning, sharper PRD framing | Use built-in PRD questions and current change `product/` templates |
-| dispatcher | `improve-codebase-architecture`, `systematic-debugging`, `investigate`, `test-driven-development`, `code-review` | Stronger feature decomposition, root-cause analysis, regression-test discipline, implementation review guidance | Use dispatcher feature/bug flows, R&D dispatchers, QA dispatcher, and local quality gates |
+| product | `product-brainstorming`, `brainstorming`, `office-hours` | Better requirement discovery, product tradeoff questioning, sharper reviewable PRD framing | Use built-in grill-me questions and current change `product/` templates |
+| dispatcher | `improve-codebase-architecture`, `systematic-debugging`, `investigate`, `test-driven-development`, `code-review`, `subagent-driven-development`, `dispatching-parallel-agents` | Stronger 0→1 feature decomposition, root-cause analysis, TDD discipline, review guidance, multi-agent task decomposition and handoffs | Use dispatcher 0→1 swarm workflow, R&D dispatchers, QA dispatcher, and local quality gates |
 | design | `design-taste-frontend`, `ui-ux-pro-max`, `frontend-design`, `design-shotgun`, `design-html`, `design-md` | Better visual direction, stronger UI taste, UX depth, design variants, production HTML mockups, design specs | Use Design Dials, Anti-Slop rules, HTML preview, design spec, and screenshots |
 | frontend | `frontend-design`, `vercel-react-best-practices`, `react-components`, `browser-use`, `e2e-testing-patterns` | Higher-quality UI implementation, framework guidance, component patterns, browser validation | Use project conventions, Playwright MCP, local tests, and built-in UI rules |
 | backend | `backend-patterns`, `api-design`, `test-driven-development`, `security-review` | Better API boundaries, service structure, TDD and security review | Use backend template rules, local tests, and code-review agents |
@@ -42,7 +42,6 @@ If the user approves, install only the approved skills. If the user declines or 
 | security-reviewer | `security-review`, `cso` | Deeper vulnerability review and threat modeling | Use OWASP checklist and local grep/scans |
 | devops | `docker-patterns`, `deployment-patterns`, `canary` | Better deployment safety, container guidance, post-deploy checks | Use devops checklist and local health checks |
 | triage | `investigate`, `systematic-debugging` | Better issue classification and root-cause routing | Use triage state machine |
-| dispatcher | `subagent-driven-development`, `dispatching-parallel-agents` | Better multi-agent task decomposition and handoffs | Use dispatcher template and local reports |
 | sub-agent | Task-specific skills from the parent agent | Deepens the subtask domain only when useful | Follow assigned brief and project local rules |
 
 ## External Enhancement Sources

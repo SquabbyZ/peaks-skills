@@ -65,6 +65,13 @@ If recommended skills are missing, tell the user which skills would help and wha
 
 If the product has UI, the first approved design must produce `.peaks/changes/<change-id>/design/design-spec.md` before frontend technical docs.
 
+Hard gate:
+
+- Markdown-only layout is not enough for UI work.
+- Produce a visual artifact under `.peaks/changes/<change-id>/design/`, preferably `design-preview.html`; equivalent exports from Figma/Pixso/Penpot/other design platforms are acceptable.
+- Open or preview the visual artifact and ask the user for explicit approval.
+- Record approval in `design/design-confirmation.md`; missing or empty confirmation fails the quality gate.
+
 Use or recommend:
 
 - `design-taste-frontend`
@@ -232,7 +239,7 @@ The design spec must include color tokens, typography, spacing, radius, shadow, 
    ```
 8. **迭代修改** — 根据用户反馈修改 HTML 设计稿，重复步骤 6-7 直到用户满意
 9. **定稿** — 用户选择"F"后，截图保存到 `.peaks/changes/<change-id>/design/[功能名]-[日期].png`
-10. **生成设计规范** — 产出 `.peaks/changes/<change-id>/design/design-spec-[功能名]-[日期].md`
+10. **生成设计规范** — 产出 `.peaks/changes/<change-id>/design/design-spec.md`
 11. **知识积累** — 保存设计交流内容到 `.peaks/knowledge/design-[功能名].md`：
     ```markdown
     # 设计交流记录 - [功能名]
@@ -334,10 +341,10 @@ The design spec must include color tokens, typography, spacing, radius, shadow, 
 | 文件       | 路径                                                | 说明             |
 | ---------- | --------------------------------------------------- | ---------------- |
 | 设计稿 HTML | `.peaks/changes/<change-id>/design/[功能名]-[YYYYMMDD].html`          | 可交互的设计原型 |
-| 设计规范   | `.peaks/changes/<change-id>/design/design-spec-[功能名]-[YYYYMMDD].md` | 视觉规范说明     |
+| 设计规范   | `.peaks/changes/<change-id>/design/design-spec.md` | 视觉规范说明     |
 | 知识积累   | `.peaks/knowledge/design-spec-[功能名].md`          | **定稿后生成**，供后续迭代参考 |
 
-**说明**：`.peaks/changes/<change-id>/design/design-spec-[日期].md` 是本次设计的详细规范，`**.peaks/project/product-knowledge.md**` 是该功能的设计知识沉淀，后续迭代时直接加载使用。
+**说明**：`.peaks/changes/<change-id>/design/design-spec.md` 是本次设计的详细规范，`**.peaks/project/product-knowledge.md**` 是该功能的设计知识沉淀，后续迭代时直接加载使用。
 
 设计规范必须清晰描述视觉要求：
 
@@ -382,7 +389,7 @@ The design spec must include color tokens, typography, spacing, radius, shadow, 
 | 文件       | 路径                                                | 说明             |
 | ---------- | --------------------------------------------------- | ---------------- |
 | 设计稿 HTML | `.peaks/changes/<change-id>/design/[功能名]-[YYYYMMDD].html`          | 可交互的设计原型 |
-| 设计规范   | `.peaks/changes/<change-id>/design/design-spec-[功能名]-[YYYYMMDD].md` | 视觉规范说明     |
+| 设计规范   | `.peaks/changes/<change-id>/design/design-spec.md` | 视觉规范说明     |
 
 **重要**：HTML 设计稿是视觉参考原型，**不直接复用**到开发中。开发阶段会根据 PRD 和设计规范重新实现。
 
@@ -411,6 +418,7 @@ The design spec must include color tokens, typography, spacing, radius, shadow, 
 - [ ] HTTP 服务器已启动（npx serve）
 - [ ] 设计稿已通过可用的浏览器工具 在浏览器中打开
 - [ ] 用户通过 AskUserQuestion 交互确认设计稿
+- [ ] 用户确认已写入 `.peaks/changes/<change-id>/design/design-confirmation.md`
 - [ ] 设计规范文档已保存（含 Dials、方向、色彩、组件规范）
 - [ ] 已更新 `.peaks/knowledge/design-knowledge.md`（记录用户的设计偏好）
 - [ ] 已生成 `.peaks/knowledge/design-spec-[功能名].md`（供后续迭代参考）
