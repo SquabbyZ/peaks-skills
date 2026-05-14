@@ -42,6 +42,18 @@ For empty or nearly-empty projects, use `references/new-project-swarm-workflow.m
 - Write all phase artifacts under `.peaks/changes/<change-id>/`.
 - Do not write new workflow artifacts to legacy top-level `.peaks/prds`, `.peaks/designs`, `.peaks/reports`, `.peaks/plans`, `.peaks/test-docs`, `.peaks/briefs`, or `.peaks/checkpoints`.
 - Generate `swarm/task-graph.json`, `swarm/waves.json`, `swarm/status.json`, and `swarm/file-ownership.json` before dispatching child agents.
+- After technical confirmation, run `node <peaks-sdd-skill-dir>/scripts/ensure-execution-agents.mjs <projectPath>` before implementation. This must generate or repair execution agents: `frontend.md`, `frontend-child.md`, `backend.md`, `backend-child.md`, `qa-child.md`, `code-reviewer-frontend.md`, `code-reviewer-backend.md`, and `security-reviewer.md` as applicable.
+- Then run `node <peaks-sdd-skill-dir>/scripts/plan-swarm.mjs <projectPath>` to create `swarm/task-graph.json`, `swarm/waves.json`, `swarm/briefs/*.md`, `swarm/handoffs/*.md`, `swarm/file-ownership.json`, and `swarm/status.json` before dispatching child agents.
+- The task graph must include frontend, backend/API/database/auth when in scope, QA dispatch/execution, code review, security review, unit test, and runtime smoke nodes. A QA dispatcher alone is not enough.
+- `swarm/waves.json` must contain at least one `parallel` wave with two or more execution agents and no more than five agents per wave; never schedule more than 10 development child agents.
+- Write one brief per execution agent under `swarm/briefs/<agent>.md` with Artifact Path, task, file boundary, dependencies, and handoff requirements before launching that agent.
+- Each execution agent must write `swarm/handoffs/<agent>.md` with input version, output version, changed file status, and next agent/downstream owner before the next dependent wave starts.
+- Run `node <peaks-sdd-skill-dir>/scripts/run-quality-gates.mjs <projectPath>` after development waves. It must produce code review, security review, coverage, QA rounds, and acceptance evidence.
+- Run frontend and backend code review in parallel when both surfaces exist, and run security review in the same quality wave when possible.
+- If code review or security review reports CRITICAL/HIGH unresolved findings, block completion, dispatch fix waves, and repeat review/fix up to 10 rounds before declaring blocked.
+- QA must execute three rounds in order: functional, business, performance. A test plan without qa-child execution reports is not enough.
+- Run `node <peaks-sdd-skill-dir>/scripts/run-delivery-smoke.mjs <projectPath>` for delivery. Runtime smoke must start the app, verify the core path, request user UX verification, and write `qa/runtime-smoke-report.md` before `final-report.md`.
+- Write `swarm/agent-usage.md` with explicit Artifact Path references for every actually invoked agent; do not mark completion from intent alone.
 - Inject only the MCP servers needed for a given phase, following `references/mcp-policy.md`.
 - Do not start implementation until PRD, design spec, and architecture are confirmed.
 
@@ -204,8 +216,8 @@ dispatcher 收集所有自测报告
 ## 代码变更
 | 文件 | 变更类型 | 状态 |
 |------|----------|------|
-| src/features/auth/pages/Login.tsx | 新增 | ✅ |
-| src/features/auth/components/AuthForm.tsx | 新增 | ✅ |
+| src/pages/LoginPage.tsx | 新增 | ✅ |
+| src/components/login/AuthForm.tsx | 新增 | ✅ |
 
 ## 自测结果
 
@@ -432,6 +444,21 @@ dispatcher 收集修复报告
 ├── cr-security-passed.md    # 全部通过报告
 └── cr-exceeded-limit.md    # 超过限制报告（如有）
 ```
+
+同时必须产出，并在每份报告正文中显式写明 Artifact Path：
+- `.peaks/changes/<change-id>/review/code-review.md` — 记录 reviewer agent、范围、发现、结论；存在未解决 CRITICAL/HIGH 时阻断。
+- `.peaks/changes/<change-id>/review/code-review-smoke.md` — code review 检查环境自测/冒烟报告，记录命令、目标和状态。
+- `.peaks/changes/<change-id>/security/security-report.md` — 记录 security-reviewer、检查项、CRITICAL/HIGH 是否清零；存在未解决 CRITICAL/HIGH 时阻断。
+- `.peaks/changes/<change-id>/security/security-smoke.md` — 安全检查环境自测/冒烟报告，记录命令、目标和状态。
+- `.peaks/changes/<change-id>/swarm/agent-usage.md` — 记录实际调用的 product/design/dev/review/security/qa agents、输入 brief 和输出报告。
+
+## 运行时体验验证
+
+写 `final-report.md` 前必须启动应用或服务，验证核心路径，并邀请用户体验：
+
+- 前端/桌面项目：记录启动命令、URL/窗口、核心页面路径、截图或人工验证说明到 `.peaks/changes/<change-id>/qa/runtime-smoke-report.md`。
+- 后端项目：记录启动命令、健康检查/API 核心路径和结果到 `.peaks/changes/<change-id>/qa/runtime-smoke-report.md`。
+- 没有 `product/swagger.json`、`qa/runtime-smoke-report.md`、`qa/business-report.md`、`review/code-review.md`、`review/code-review-smoke.md`、`security/security-report.md`、`security/security-smoke.md` 时不得写最终通过结论。
 
 ## Agent 池管理
 

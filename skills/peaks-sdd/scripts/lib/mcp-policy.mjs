@@ -1,4 +1,8 @@
 #!/usr/bin/env node
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export const MCP_SERVER_REGISTRY = {
   gitnexus: {
@@ -54,11 +58,17 @@ export const MCP_SERVER_REGISTRY = {
     args: () => ['-y', 'frontend-design@claude-plugins-official'],
     strategy: 'ui-projects-only',
     stages: ['design', 'frontend-implementation', 'preview']
+  },
+  openspec: {
+    command: 'node',
+    args: () => [join(__dirname, '..', 'mcp', 'openspec-server.mjs')],
+    strategy: 'openspec-change-management',
+    stages: ['product', 'openspec-change', 'apply', 'archive']
   }
 };
 
 export function getRecommendedMcpServers(techStack = {}) {
-  const recommended = ['gitnexus', 'claude-mem', 'context7'];
+  const recommended = ['gitnexus', 'claude-mem', 'context7', 'openspec'];
 
   if (hasTypeScript(techStack)) {
     recommended.push('typescript-lsp');

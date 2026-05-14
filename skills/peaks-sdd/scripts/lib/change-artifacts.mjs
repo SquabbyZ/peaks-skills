@@ -2,6 +2,7 @@
 
 import { existsSync, mkdirSync, writeFileSync, readFileSync } from 'fs';
 import { join, relative } from 'path';
+import { writeCorePhaseHandoffs } from './project-agent-handoff.mjs';
 
 const DEFAULT_INITIAL_CHANGE_SLUG = 'initial-product';
 
@@ -15,6 +16,7 @@ export const CHANGE_SUBDIRS = [
   'dispatch',
   'qa/screenshots',
   'review',
+  'security',
   'checkpoints'
 ];
 
@@ -95,6 +97,7 @@ export function createPeaksProjectLayout(projectPath, options = {}) {
   ensureProjectFile(join(paths.projectDir, 'roadmap.md'), '# Roadmap\n\n阶段规划会在需要时更新。\n');
   ensureProjectFile(join(paths.projectDir, 'decisions.md'), '# Project Decisions\n\n跨 change 的长期决策索引。\n');
   ensureProjectFile(join(paths.changeDir, 'enhancements.md'), '# Enhancements\n\n记录本 change 使用的外部 skills、MCP 查询和最佳实践来源。\n');
+  writeCorePhaseHandoffs(paths);
 
   return paths;
 }

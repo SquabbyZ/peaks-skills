@@ -141,11 +141,15 @@ Expected behavior:
 
 Expected artifacts:
 
+- [ ] `.peaks/changes/<change-id>/swarm/agent-usage.md`
 - [ ] `.peaks/changes/<change-id>/swarm/reports/`
 - [ ] `.peaks/changes/<change-id>/review/code-review.md`
-- [ ] `.peaks/changes/<change-id>/review/security-review.md`
+- [ ] `.peaks/changes/<change-id>/security/security-report.md`
 - [ ] `.peaks/changes/<change-id>/qa/test-plan.md`
-- [ ] `.peaks/changes/<change-id>/qa/e2e-report.md`
+- [ ] `.peaks/changes/<change-id>/qa/functional-report.md`
+- [ ] `.peaks/changes/<change-id>/qa/business-report.md`
+- [ ] `.peaks/changes/<change-id>/qa/performance-report.md`
+- [ ] `.peaks/changes/<change-id>/qa/runtime-smoke-report.md`
 
 ## Phase 6: Preview and Final Report
 

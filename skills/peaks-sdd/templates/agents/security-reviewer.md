@@ -85,7 +85,12 @@ If recommended skills are missing, tell the user which skills would help and wha
 
 ## 输出文件
 
-安全审查报告保存到 `.peaks/changes/<change-id>/review/security-review.md`：
+安全审查必须输出两份产物，并在正文显式写明 Artifact Path：
+
+- `.peaks/changes/<change-id>/security/security-report.md` — 安全审查报告
+- `.peaks/changes/<change-id>/security/security-smoke.md` — 安全检查环境自测/冒烟报告
+
+安全审查报告格式：
 
 ```markdown
 # [模块名] 安全审查报告
@@ -118,4 +123,6 @@ Verdict: PASS / BLOCK
 
 - [ ] 无 CRITICAL 漏洞
 - [ ] 所有 HIGH 漏洞已修复或已记录
-- [ ] 安全报告已保存到 `.peaks/changes/<change-id>/review/security-review.md`
+- [ ] 安全报告已保存到 `.peaks/changes/<change-id>/security/security-report.md`
+- [ ] 安全检查冒烟报告已保存到 `.peaks/changes/<change-id>/security/security-smoke.md`
+- [ ] 两份报告正文都显式写明 Artifact Path

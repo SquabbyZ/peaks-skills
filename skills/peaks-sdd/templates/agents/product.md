@@ -180,7 +180,7 @@ cola 的核心定位是什么？
 
 ## Swagger.json 生成（支持并行开发）
 
-PRD 确认后，必须生成 Swagger.json 以支持前后端并行开发：
+PRD 确认后，必须生成 Swagger.json 以支持前后端并行开发；如果本 change 明确没有任何 API/IPC/HTTP 接口，则必须输出 `.peaks/changes/<change-id>/product/no-api.md`，写明 Artifact Path、Reason 和 `Decision: NO_API`：
 
 ### 生成时机
 
@@ -221,10 +221,11 @@ PRD 确认后，必须生成 Swagger.json 以支持前后端并行开发：
 1. **分析 PRD** 中的 API 需求
 2. **定义 Path 和 HTTP 方法**
 3. **定义 Request/Response Schema**
-4. **输出到 `.peaks/changes/<change-id>/openspec/openapi.json`**
-5. **（可选）启动 Prism Mock 服务**：告知用户可用以下命令启动 API Mock：
+4. **输出到 `.peaks/changes/<change-id>/product/swagger.json`**，并在产物说明中显式写明该路径
+5. **同步到 OpenSpec**：如需要 OpenSpec 映射，再复制/转换到 `.peaks/changes/<change-id>/openspec/openapi.json`
+6. **（可选）启动 Prism Mock 服务**：告知用户可用以下命令启动 API Mock：
    ```bash
-   npx prism mock .peaks/changes/<change-id>/openspec/openapi.json --port 3001
+   npx prism mock .peaks/changes/<change-id>/product/swagger.json --port 3001
    ```
 
 ### 产出确认
@@ -239,11 +240,11 @@ PRD 确认后，必须生成 Swagger.json 以支持前后端并行开发：
 1. **接收需求**：从 dispatcher 或 dispatcher bug flow 或用户直接获取需求描述
 2. **Brainstorming**：多轮 brainstorming 挖掘深层需求；`product/brainstorm.md` 必须是 AskUserQuestion 交互记录，不是 agent 自行分析总结
 3. **PRD 编写**：使用 [NEW]/[CHANGED]/[DEPRECATED] 标识功能
-4. **用户确认**：与用户多轮交互，直到用户明确表示没有需要改动
+4. **PRD 草案评审**：与用户多轮交互，直到用户明确表示 PRD 内容没有需要改动；产品想法、UI 方向讨论或“方向可以”不等于 PRD 确认
 5. **建设性建议**（必须）：主动提出安全性、UX、性能、监控等建议，**使用 AskUserQuestion** 让用户选择
-6. **Swagger 生成**：PRD 确认后生成 API 规范
-7. **产出 PRD**：保存到 `.peaks/changes/<change-id>/product/prd.md`
-8. **脑暴知识积累**：保存脑暴内容到 `.peaks/knowledge/product-brainstorm-[功能名].md`：
+6. **PRD 阻塞确认**：PRD 写入 `.peaks/changes/<change-id>/product/prd.md` 后，单独询问用户是否批准 PRD 进入下一阶段，并写入 `product/prd-confirmation.md`
+7. **Swagger 生成**：PRD 确认后生成 API 规范
+8. **脑暴记录**：保存脑暴内容到 `.peaks/changes/<change-id>/product/brainstorm.md`；跨迭代稳定知识只更新 `.peaks/project/product-knowledge.md`：
    ```markdown
    # 产品脑暴记录 - [功能名]
 
@@ -629,7 +630,7 @@ Accepted | Deprecated
 product agent 会在每次脑暴后学习并更新知识，让 agent 越用越专业。
 
 ### 知识文件位置
-`.peaks/knowledge/product-knowledge.md`
+`.peaks/project/product-knowledge.md`
 
 ### 知识更新时机
 1. 每次脑暴确认后

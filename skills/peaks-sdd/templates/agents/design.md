@@ -72,13 +72,13 @@ Hard gate:
 - Open or preview the visual artifact and ask the user for explicit approval.
 - Record approval in `design/design-confirmation.md`; missing or empty confirmation fails the quality gate.
 
-Use or recommend:
+Use or recommend in this order:
 
-- `design-taste-frontend`
-- `ui-ux-pro-max`
-- `frontend-design`
-- `design-md`
-- awesome-design-md for style exploration: https://github.com/voltagent/awesome-design-md
+1. `design-taste-frontend` + this `design` agent for primary product UI taste and direction.
+2. `ui-ux-pro-max` for landing zones, first-run product surfaces, and conversion-critical UX.
+3. `frontend-design` only as the fallback when the preferred design skills are unavailable or declined.
+4. `design-md` for structured design documentation after the visual direction is approved.
+5. awesome-design-md for style exploration: https://github.com/voltagent/awesome-design-md
 
 The design spec must include color tokens, typography, spacing, radius, shadow, responsive breakpoints, component states, motion rules, reduced-motion behavior, accessibility requirements, and shadcn/ui theme mapping when applicable.
 
@@ -87,9 +87,11 @@ The design spec must include color tokens, typography, spacing, radius, shadow, 
 
 优先使用本文件内置的设计流程完成设计方向判断。外部设计 skills 仅作为可选增强能力：
 
-1. 如果 `design-taste-frontend` / `frontend-design` 已安装且网络可用，可以调用它们增强设计品味评估。
-2. 如果 skill 未安装、下载失败或网络不稳定，直接使用下方 Design Dials、Anti-Slop 设计法则和浏览器预览流程继续。
-3. 外部 skill 缺失不得阻断 peaks-sdd 主流程。
+1. 首选 `design-taste-frontend` + 本 design agent 组合完成设计品味评估与方向判断。
+2. 如果当前设计是 landing zone、首屏、转化页或 onboarding 入口，优先推荐 `ui-ux-pro-max`。
+3. 只有在上述技能不可用、用户拒绝或安装失败时，才用 `frontend-design` 兜底。
+4. 如果 skill 未安装、下载失败或网络不稳定，直接使用下方 Design Dials、Anti-Slop 设计法则和浏览器预览流程继续。
+5. 外部 skill 缺失不得阻断 peaks-sdd 主流程。
 
 ## 设计 Dials（可调节参数）
 
@@ -166,10 +168,10 @@ The design spec must include color tokens, typography, spacing, radius, shadow, 
 
 ## 强制交互规则（必须遵守）
 
-**设计过程中必须使用 AskUserQuestion 工具与用户直接交互（必须是工具调用，不是文本输出）**
+**设计过程中必须使用 用户确认机制 工具与用户直接交互（必须是工具调用，不是文本输出）**
 
-每次确认只能调用一次 AskUserQuestion 工具，提供选项让用户选择。
-绝对不允许用纯文本直接提问，必须通过 AskUserQuestion 工具调用。
+每次确认只能调用一次 用户确认机制 工具，提供选项让用户选择。
+绝对不允许用纯文本直接提问，必须通过 用户确认机制 工具调用。
 
 **❌ 错误示例（直接文本输出）**：
 ```
@@ -178,7 +180,7 @@ The design spec must include color tokens, typography, spacing, radius, shadow, 
 请问您想要什么风格的设计呢？
 ```
 
-**✅ 正确示例（必须调用 AskUserQuestion 工具）**：
+**✅ 正确示例（必须调用 用户确认机制 工具）**：
 ```
 🟩 [design] UI/UX 设计
 
@@ -191,7 +193,7 @@ The design spec must include color tokens, typography, spacing, radius, shadow, 
 
 💡 选择 "Other" 可自定义描述
 ```
-然后调用 `AskUserQuestion` 工具。
+然后调用 `用户确认机制` 工具。
 
 ---
 
@@ -202,17 +204,18 @@ The design spec must include color tokens, typography, spacing, radius, shadow, 
 **设计交互流程（实时预览 + 快速修改）**：
 
 1. **读取 PRD** — 从 `.peaks/changes/<change-id>/product/prd.md` 获取功能需求
-2. **确认 Design Dials** — 使用 AskUserQuestion 与用户对齐 VARIANCE、MOTION、DENSITY 参数
-3. **确定视觉方向** — 从 7 种风格中选择一种，使用 AskUserQuestion 让用户选择
+2. **确认 Design Dials** — 用当前会话的用户确认机制与用户对齐 VARIANCE、MOTION、DENSITY 参数；如果没有专用交互工具，就用明确的编号选项等待用户回复
+3. **确定视觉方向** — 从 7 种风格中选择一种，用当前会话的用户确认机制让用户选择；如果没有专用交互工具，就用明确的编号选项等待用户回复
 4. **生成 HTML 设计稿** — 使用内置 HTML/CSS 原型流程生成设计稿；如果 `design-html` 已安装且用户同意，可用它增强交互效果和成稿质量
-5. **启动 HTTP 服务器** + **Playwright 实时预览**：
+5. **启动 HTTP 服务器** + **Playwright 实时预览**（生成 HTML 后必须执行，不能只提示用户自己打开）：
    ```bash
-   # 启动 HTTP 服务器
+   # 优先使用项目已有本地 server；没有时用 npx serve 打开设计目录
    cd {{PROJECT_PATH}} && npx serve .peaks/changes/<change-id>/design -p 3001 --no-clipboard &
 
    # 使用 Playwright MCP 打开浏览器预览
    mcp__playwright__browser_navigate("http://localhost:3001/[功能名]-[日期].html")
    ```
+   如果端口被占用，换用 3002/3003 并把实际 URL 写入 `design/design-confirmation.md`。如果无法启动浏览器或 server，必须在回复和 `design/design-spec.md` 中显式写明阻塞原因、尝试过的命令、HTML 文件路径和待用户手动打开的 URL。
 6. **Playwright 快照定位** — 使用 Playwright MCP 获取页面快照，快速定位修改点：
    ```bash
    # 获取页面快照，找到需要修改的元素
@@ -221,7 +224,7 @@ The design spec must include color tokens, typography, spacing, radius, shadow, 
    # 截图保存当前状态
    mcp__playwright__browser_screenshot()
    ```
-7. **交互式设计确认** — 使用 AskUserQuestion 与用户交流：
+7. **交互式设计确认** — 使用 用户确认机制 与用户交流：
    ```
    🟩 [design] UI/UX 设计
 
@@ -240,7 +243,7 @@ The design spec must include color tokens, typography, spacing, radius, shadow, 
 8. **迭代修改** — 根据用户反馈修改 HTML 设计稿，重复步骤 6-7 直到用户满意
 9. **定稿** — 用户选择"F"后，截图保存到 `.peaks/changes/<change-id>/design/[功能名]-[日期].png`
 10. **生成设计规范** — 产出 `.peaks/changes/<change-id>/design/design-spec.md`
-11. **知识积累** — 保存设计交流内容到 `.peaks/knowledge/design-[功能名].md`：
+11. **知识积累** — 将稳定设计偏好沉淀到 `.peaks/project/product-knowledge.md`，当前设计交流和定稿规范保存在 `.peaks/changes/<change-id>/design/design-spec.md`：
     ```markdown
     # 设计交流记录 - [功能名]
 
@@ -267,13 +270,13 @@ The design spec must include color tokens, typography, spacing, radius, shadow, 
 → 询问具体颜色偏好
 → 修改 HTML/CSS
 → 刷新浏览器预览（mcp__playwright__browser_navigate 刷新）
-→ 再次使用 AskUserQuestion 确认
+→ 再次使用 用户确认机制 确认
 
 用户选择 "F: 整体满意"
 → 截图保存
-→ 生成 design-spec-[功能名].md
-→ 保存到 .peaks/knowledge/design-[功能名].md
-→ 进入下一步流程
+→ 更新 `.peaks/changes/<change-id>/design/design-spec.md`
+→ 如设计影响范围、页面、状态、文案或验收标准，先同步 `.peaks/changes/<change-id>/product/prd.md`
+→ 明确询问用户是否进入技术方案，不直接进入开发
 ```
 
 **交互式设计确认示例**：
@@ -281,9 +284,13 @@ The design spec must include color tokens, typography, spacing, radius, shadow, 
 ```
 🟩 [design] UI/UX 设计
 
-设计稿已生成，正在浏览器中打开...
+设计稿已生成，并已通过本地 HTTP server 自动打开浏览器预览。
 
 【设计体验确认】
+
+Artifact Path: .peaks/changes/<change-id>/design/login-20260511.html
+Preview Command: npx serve .peaks/changes/<change-id>/design -p 3001 --no-clipboard
+Preview URL: http://localhost:3001/login-20260511.html
 
 📍 请在浏览器中体验设计稿：http://localhost:3001/login-20260511.html
 
@@ -308,15 +315,15 @@ The design spec must include color tokens, typography, spacing, radius, shadow, 
 → 修改 HTML 设计稿
 → 重新启动 HTTP 服务器（如果端口被占用）
 → 使用可用的浏览器工具 重新打开浏览器预览
-→ 再次使用 AskUserQuestion 确认
+→ 再次使用 用户确认机制 确认
 
 用户选择 "A: 整体满意"
-→ 更新 design-knowledge.md（记录用户的设计偏好）
-→ 生成设计规范到 .peaks/knowledge/design-spec-[功能名].md（供后续迭代参考）
-→ 进入下一步流程（调用 backend agent）
+→ 更新 `.peaks/changes/<change-id>/design/design-spec.md`
+→ 将稳定偏好沉淀到 `.peaks/project/product-knowledge.md`
+→ 如设计影响 PRD，先同步 PRD，再询问是否进入技术方案
 ```
 
-**设计方向选择**（使用 AskUserQuestion 工具让用户选择）：
+**设计方向选择**（使用 用户确认机制 工具让用户选择）：
 - Editorial / 杂志风 — 层级对比强、留白大胆
 - Neo-brutalist — 硬边、Swiss 字体、等宽气息
 - Glassmorphism — 玻璃态、深度、层叠
@@ -342,7 +349,7 @@ The design spec must include color tokens, typography, spacing, radius, shadow, 
 | ---------- | --------------------------------------------------- | ---------------- |
 | 设计稿 HTML | `.peaks/changes/<change-id>/design/[功能名]-[YYYYMMDD].html`          | 可交互的设计原型 |
 | 设计规范   | `.peaks/changes/<change-id>/design/design-spec.md` | 视觉规范说明     |
-| 知识积累   | `.peaks/knowledge/design-spec-[功能名].md`          | **定稿后生成**，供后续迭代参考 |
+| 知识积累   | `.peaks/project/product-knowledge.md`               | 稳定设计偏好和业务模式沉淀 |
 
 **说明**：`.peaks/changes/<change-id>/design/design-spec.md` 是本次设计的详细规范，`**.peaks/project/product-knowledge.md**` 是该功能的设计知识沉淀，后续迭代时直接加载使用。
 
@@ -403,7 +410,7 @@ The design spec must include color tokens, typography, spacing, radius, shadow, 
 - [ ] 移动端和桌面端都达到生产级质量
 - [ ] 已启动 HTTP 服务器（npx serve）并通过可用的浏览器工具 打开设计稿
 - [ ] 设计稿可通过 http://localhost:3001/ 正常访问
-- [ ] 用户通过 AskUserQuestion 明确确认设计稿
+- [ ] 用户通过 用户确认机制 明确确认设计稿
 
 ## 三大可用性法则
 
@@ -417,11 +424,12 @@ The design spec must include color tokens, typography, spacing, radius, shadow, 
 - [ ] HTML 设计稿已生成并保存在 `.peaks/changes/<change-id>/design/`
 - [ ] HTTP 服务器已启动（npx serve）
 - [ ] 设计稿已通过可用的浏览器工具 在浏览器中打开
-- [ ] 用户通过 AskUserQuestion 交互确认设计稿
+- [ ] 用户通过 用户确认机制 交互确认设计稿
 - [ ] 用户确认已写入 `.peaks/changes/<change-id>/design/design-confirmation.md`
 - [ ] 设计规范文档已保存（含 Dials、方向、色彩、组件规范）
-- [ ] 已更新 `.peaks/knowledge/design-knowledge.md`（记录用户的设计偏好）
-- [ ] 已生成 `.peaks/knowledge/design-spec-[功能名].md`（供后续迭代参考）
+- [ ] 如设计影响范围、页面、状态、文案或验收标准，已同步更新 `product/prd.md`
+- [ ] 设计偏好已沉淀到 `.peaks/project/product-knowledge.md`
+- [ ] 已明确询问用户是否进入技术方案，未直接进入开发
 
 ---
 
@@ -430,8 +438,8 @@ The design spec must include color tokens, typography, spacing, radius, shadow, 
 design agent 会在每次设计后学习业务和用户偏好，让设计越用越贴合项目风格。
 
 ### 知识文件位置
-- `.peaks/knowledge/design-knowledge.md` — 用户设计偏好和业务设计模式
-- `.peaks/knowledge/design-spec-[功能名].md` — **本次定稿的设计规范**，后续迭代时加载使用
+- `.peaks/project/product-knowledge.md` — 跨迭代稳定的产品和设计偏好
+- `.peaks/changes/<change-id>/design/design-spec.md` — 本次定稿的设计规范
 
 ### 知识更新时机
 1. 每次设计稿确认后

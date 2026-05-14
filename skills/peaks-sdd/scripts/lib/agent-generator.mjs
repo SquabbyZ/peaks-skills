@@ -4,8 +4,9 @@
  * 根据技术栈动态生成 Agent 配置文件
  */
 
-import { readFileSync, existsSync, mkdirSync, writeFileSync, readdirSync, statSync } from 'fs';
+import { readFileSync, existsSync, mkdirSync, writeFileSync, readdirSync, statSync, copyFileSync, rmSync, mkdtempSync } from 'fs';
 import { join } from 'path';
+import { tmpdir } from 'os';
 import { status, agentBadge } from './terminal-ui.mjs';
 
 /**
@@ -53,6 +54,7 @@ export function buildTechStackDesc(techStack) {
 }
 
 function hasFrontendStack(techStack) {
+  if (techStack.isZeroToOneProject) return true;
   if (techStack.frontend || techStack.frontendFramework) return true;
 
   if (techStack.isMonorepo && techStack.packageDetails) {
@@ -432,8 +434,8 @@ function getColorAnsi(colorName) {
  * @param {string} agentsDir - agent 输出目录
  * @returns {Array} 生成的 agent 列表
  */
-function generateQaSubAgents(techStack, templatesDir, agentsDir) {
-  const qaAgents = ['qa', 'qa-child'];
+function generateQaSubAgents(techStack, templatesDir, agentsDir, options = {}) {
+  const qaAgents = options.includeChild === false ? ['qa'] : ['qa', 'qa-child'];
   const generated = [];
   const qaTemplateDir = join(templatesDir, 'qa');
 
@@ -786,22 +788,138 @@ function generateSubAgentFile(agentName, techStack, module, templatePath, destDi
  */
 // 初始化时保留的 agents（不覆盖，允许知识积累）
 const PRESERVED_AGENTS = ['design'];
+const DEFAULT_CORE_AGENTS = ['dispatcher', 'product', 'qa'];
+const ZERO_TO_ONE_CORE_AGENTS = ['dispatcher', 'product', 'design', 'qa', 'triage'];
+const DEFERRED_AGENTS = [
+  'frontend',
+  'frontend-child',
+  'backend',
+  'backend-child',
+  'qa-child',
+  'devops',
+  'postgres',
+  'tauri',
+  'code-reviewer-frontend',
+  'code-reviewer-backend',
+  'security-reviewer'
+];
+const CONTRACT_PATCH_MARKER = '<!-- peaks-sdd-contract-v2 -->';
+const WORKFLOW_CONTRACT_PATCH = `${CONTRACT_PATCH_MARKER}
 
-export function generateAgentConfigs(techStack, templatesDir, agentsDir, projectPath) {
+## Peaks-SDD 0-1 Workflow Contract v2
+
+This project agent must follow the current peaks-sdd 0-1 gates even if older instructions above differ:
+
+- Product/UI discussion is discovery only; PRD approval requires \`.peaks/changes/<change-id>/product/prd-confirmation.md\`.
+- Design approval requires \`design/design-confirmation.md\`; after approval, sync PRD if design changes scope/pages/states/copy/acceptance criteria, then ask whether to proceed to technical planning.
+- Development may not start until \`architecture/system-design-confirmation.md\` records explicit user approval.
+- Completion requires visible \`swarm/agent-usage.md\`, \`review/code-review.md\`, \`security/security-report.md\`, \`.peaks/ut/unit-test-report.md\`, \`.peaks/ut/coverage-summary.json\`, \`qa/functional-report.md\`, \`qa/business-report.md\`, \`qa/performance-report.md\`, \`qa/runtime-smoke-report.md\`, QA rounds, and final report.
+- Security reports use \`security/security-report.md\`; legacy \`review/security-review.md\` is not accepted.
+- For 0-1 multi-page frontend apps, pages use \`src/pages/PageName.tsx\`; page-specific components use \`src/components/<page-name>/\`.
+`;
+
+export function ensureProjectAgents({ projectPath, templatesDir, techStack, mode = 'auto' }) {
+  const agentsDir = join(projectPath, '.claude', 'agents');
+  mkdirSync(agentsDir, { recursive: true });
+
+  const tempAgentsDir = mkdtempSync(join(tmpdir(), 'peaks-sdd-agents-render-'));
+
+  try {
+    generateAgentConfigs(techStack, templatesDir, tempAgentsDir, projectPath, mode);
+
+    const expectedAgents = readdirSync(tempAgentsDir).filter(file => file.endsWith('.md'));
+    const existingAgents = new Set(readdirSync(agentsDir).filter(file => file.endsWith('.md')));
+    const missingAgents = expectedAgents.filter(file => !existingAgents.has(file));
+
+    for (const file of missingAgents) {
+      copyFileSync(join(tempAgentsDir, file), join(agentsDir, file));
+    }
+
+    const patchedAgents = patchExistingCoreAgents(agentsDir, existingAgents);
+    const deferredAgents = isCoreAgentMode(mode, techStack) ? quarantineDeferredAgents(agentsDir) : [];
+    const finalAgents = new Set([
+      ...existingAgents,
+      ...missingAgents,
+      ...patchedAgents.map(agent => `${agent}.md`)
+    ]);
+    for (const agent of deferredAgents) {
+      finalAgents.delete(`${agent}.md`);
+    }
+
+    return {
+      bootstrapped: missingAgents.length > 0 || patchedAgents.length > 0 || deferredAgents.length > 0,
+      generatedAgents: missingAgents.map(file => file.replace(/\.md$/, '')),
+      patchedAgents,
+      deferredAgents,
+      missingAgents: missingAgents.map(file => file.replace(/\.md$/, '')),
+      missingCoreAgents: getRequiredCoreAgents(mode, techStack).filter(agent => !finalAgents.has(`${agent}.md`))
+    };
+  } finally {
+    rmSync(tempAgentsDir, { recursive: true, force: true });
+  }
+}
+
+function isCoreAgentMode(mode, techStack) {
+  return mode === 'core' || (mode === 'auto' && techStack.isZeroToOneProject && !techStack.hasConfirmedPlanningArtifacts);
+}
+
+function getRequiredCoreAgents(mode, techStack) {
+  return isCoreAgentMode(mode, techStack) ? ZERO_TO_ONE_CORE_AGENTS : DEFAULT_CORE_AGENTS;
+}
+
+function quarantineDeferredAgents(agentsDir) {
+  const quarantined = [];
+  const deferredDir = join(agentsDir, '.deferred');
+
+  for (const agent of DEFERRED_AGENTS) {
+    const agentPath = join(agentsDir, `${agent}.md`);
+    if (!existsSync(agentPath)) continue;
+
+    mkdirSync(deferredDir, { recursive: true });
+    copyFileSync(agentPath, join(deferredDir, `${agent}.md`));
+    rmSync(agentPath, { force: true });
+    quarantined.push(agent);
+  }
+
+  return quarantined;
+}
+
+function patchExistingCoreAgents(agentsDir, existingAgents) {
+  const patched = [];
+
+  for (const agent of ZERO_TO_ONE_CORE_AGENTS) {
+    const file = `${agent}.md`;
+    if (!existingAgents.has(file)) continue;
+
+    const agentPath = join(agentsDir, file);
+    const content = readFileSync(agentPath, 'utf-8');
+    if (content.includes(CONTRACT_PATCH_MARKER)) continue;
+
+    writeFileSync(agentPath, `${content.trimEnd()}\n\n${WORKFLOW_CONTRACT_PATCH}`, 'utf-8');
+    patched.push(agent);
+  }
+
+  return patched;
+}
+
+export function generateAgentConfigs(techStack, templatesDir, agentsDir, projectPath, mode = 'auto') {
   const agents = [];
+  const isCoreOnly = isCoreAgentMode(mode, techStack);
 
-  const baseAgents = [
-    'product', 'qa', 'devops', 'security-reviewer',
-    'code-reviewer-frontend', 'code-reviewer-backend', 'triage'
-  ];
+  const baseAgents = isCoreOnly
+    ? ['dispatcher', 'product', 'design', 'qa', 'triage']
+    : [
+      'product', 'qa', 'devops', 'security-reviewer',
+      'code-reviewer-frontend', 'code-reviewer-backend', 'triage'
+    ];
 
   const stackAgents = [];
-  if (hasFrontendStack(techStack)) {
+  if (!isCoreOnly && hasFrontendStack(techStack)) {
     stackAgents.push('sub-front/frontend', 'design');
   }
-  if (hasBackendStack(techStack)) stackAgents.push('sub-back/backend');
-  if (techStack.hasTauri) stackAgents.push('tauri');
-  if (techStack.database) stackAgents.push('postgres');
+  if (!isCoreOnly && hasBackendStack(techStack)) stackAgents.push('sub-back/backend');
+  if (!isCoreOnly && techStack.hasTauri) stackAgents.push('tauri');
+  if (!isCoreOnly && techStack.database) stackAgents.push('postgres');
 
   const allAgents = [...new Set([...baseAgents, ...stackAgents])];
 
@@ -810,7 +928,7 @@ export function generateAgentConfigs(techStack, templatesDir, agentsDir, project
     if (agent === 'qa') {
       console.log(`\n\x1b[1m\x1b[36m🧪\x1b[0m \x1b[1mQA 测试 Agents\x1b[0m`);
       console.log('\x1b[90m' + '─'.repeat(50) + '\x1b[0m');
-      const qaSubAgents = generateQaSubAgents(techStack, templatesDir, agentsDir);
+      const qaSubAgents = generateQaSubAgents(techStack, templatesDir, agentsDir, { includeChild: !isCoreOnly });
       console.log(`\n\x1b[90m   共生成 ${qaSubAgents.length} 个 QA Agent\x1b[0m`);
       agents.push(...qaSubAgents);
       continue;
@@ -847,20 +965,22 @@ export function generateAgentConfigs(techStack, templatesDir, agentsDir, project
     }
   }
 
-  // 生成调度 Agent 和子 Agent 配置
-  console.log(`\n\x1b[1m\x1b[36m🚀\x1b[0m \x1b[1m调度 Agent 配置\x1b[0m`);
-  console.log('\x1b[90m' + '─'.repeat(50) + '\x1b[0m');
+  if (!agents.includes('dispatcher')) {
+    console.log(`\n\x1b[1m\x1b[36m🚀\x1b[0m \x1b[1m调度 Agent 配置\x1b[0m`);
+    console.log('\x1b[90m' + '─'.repeat(50) + '\x1b[0m');
 
-  const scanResult = scanProjectModules(techStack, projectPath);
-  const dispatcherSuccess = generateDispatcherConfig(techStack, scanResult, templatesDir, agentsDir);
-  if (dispatcherSuccess) {
-    agents.push('dispatcher');
+    const scanResult = scanProjectModules(techStack, projectPath);
+    const dispatcherSuccess = generateDispatcherConfig(techStack, scanResult, templatesDir, agentsDir);
+    if (dispatcherSuccess) {
+      agents.push('dispatcher');
+    }
+
+    if (!isCoreOnly) {
+      const subAgents = generateSubAgentConfigs(techStack, scanResult, templatesDir, agentsDir);
+      agents.push(...subAgents);
+      console.log(`\n\x1b[90m   共生成 ${subAgents.length} 个子 Agent\x1b[0m`);
+    }
   }
-
-  const subAgents = generateSubAgentConfigs(techStack, scanResult, templatesDir, agentsDir);
-  agents.push(...subAgents);
-
-  console.log(`\n\x1b[90m   共生成 ${subAgents.length} 个子 Agent\x1b[0m`);
 
   return agents;
 }

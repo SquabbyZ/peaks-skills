@@ -1,20 +1,32 @@
 [
   {
     "id": 1,
-    "prompt": "初始化我的项目",
-    "expected": "扫描技术栈，生成 .claude/agents/ 配置（dispatcher/frontend/backend/product/qa 等），创建 .peaks/ 目录结构，配置 MCP servers（gitnexus、claude-mem、context7 等）。初始化阶段不批量安装外部 skills；后续任务按需推荐可选增强并经用户同意后安装",
-    "scenario": "新项目首次使用 peaks-sdd"
+    "prompt": "初始化我的项目，使用 React + TypeScript + Tailwind",
+    "expected": "扫描技术栈，生成 .claude/agents/ 配置（dispatcher/frontend/backend/product/qa 等），创建 .peaks/ 目录结构。初始化后展示项目结构概览，让用户知道当前进度",
+    "scenario": "新项目首次初始化，用户可见性要求：每步应告知用户正在做什么"
   },
   {
     "id": 2,
     "prompt": "登录按钮点击没反应",
-    "expected": "进入 dispatcher bug flow：复现 → 根因分析 → 假设验证 → 修复 → 测试 → 验证。产出 bug 分析报告到 .peaks/bugs/",
-    "scenario": "Bug 修复场景"
+    "expected": "进入 bug flow：复现 → 根因分析 → 假设验证 → 修复 → 测试（含回归测试）→ 验证。产出 bug 分析报告到 .peaks/changes/<id>/qa/ 或 .peaks/bugs/",
+    "scenario": "Bug 修复场景，重点验证是否包含性能测试和安全检查"
   },
   {
     "id": 3,
-    "prompt": "给已有项目添加用户注册功能",
-    "expected": "判断是存量项目 → 使用 OpenSpec workflow：openspec.mjs propose → specs → design → tasks → apply → archive。查询 claude-mem 获取上次项目上下文，使用 gitnexus 理解现有代码结构。12步完整 Spec-It 流程",
-    "scenario": "存量项目功能开发（OpenSpec 集成）"
+    "prompt": "我需要一个用户注册功能，要支持邮箱和第三方登录",
+    "expected": "先检测项目是否已初始化。存量项目走 OpenSpec workflow：propose → specs → design → tasks → apply。执行过程中展示每个阶段的产出物和进度",
+    "scenario": "功能开发，重点验证用户可见性 - agent 执行时用户能了解进度"
+  },
+  {
+    "id": 4,
+    "prompt": "添加一个 API 接口，用于获取用户列表，要求支持分页和筛选",
+    "expected": "走 OpenSpec workflow 或 dispatcher 调度。执行安全检查（SQL注入防护、认证授权）、性能检查（数据库索引、分页效率）。最终产出包含 code review、安全审查报告",
+    "scenario": "安全测试和性能测试覆盖验证"
+  },
+  {
+    "id": 5,
+    "prompt": "部署到生产环境前需要做哪些检查？",
+    "expected": "展示完整的质量门禁清单：单元测试覆盖率报告、安全扫描结果、性能基准测试、运行时冒烟测试、UX 验证。执行三轮 QA 验证",
+    "scenario": "部署前检查清单，验证是否包含安全测试和性能测试环节"
   }
 ]

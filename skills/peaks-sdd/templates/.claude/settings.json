@@ -27,32 +27,27 @@
   "hooks": {
     "PreToolUse": [
       {
-        "matcher": "Bash|npm|pnpm|yarn",
-        "command": "node {{SKILL_PATH}}/scripts/check-gate.mjs check \"{{PROJECT_PATH}}\"",
-        "description": "Code Review + Security 强制检查"
-      },
-      {
         "matcher": "Bash",
-        "command": "node {{SKILL_PATH}}/scripts/context-monitor.mjs check",
+        "command": "node \"{{SKILL_PATH}}/scripts/context-monitor.mjs\" check",
         "description": "Context 使用率检查"
       }
     ],
     "PostToolUse": [
       {
         "matcher": "Edit|Write",
-        "command": "node {{SKILL_PATH}}/scripts/auto-format.mjs \"$FILE_PATH\"",
+        "command": "node \"{{SKILL_PATH}}/scripts/auto-format.mjs\" \"$FILE_PATH\"",
         "description": "自动格式化代码"
       },
       {
         "matcher": "Write",
-        "command": "node {{SKILL_PATH}}/scripts/file-size-check.mjs \"$FILE_PATH\"",
+        "command": "node \"{{SKILL_PATH}}/scripts/file-size-check.mjs\" \"$FILE_PATH\"",
         "description": "检查文件大小"
       }
     ],
     "Stop": [
       {
         "matcher": ".*",
-        "command": "node {{SKILL_PATH}}/scripts/verify-artifacts.mjs \"{{PROJECT_PATH}}\" --allow-local-tools",
+        "command": "node \"{{SKILL_PATH}}/scripts/verify-artifacts.mjs\" \"{{PROJECT_PATH}}\" --allow-local-tools",
         "description": "验证 peaks-sdd 产出物门禁"
       }
     ]

@@ -8,16 +8,18 @@
  *   node init.mjs <projectPath> --frontend=react --backend=nestjs  # 指定技术栈
  */
 
-import { existsSync, mkdirSync, readdirSync, statSync, readFileSync } from 'fs';
+import { existsSync, readdirSync, statSync, readFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { performance } from 'perf_hooks';
 
 import { detectTechStack, printTechStack } from './lib/tech-stack-detector.mjs';
-import { generateAgentConfigs } from './lib/agent-generator.mjs';
-import { createPeaksDirectory, createDataDirectories, configureMcpServers } from './lib/directory-creator.mjs';
+import { ensureProjectAgents } from './lib/agent-generator.mjs';
+import { createPeaksDirectory, createDataDirectories, configureProjectSettings, syncProjectTemplates } from './lib/directory-creator.mjs';
 import { printAnimatedTitle, status } from './lib/terminal-ui.mjs';
 import { createChangeId } from './lib/change-artifacts.mjs';
+import { createWelcomeCard } from './lib/progress-communicator.mjs';
+import { hasValidPlanningConfirmations } from './lib/planning-confirmations.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -62,6 +64,16 @@ function parseChangeName(args) {
     }
   }
   return 'initial-product';
+}
+
+function isZeroToOneProject(projectPath) {
+  const ignoredEntries = new Set(['.DS_Store', '.git', '.claude', '.gitnexus', '.peaks', 'openspec']);
+  const entries = readdirSync(projectPath).filter(entry => !ignoredEntries.has(entry));
+  return entries.length === 0;
+}
+
+function hasConfirmedPlanningArtifacts(projectPath) {
+  return hasValidPlanningConfirmations(projectPath);
 }
 
 /**
@@ -117,11 +129,22 @@ function scanMonorepoPackages(projectPath) {
       else if (deps.mongoose) dbFramework = 'mongodb';
       else if (deps.typeorm) dbFramework = 'postgresql';
 
+      let buildToolFramework = null;
+      if (deps.vite) buildToolFramework = 'vite';
+      else if (deps.next) buildToolFramework = 'next';
+
+      let testFramework = null;
+      if (deps.vitest) testFramework = 'vitest';
+      else if (deps.jest) testFramework = 'jest';
+      else if (deps['@playwright/test']) testFramework = 'playwright';
+
       result.packageDetails[pkgName] = {
-        frontend: frontendFramework ? { framework: frontendFramework } : { framework: null },
-        backend: backendFramework ? { framework: backendFramework } : { framework: null },
-        ui: uiFramework ? { framework: uiFramework } : { framework: null },
-        database: dbFramework ? { framework: dbFramework } : { framework: null }
+        frontend: frontendFramework ? { framework: frontendFramework, version: deps[frontendFramework] } : { framework: null },
+        backend: backendFramework ? { framework: backendFramework, version: deps[backendFramework === 'nestjs' ? '@nestjs/core' : backendFramework] } : { framework: null },
+        ui: uiFramework ? { framework: uiFramework, version: deps[uiFramework === 'mui' ? '@mui/material' : uiFramework] } : { framework: null },
+        database: dbFramework ? { framework: dbFramework, version: deps.prisma || deps.typeorm || deps.mongoose } : { framework: null },
+        buildTool: buildToolFramework ? { framework: buildToolFramework, version: deps[buildToolFramework] } : { framework: null },
+        test: testFramework ? { framework: testFramework, version: deps[testFramework === 'playwright' ? '@playwright/test' : testFramework] } : { framework: null }
       };
     } catch (e) {
       // 忽略解析失败的 package.json
@@ -129,6 +152,48 @@ function scanMonorepoPackages(projectPath) {
   }
 
   return result;
+}
+
+/**
+ * Initialize OpenSpec directory structure
+ * @param {string} projectPath - Project path
+ * @param {string} skillDir - Skill directory
+ */
+async function initializeOpenSpec(projectPath, skillDir) {
+  const openspecDir = join(projectPath, 'openspec');
+  const hasOpenSpec = existsSync(openspecDir);
+
+  console.log('\n\x1b[1m\x1b[36m📦\x1b[0m 初始化 OpenSpec:');
+  console.log('\x1b[90m' + '─'.repeat(50) + '\x1b[0m');
+
+  if (!hasOpenSpec) {
+    console.log('  \x1b[90m运行 openspec init...\x1b[0m');
+    try {
+      const { spawn } = await import('child_process');
+      const result = await new Promise((resolve) => {
+        const proc = spawn('npx', ['-y', '@fission-ai/openspec@latest', 'init'], {
+          stdio: ['inherit', 'pipe', 'pipe'],
+          cwd: projectPath
+        });
+        let stdout = '';
+        let stderr = '';
+        proc.stdout.on('data', (d) => { stdout += d.toString(); process.stdout.write(d); });
+        proc.stderr.on('data', (d) => { stderr += d.toString(); process.stderr.write(d); });
+        proc.on('close', (code) => resolve({ code, stdout, stderr }));
+        proc.on('error', (e) => resolve({ code: -1, stdout: '', stderr: e.message }));
+      });
+      if (result.code === 0) {
+        console.log('  \x1b[32m✓ OpenSpec 目录结构已创建\x1b[0m');
+        console.log('  \x1b[90m  └─ specs/, changes/, .openspec/\x1b[0m');
+      } else {
+        console.log('  \x1b[33m⚠ OpenSpec 初始化失败，将使用默认目录结构\x1b[0m');
+      }
+    } catch (e) {
+      console.log('  \x1b[33m⚠ OpenSpec 不可用，跳过\x1b[0m');
+    }
+  } else {
+    console.log('  \x1b[36m➖ openspec/ 已存在\x1b[0m');
+  }
 }
 
 async function main() {
@@ -169,17 +234,18 @@ async function main() {
     }
   }
 
+  techStack.isZeroToOneProject = isZeroToOneProject(projectPath);
+  techStack.hasConfirmedPlanningArtifacts = hasConfirmedPlanningArtifacts(projectPath);
+
   printTechStack(techStack, projectPath);
 
   printAnimatedTitle('🧩 生成 Agents');
   if (skillDir) {
     const templatesDir = join(skillDir, 'templates', 'agents');
-    const agentsDir = join(projectPath, '.claude', 'agents');
 
-    mkdirSync(agentsDir, { recursive: true });
-
-    const generatedAgents = generateAgentConfigs(techStack, templatesDir, agentsDir, projectPath);
-    console.log(`\n\x1b[90m   共生成 ${generatedAgents.length} 个 Agent\x1b[0m`);
+    const result = ensureProjectAgents({ projectPath, templatesDir, techStack });
+    const action = result.bootstrapped ? '生成/补齐' : '已存在';
+    console.log(`\n\x1b[90m   Agents ${action}: ${result.generatedAgents.length} 个\x1b[0m`);
   } else {
     console.log(`\n   ${status.warning('未找到 peaks-sdd skill 目录，跳过 Agent 生成')}`);
   }
@@ -193,8 +259,15 @@ async function main() {
   printAnimatedTitle('📂 创建数据目录');
   createDataDirectories(projectPath);
 
-  printAnimatedTitle('🔌 配置 MCP 服务');
-  configureMcpServers(projectPath, techStack);
+  // Initialize OpenSpec directory structure
+  await initializeOpenSpec(projectPath, skillDir);
+
+  printAnimatedTitle('📋 同步模板资产');
+  const syncedTemplates = syncProjectTemplates(projectPath, skillDir);
+  console.log(`\n\x1b[90m   模板资产已补齐: ${syncedTemplates.copied.length} 个，保留已有: ${syncedTemplates.skipped.length} 个\x1b[0m`);
+
+  printAnimatedTitle('🔌 配置 MCP 和 Hooks');
+  configureProjectSettings(projectPath, techStack, skillDir);
 
   const elapsed = ((performance.now() - startTime) / 1000).toFixed(2);
 
@@ -202,6 +275,9 @@ async function main() {
   console.log('\x1b[1m\x1b[36m║\x1b[0m  \x1b[1m\x1b[32m✅ 初始化完成！\x1b[0m\x1b[36m                            ║\x1b[0m');
   console.log(`\x1b[1m\x1b[36m║\x1b[0m  \x1b[90m耗时: ${elapsed}s\x1b[0m\x1b[36m                            ║\x1b[0m`);
   console.log('\x1b[1m\x1b[36m╚══════════════════════════════════════════════╝\x1b[0m');
+
+  // Show workflow phases
+  console.log('\n' + createWelcomeCard({ projectPath, changeId }));
   console.log('\n\x1b[90m   接下来运行:\x1b[0m');
   console.log('\x1b[90m   • \x1b[37m/peaks-sdd 加个用户注册功能\x1b[0m  功能开发');
   console.log('\x1b[90m   • \x1b[37m/peaks-sdd 登录按钮点击没反应\x1b[0m  Bug 修复');
@@ -209,4 +285,7 @@ async function main() {
   console.log('');
 }
 
-main().catch(console.error);
+main().catch(error => {
+  console.error(error);
+  process.exitCode = 1;
+});

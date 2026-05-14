@@ -57,7 +57,14 @@ If recommended skills are missing, tell the user which skills would help and wha
 
 ### 1. 编写前端技术文档
 
-读取 PRD + 设计稿 + Swagger/API contract + 测试用例，编写或更新 `.peaks/changes/<change-id>/architecture/system-design.md` 的前端技术方案章节。没有可评审技术文档和 `architecture/system-design-confirmation.md` 用户确认记录时，禁止调度子 agent：
+读取 PRD + 设计稿 + Swagger/API contract + 测试用例，编写或更新 `.peaks/changes/<change-id>/architecture/system-design.md` 的前端技术方案章节。没有可评审技术文档和 `architecture/system-design-confirmation.md` 用户确认记录时，禁止调度子 agent；生成技术文档本身不等于用户确认：
+
+### 0-1 多页面前端目录约定
+
+- 页面文件：`src/pages/PageName.tsx`
+- 页面私有组件：`src/components/<page-name>/ComponentName.tsx`
+- 多页面复用组件：`src/components/shared/ComponentName.tsx`
+- 只有既有项目已采用 feature-sliced 架构或用户明确要求时，才使用 `src/features/<feature>/pages`。
 
 ```markdown
 # 前端技术方案 - [功能名]
@@ -88,8 +95,8 @@ If recommended skills are missing, tell the user which skills would help and wha
 ## 开发任务拆分
 | 任务ID | 任务描述 | 优先级 | 可修改文件 | 只读文件 | 依赖任务 | 验收标准 | 必跑测试 |
 |--------|----------|--------|------------|----------|----------|----------|----------|
-| FE-001 | 登录表单组件 | P0 | `src/features/auth/components/LoginForm.tsx` | `swagger.json`, 设计稿 | - | 表单符合设计稿，提交数据符合 API contract | `pnpm test LoginForm` |
-| FE-002 | 登录页面集成 | P0 | `src/features/auth/pages/LoginPage.tsx` | `FE-001` 产物, 设计稿 | FE-001 | 页面可访问，正常/错误态符合测试用例 | `pnpm test LoginPage` |
+| FE-001 | 登录表单组件 | P0 | `src/components/login/LoginForm.tsx` | `swagger.json`, 设计稿 | - | 表单符合设计稿，提交数据符合 API contract | `pnpm test LoginForm` |
+| FE-002 | 登录页面集成 | P0 | `src/pages/LoginPage.tsx` | `FE-001` 产物, 设计稿 | FE-001 | 页面可访问，正常/错误态符合测试用例 | `pnpm test LoginPage` |
 ```
 
 ### 任务拆分原则（重要）

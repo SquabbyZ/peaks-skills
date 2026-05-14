@@ -163,7 +163,9 @@ Agent(
 三轮 QA 必须额外汇总三类验收报告：
 
 - `.peaks/changes/<change-id>/qa/functional-report.md`
+- `.peaks/changes/<change-id>/qa/business-report.md`
 - `.peaks/changes/<change-id>/qa/performance-report.md`
+- `.peaks/changes/<change-id>/qa/runtime-smoke-report.md`
 - `.peaks/changes/<change-id>/security/security-report.md`
 - `.peaks/ut/unit-test-report.md`
 - `.peaks/ut/coverage-summary.json`
@@ -211,7 +213,9 @@ Agent(
 - [ ] 功能、前端性能、后端性能、安全、自动化（如存在脚本）均覆盖。
 - [ ] `qa/qa-round-1.md`、`qa/qa-round-2.md`、`qa/qa-round-3.md` 已生成。
 - [ ] `qa/functional-report.md` 已生成。
+- [ ] `qa/business-report.md` 已生成，并映射 PRD 验收标准和核心业务价值。
 - [ ] `qa/performance-report.md` 已生成。
+- [ ] `qa/runtime-smoke-report.md` 已生成，记录启动命令、访问地址、核心路径和用户 UX 验证请求。
 - [ ] `security/security-report.md` 已生成。
 - [ ] `qa/acceptance-report.md` 已生成。
 - [ ] final report 已生成。
